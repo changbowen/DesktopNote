@@ -302,14 +302,38 @@ Class MainWindow
                 If RTB_Main.Selection.IsEmpty Then
                     RTB_Main.FontSize += 1
                 Else
-                    EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
+                    Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
+                    If TypeOf ele Is InlineUIContainer Then
+                        Dim img = TryCast(CType(ele, InlineUIContainer).Child, Image)
+                        If img IsNot Nothing Then
+                            img.Width += 2
+                            img.Height += 2
+                        Else
+                            EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
+                        End If
+                    Else
+                        EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
+                    End If
                     'RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, CType(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double) + 1)
                 End If
             Else
                 If RTB_Main.Selection.IsEmpty Then
                     If RTB_Main.FontSize > 1 Then RTB_Main.FontSize -= 1
                 Else
-                    EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
+                    Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
+                    If TypeOf ele Is InlineUIContainer Then
+                        Dim img = TryCast(CType(ele, InlineUIContainer).Child, Image)
+                        If img IsNot Nothing Then
+                            If img.Width > 2 AndAlso img.Height > 2 Then
+                                img.Width -= 2
+                                img.Height -= 2
+                            End If
+                        Else
+                            EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
+                        End If
+                    Else
+                        EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
+                    End If
                     'Dim oldsize = CType(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double)
                     'If oldsize > 1 Then RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, oldsize - 1)
                 End If
