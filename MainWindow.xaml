@@ -45,6 +45,10 @@
                     <Separator/>
                     <MenuItem Command="ToggleBullets" Header="Bullet" InputGestureText="Ctrl + Shift + L"/>
                     <MenuItem Command="ToggleNumbering" Header="Numbering" InputGestureText="Ctrl + Shift + N"/>
+                    <MenuItem Command="AlignLeft" Header="Align: Left" InputGestureText="Ctrl + L"/>
+                    <MenuItem Command="AlignRight" Header="Align: Right" InputGestureText="Ctrl + R"/>
+                    <MenuItem Command="AlignCenter" Header="Align: Center" InputGestureText="Ctrl + E"/>
+                    <MenuItem Command="AlignJustify" Header="Align: Justify" InputGestureText="Ctrl + J"/>
                     <Separator/>
                     <MenuItem x:Name="MI_Font" Header="Change Font"/>
                     <MenuItem x:Name="MI_AutoStart" Header="Auto Start" IsCheckable="True"/>
