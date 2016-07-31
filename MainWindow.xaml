@@ -2,7 +2,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:DesktopNote"
     Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True">
+    
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12">
             <Rectangle.Effect>
@@ -31,17 +33,18 @@
                     <MenuItem Command="Redo"/>
                     <Separator/>
                     <MenuItem Command="Paste"/>
-                    <MenuItem Header="Paste as Text" Click="MenuItem_PasteAsText_Click"/>
+                    <MenuItem Header="Paste as Text" InputGestureText="Ctrl Shift + V" Click="PasteAsText"/>
                     <MenuItem Command="Cut"/>
                     <MenuItem Command="Copy"/>
+                    <MenuItem Header="Find" InputGestureText="Ctrl + F" Click="Find"/>
                     <Separator/>
-                    <MenuItem Header="Bold" Click="MenuItem_Bold_Click"/>
-                    <MenuItem Header="Italic" Click="MenuItem_Italic_Click"/>
-                    <MenuItem Header="Underline" Click="MenuItem_Underline_Click"/>
-                    <MenuItem Header="Strike-through" Click="MenuItem_Strike_Click"/>
+                    <MenuItem Command="ToggleBold" Header="Bold" InputGestureText="Ctrl + B"/>
+                    <MenuItem Command="ToggleItalic" Header="Italic" InputGestureText="Ctrl + I"/>
+                    <MenuItem Command="ToggleUnderline" Header="Underline" InputGestureText="Ctrl + U"/>
+                    <MenuItem Header="Strike-through" InputGestureText="Ctrl + D" Click="ToggleStrike"/>
                     <Separator/>
-                    <MenuItem Header="Bullet" Click="MenuItem_Bullet_Click"/>
-                    <MenuItem Header="Numbering" Click="MenuItem_Numbering_Click"/>
+                    <MenuItem Command="ToggleBullets" Header="Bullet" InputGestureText="Ctrl + Shift + L"/>
+                    <MenuItem Command="ToggleNumbering" Header="Numbering" InputGestureText="Ctrl + Shift + N"/>
                     <Separator/>
                     <MenuItem x:Name="MI_Font" Header="Change Font"/>
                     <MenuItem x:Name="MI_AutoStart" Header="Auto Start" IsCheckable="True"/>

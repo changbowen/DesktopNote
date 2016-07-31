@@ -188,7 +188,7 @@ Class MainWindow
     End Sub
 
     Private Sub Win_Main_MouseLeave(sender As Object, e As MouseEventArgs) Handles Win_Main.MouseLeave
-        If My.Settings.AutoDock AndAlso Not RTB_Main.IsKeyboardFocused AndAlso Not RTB_Main.ContextMenu.IsOpen Then
+        If My.Settings.AutoDock AndAlso Application.Current.Windows.Count = 1 AndAlso Not RTB_Main.IsKeyboardFocused AndAlso Not RTB_Main.ContextMenu.IsOpen Then
             DockToSide()
         End If
     End Sub
@@ -196,18 +196,8 @@ Class MainWindow
 
 #Region "Menu Items"
     Private Sub MenuItem_Help_Click(sender As Object, e As RoutedEventArgs)
-        MsgBox("Available editing shortcuts and features:" & vbCrLf &
-               vbTab & "Ctrl + Z" & vbTab & "Undo" & vbCrLf &
-               vbTab & "Ctrl + Y" & vbTab & "Redo" & vbCrLf &
-               vbTab & "Ctrl + C" & vbTab & "Copy" & vbCrLf &
-               vbTab & "Ctrl + X" & vbTab & "Cut" & vbCrLf &
-               vbTab & "Ctrl + V" & vbTab & "Paste" & vbCrLf &
-               vbTab & "Ctrl + Shift + V" & vbTab & "Paste as Text" & vbCrLf &
-               vbTab & "Ctrl + B" & vbTab & "Bold" & vbCrLf &
-               vbTab & "Ctrl + I" & vbTab & "Italic" & vbCrLf &
-               vbTab & "Ctrl + U" & vbTab & "Underline" & vbCrLf &
-               vbTab & "Ctrl + D" & vbTab & "Strike-through" & vbCrLf &
-               vbTab & "Ctrl + mouse wheel" & vbTab & "Change font size" & vbCrLf &
+        MsgBox("Available editing features can be accessd from menu or keyboard combination." & vbCrLf &
+               "Use Ctrl + mouse wheel to Change font size" & vbCrLf &
                "Change font or font size when there is a selection will only change selected text." & vbCrLf &
                "Note content will be auto saved to application root.", MsgBoxStyle.Information)
     End Sub
@@ -216,17 +206,7 @@ Class MainWindow
         Me.Close()
     End Sub
 
-    Private Sub MenuItem_PasteAsText_Click(sender As Object, e As RoutedEventArgs)
-        'method 1 not working well
-        'Dim p1 = RTB_Main.CaretPosition
-        'ApplicationCommands.Paste.Execute(Nothing, RTB_Main)
-        'Dim p2 = RTB_Main.CaretPosition
-        'RTB_Main.Selection.Select(p1, p2)
-        'RTB_Main.Selection.ClearAllProperties()
 
-        'method 2
-        RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText)
-    End Sub
 
     Private Sub MenuItem_Bullet_Click(sender As Object, e As RoutedEventArgs)
         'Dim tr = New TextRange(RTB_Main.Document.ContentStart, RTB_Main.CaretPosition)
@@ -267,24 +247,32 @@ Class MainWindow
         tr.ClearAllProperties()
     End Sub
 
-    Private Sub MenuItem_Bold_Click(sender As Object, e As RoutedEventArgs)
-        EditingCommands.ToggleBold.Execute(Nothing, RTB_Main)
+    Private Sub ToggleStrike()
+        'strike-through
+        Dim tdc = RTB_Main.Selection.GetPropertyValue(Inline.TextDecorationsProperty)
+        If tdc Is DependencyProperty.UnsetValue OrElse tdc.Count > 0 Then
+            tdc = Nothing
+        Else
+            tdc = TextDecorations.Strikethrough
+        End If
+        RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc)
     End Sub
 
-    Private Sub MenuItem_Italic_Click(sender As Object, e As RoutedEventArgs)
-        EditingCommands.ToggleItalic.Execute(Nothing, RTB_Main)
+    Private Sub PasteAsText()
+        'method 1 not working well
+        'Dim p1 = RTB_Main.CaretPosition
+        'ApplicationCommands.Paste.Execute(Nothing, RTB_Main)
+        'Dim p2 = RTB_Main.CaretPosition
+        'RTB_Main.Selection.Select(p1, p2)
+        'RTB_Main.Selection.ClearAllProperties()
+
+        'method 2
+        RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText)
     End Sub
 
-    Private Sub MenuItem_Underline_Click(sender As Object, e As RoutedEventArgs)
-        EditingCommands.ToggleUnderline.Execute(Nothing, RTB_Main)
-    End Sub
-
-    Private Sub MenuItem_Strike_Click(sender As Object, e As RoutedEventArgs)
-        ToggleStrike()
-    End Sub
-
-    Private Sub MenuItem_Numbering_Click(sender As Object, e As RoutedEventArgs)
-        EditingCommands.ToggleNumbering.Execute(Nothing, RTB_Main)
+    Private Sub Find()
+        Dim search_win As New Win_Search
+        search_win.Show()
     End Sub
 #End Region
 
@@ -300,23 +288,10 @@ Class MainWindow
         If e.Key = Key.D AndAlso Keyboard.Modifiers = ModifierKeys.Control Then
             ToggleStrike()
         ElseIf e.Key = Key.V AndAlso Keyboard.Modifiers = ModifierKeys.Control + ModifierKeys.Shift Then
-            RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText)
+            PasteAsText()
         ElseIf e.Key = Key.F AndAlso Keyboard.Modifiers = ModifierKeys.Control Then
-            'find
-            Dim search_win As New Win_Search
-            search_win.Show()
+            Find()
         End If
-    End Sub
-
-    Private Sub ToggleStrike()
-        'strike-through
-        Dim tdc = RTB_Main.Selection.GetPropertyValue(Inline.TextDecorationsProperty)
-        If tdc Is DependencyProperty.UnsetValue OrElse tdc.Count > 0 Then
-            tdc = Nothing
-        Else
-            tdc = TextDecorations.Strikethrough
-        End If
-        RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc)
     End Sub
 
     Private Sub RTB_Main_MouseWheel(sender As Object, e As MouseWheelEventArgs) Handles RTB_Main.PreviewMouseWheel
@@ -369,7 +344,7 @@ Class MainWindow
     End Sub
 
     Private Sub RTB_Main_LostKeyboardFocus(sender As Object, e As KeyboardFocusChangedEventArgs) Handles RTB_Main.LostKeyboardFocus
-        If My.Settings.AutoDock AndAlso Not RTB_Main.ContextMenu.IsOpen Then
+        If My.Settings.AutoDock AndAlso Application.Current.Windows.Count = 1 AndAlso Not RTB_Main.ContextMenu.IsOpen Then
             DockToSide()
         End If
     End Sub
@@ -543,4 +518,7 @@ Class MainWindow
         My.Settings.Save()
     End Sub
 
+    Private Sub MenuItem_Click(sender As Object, e As RoutedEventArgs)
+
+    End Sub
 End Class
