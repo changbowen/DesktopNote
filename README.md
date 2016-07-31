@@ -1,6 +1,9 @@
 # DesktopNote
 The only **simple** yet **rich-featured** desktop note app you'll ever need for your PC.
 
+## Screenshot
+<img src="http://i.imgur.com/krUfUtI.png" alt=""/>
+
 ## Features
 - Auto saving note contents to application root folder.
 - Supports images as content.
