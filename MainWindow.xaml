@@ -1,0 +1,66 @@
+﻿<Window x:Name="Win_Main" x:Class="MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True">
+    <Grid>
+        <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12">
+            <Rectangle.Effect>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="8"/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <RichTextBox x:Name="RTB_Main" Margin="20" Background="{x:Null}" BorderBrush="{x:Null}" AcceptsTab="True" BorderThickness="0" IsInactiveSelectionHighlightEnabled="True">
+            <RichTextBox.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource {x:Static SystemColors.HighlightColorKey}}"/>
+                <!--<Thickness x:Key="ListPadding" Left="16"/>-->
+                <!--<sys:Double x:Key="DocFontSize">14</sys:Double>-->
+                <Style TargetType="{x:Type List}">
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Padding" Value="16,0,0,0"/>
+                    <Setter Property="MarkerOffset" Value="10"/>
+                    <!--<Setter Property="FontSize" Value="{Binding ElementName=RTB_Main, Path=FontSize, Mode=OneWay}"/>-->
+                </Style>
+                <Style TargetType="{x:Type Paragraph}">
+                    <Setter Property="Margin" Value="0"/>
+                    <!--<Setter Property="FontSize" Value="{Binding ElementName=RTB_Main, Path=FontSize, Mode=OneWay}"/>-->
+                </Style>
+            </RichTextBox.Resources>
+            <RichTextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Command="Undo"/>
+                    <MenuItem Command="Redo"/>
+                    <Separator/>
+                    <MenuItem Command="Paste"/>
+                    <MenuItem Header="Paste as Text" Click="MenuItem_PasteAsText_Click"/>
+                    <MenuItem Command="Cut"/>
+                    <MenuItem Command="Copy"/>
+                    <Separator/>
+                    <MenuItem Header="Bold" Click="MenuItem_Bold_Click"/>
+                    <MenuItem Header="Italic" Click="MenuItem_Italic_Click"/>
+                    <MenuItem Header="Underline" Click="MenuItem_Underline_Click"/>
+                    <MenuItem Header="Strike-through" Click="MenuItem_Strike_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Bullet" Click="MenuItem_Bullet_Click"/>
+                    <MenuItem Header="Numbering" Click="MenuItem_Numbering_Click"/>
+                    <Separator/>
+                    <MenuItem x:Name="MI_Font" Header="Change Font"/>
+                    <MenuItem x:Name="MI_AutoStart" Header="Auto Start" IsCheckable="True"/>
+                    <MenuItem x:Name="MI_AutoDock" Header="Auto Dock" IsCheckable="True"/>
+                    <MenuItem Header="Reset Formats" Click="MenuItem_Reset_Click"/>
+                    <MenuItem Header="Help" Click="MenuItem_Help_Click"/>
+                    <MenuItem Header="Exit" Click="MenuItem_Exit_Click"/>
+                </ContextMenu>
+            </RichTextBox.ContextMenu>
+            <FlowDocument>
+                <List>
+                    <ListItem>
+                        <Paragraph>
+                            <Run Text="Notes here."/>
+                        </Paragraph>
+                    </ListItem>
+                </List>                
+            </FlowDocument>
+        </RichTextBox>
+        <TextBlock x:Name="TB_Status" Text="Saved" Margin="18" VerticalAlignment="Bottom" HorizontalAlignment="Right" Opacity="0.5" FontStyle="Italic" FontSize="10" Visibility="Hidden"/>
+    </Grid>
+</Window>
