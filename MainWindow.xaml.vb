@@ -303,14 +303,18 @@ Class MainWindow
                     RTB_Main.FontSize += 1
                 Else
                     Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
-                    If TypeOf ele Is InlineUIContainer Then
-                        Dim img = TryCast(CType(ele, InlineUIContainer).Child, Image)
-                        If img IsNot Nothing Then
-                            img.Width += 2
-                            img.Height += 2
-                        Else
-                            EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
-                        End If
+                    Dim img As Image
+                    Select Case ele.GetType
+                        Case GetType(InlineUIContainer)
+                            img = TryCast(CType(ele, InlineUIContainer).Child, Image)
+                        Case GetType(Image)
+                            img = ele
+                        Case Else
+                            Exit Sub
+                    End Select
+                    If img IsNot Nothing Then
+                        img.Width += 2
+                        img.Height += 2
                     Else
                         EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
                     End If
@@ -321,15 +325,19 @@ Class MainWindow
                     If RTB_Main.FontSize > 1 Then RTB_Main.FontSize -= 1
                 Else
                     Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
-                    If TypeOf ele Is InlineUIContainer Then
-                        Dim img = TryCast(CType(ele, InlineUIContainer).Child, Image)
-                        If img IsNot Nothing Then
-                            If img.Width > 2 AndAlso img.Height > 2 Then
-                                img.Width -= 2
-                                img.Height -= 2
-                            End If
-                        Else
-                            EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
+                    Dim img As Image
+                    Select Case ele.GetType
+                        Case GetType(InlineUIContainer)
+                            img = TryCast(CType(ele, InlineUIContainer).Child, Image)
+                        Case GetType(Image)
+                            img = ele
+                        Case Else
+                            Exit Sub
+                    End Select
+                    If img IsNot Nothing Then
+                        If img.Width > 2 AndAlso img.Height > 2 Then
+                            img.Width -= 2
+                            img.Height -= 2
                         End If
                     Else
                         EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
