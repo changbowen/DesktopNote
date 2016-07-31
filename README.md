@@ -14,3 +14,6 @@ The only **simple** yet **rich-featured** desktop note app you'll ever need for 
   - Bold, italic, underline, strike-through
   - Paste as text.
 - Bullets & Numbering list.
+
+## Requirements
+- Windows desktop with .Net 4.5 or above.
