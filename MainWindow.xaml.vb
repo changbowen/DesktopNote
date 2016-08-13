@@ -12,7 +12,7 @@ Class MainWindow
     Private currScrnRect As Rect
     Private Property dockedto As DockStatus
         Get
-            Return CType(GetValue(dockedtoProperty), DockStatus)
+            Return DirectCast(GetValue(dockedtoProperty), DockStatus)
         End Get
         Set(value As DockStatus)
             SetValue(dockedtoProperty, value)
@@ -196,14 +196,17 @@ Class MainWindow
 
 #Region "Menu Items"
     Private Sub MenuItem_Help_Click(sender As Object, e As RoutedEventArgs)
-        MsgBox("Available editing features can be accessd from menu or keyboard combination." & vbCrLf &
-               "Use Ctrl + mouse wheel to Change font size" & vbCrLf &
+        If MsgBox("Available editing features can be accessd from menu or keyboard combination." & vbCrLf &
+               "Use Ctrl + mouse wheel to change font size" & vbCrLf &
                "Change font or font size when there is a selection will only change selected text." & vbCrLf &
-               "Note content will be auto saved to application root.", MsgBoxStyle.Information)
+               "Note content will be auto saved to application root." & vbCrLf &
+               "You will be directed to the homepage if you click OK", MsgBoxStyle.Information + MsgBoxStyle.OkCancel) = MsgBoxResult.Ok Then
+            Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote")
+        End If
     End Sub
 
     Private Sub MenuItem_Exit_Click(sender As Object, e As RoutedEventArgs)
-        Me.Close()
+        Quit(True)
     End Sub
 
 
@@ -242,10 +245,26 @@ Class MainWindow
         My.Settings.Save()
     End Sub
 
-    Private Sub MenuItem_Reset_Click(sender As Object, e As RoutedEventArgs)
+    Private Sub MenuItem_ResetFormats_Click(sender As Object, e As RoutedEventArgs)
         Dim tr As New TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd)
         tr.ClearAllProperties()
+
+        Dim cp As Color = ColorConverter.ConvertFromString(My.Settings.Properties("PaperColor").DefaultValue)
+        My.Settings.PaperColor = cp
+        Rec_BG.Fill = New SolidColorBrush(cp)
     End Sub
+
+
+    Private Sub MenuItem_ResetSet_Click(sender As Object, e As RoutedEventArgs)
+        My.Settings.Reset()
+        My.Settings.Save()
+
+        Me.Close()
+        Dim win As New MainWindow
+        Application.Current.MainWindow = win
+        win.Show()
+    End Sub
+
 
     Private Sub ToggleStrike()
         'strike-through
@@ -258,6 +277,17 @@ Class MainWindow
         RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc)
     End Sub
 
+
+    Private Sub ToggleHighlight()
+        Dim tdc = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty), SolidColorBrush)
+        If tdc IsNot Nothing Then
+            RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, Nothing)
+        Else
+            RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, New SolidColorBrush(Colors.Black))
+            RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, New SolidColorBrush(Colors.Yellow))
+        End If
+    End Sub
+
     Private Sub PasteAsText()
         'method 1 not working well
         'Dim p1 = RTB_Main.CaretPosition
@@ -268,6 +298,53 @@ Class MainWindow
 
         'method 2
         RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText)
+    End Sub
+
+    Private Sub IncreaseSize()
+        If RTB_Main.Selection.IsEmpty Then
+            RTB_Main.FontSize += 1
+        Else
+            Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
+            Dim img As Image
+            Select Case ele.GetType
+                Case GetType(InlineUIContainer)
+                    img = TryCast(DirectCast(ele, InlineUIContainer).Child, Image)
+                Case GetType(Image)
+                    img = ele
+            End Select
+            If img IsNot Nothing Then
+                img.Width += 2
+                img.Height += 2
+            Else
+                EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
+            End If
+            'RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, DirectCast(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double) + 1)
+        End If
+    End Sub
+
+    Private Sub DecreaseSize()
+        If RTB_Main.Selection.IsEmpty Then
+            If RTB_Main.FontSize > 1 Then RTB_Main.FontSize -= 1
+        Else
+            Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
+            Dim img As Image
+            Select Case ele.GetType
+                Case GetType(InlineUIContainer)
+                    img = TryCast(DirectCast(ele, InlineUIContainer).Child, Image)
+                Case GetType(Image)
+                    img = ele
+            End Select
+            If img IsNot Nothing Then
+                If img.Width > 2 AndAlso img.Height > 2 Then
+                    img.Width -= 2
+                    img.Height -= 2
+                End If
+            Else
+                EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
+            End If
+            'Dim oldsize = CType(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double)
+            'If oldsize > 1 Then RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, oldsize - 1)
+        End If
     End Sub
 
     Private Sub Find()
@@ -291,6 +368,8 @@ Class MainWindow
             PasteAsText()
         ElseIf e.Key = Key.F AndAlso Keyboard.Modifiers = ModifierKeys.Control Then
             Find()
+        ElseIf e.Key = Key.H AndAlso Keyboard.Modifiers = ModifierKeys.Control Then
+            ToggleHighlight()
         End If
     End Sub
 
@@ -299,52 +378,9 @@ Class MainWindow
         If Keyboard.Modifiers = ModifierKeys.Control Then
             e.Handled = True
             If e.Delta > 0 Then 'wheel up
-                If RTB_Main.Selection.IsEmpty Then
-                    RTB_Main.FontSize += 1
-                Else
-                    Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
-                    Dim img As Image
-                    Select Case ele.GetType
-                        Case GetType(InlineUIContainer)
-                            img = TryCast(CType(ele, InlineUIContainer).Child, Image)
-                        Case GetType(Image)
-                            img = ele
-                        Case Else
-                            Exit Sub
-                    End Select
-                    If img IsNot Nothing Then
-                        img.Width += 2
-                        img.Height += 2
-                    Else
-                        EditingCommands.IncreaseFontSize.Execute(Nothing, RTB_Main)
-                    End If
-                    'RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, CType(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double) + 1)
-                End If
+                IncreaseSize()
             Else
-                If RTB_Main.Selection.IsEmpty Then
-                    If RTB_Main.FontSize > 1 Then RTB_Main.FontSize -= 1
-                Else
-                    Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
-                    Dim img As Image
-                    Select Case ele.GetType
-                        Case GetType(InlineUIContainer)
-                            img = TryCast(CType(ele, InlineUIContainer).Child, Image)
-                        Case GetType(Image)
-                            img = ele
-                        Case Else
-                            Exit Sub
-                    End Select
-                    If img IsNot Nothing Then
-                        If img.Width > 2 AndAlso img.Height > 2 Then
-                            img.Width -= 2
-                            img.Height -= 2
-                        End If
-                    Else
-                        EditingCommands.DecreaseFontSize.Execute(Nothing, RTB_Main)
-                    End If
-                    'Dim oldsize = CType(RTB_Main.Selection.GetPropertyValue(FontSizeProperty), Double)
-                    'If oldsize > 1 Then RTB_Main.Selection.ApplyPropertyValue(FontSizeProperty, oldsize - 1)
-                End If
+                DecreaseSize()
             End If
         End If
     End Sub
@@ -380,9 +416,32 @@ Class MainWindow
             DockToSide()
         End If
     End Sub
+
+    Private Sub RTB_Main_ContextMenuOpening(sender As Object, e As ContextMenuEventArgs) Handles RTB_Main.ContextMenuOpening
+        'update combobox selection etc
+        If Not RTB_Main.Selection.IsEmpty Then
+            Dim caretFont = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty), FontFamily)
+            If caretFont IsNot Nothing Then
+                CB_Font.SelectedValue = caretFont.Source
+            Else 'multiple fonts
+                CB_Font.SelectedIndex = -1
+            End If
+            CB_Font.ToolTip = "Font (Selection)"
+        Else
+            CB_Font.SelectedValue = My.Settings.Font
+            CB_Font.ToolTip = "Font (Default)"
+        End If
+    End Sub
 #End Region
 
     Private Sub Win_Main_Loaded(sender As Object, e As RoutedEventArgs) Handles Win_Main.Loaded
+
+
+        'Dim resreader As New System.Resources.ResourceReader("C:\Users\changbw001\OneDrive\WPF Projects\DesktopNote\Xceed.Wpf.Toolkit.dll")
+        'For Each entry As System.Collections.DictionaryEntry In resreader
+        '    MsgBox(entry.Key.ToString)
+        'Next
+
         'check for update
         Task.Run(Sub()
                      Dim updatelocation = "\\SRV496-01CN\PUBLIC_IT\Apps_Update\" & assname & ".exe"
@@ -395,48 +454,100 @@ Class MainWindow
                      End If
                  End Sub)
 
-        'check and merge previous settings
-        If My.Settings.UpgradeFlag = True Then
-            My.Settings.Upgrade()
-            My.Settings.UpgradeFlag = False
-            My.Settings.Save()
-        End If
+        With My.Settings
+            'check and merge previous settings
+            If .UpgradeFlag = True Then
+                .Upgrade()
+                .UpgradeFlag = False
+                .Save()
+            End If
 
-        'load settings
-        Me.Width = My.Settings.Win_Size.Width
-        Me.Height = My.Settings.Win_Size.Height
-        If My.Settings.Win_Pos <> Nothing Then
-            Me.Left = My.Settings.Win_Pos.X
-            Me.Top = My.Settings.Win_Pos.Y
-        End If
-        'dockedto = My.Settings.DockedTo
-        lastdockstatus = My.Settings.DockedTo
-        RTB_Main.FontFamily = New FontFamily(My.Settings.Font)
+            'load settings
+            Me.Width = .Win_Size.Width
+            Me.Height = .Win_Size.Height
+            If .Win_Pos <> Nothing Then
+                Me.Left = .Win_Pos.X
+                Me.Top = .Win_Pos.Y
+            End If
+            'dockedto = .DockedTo
+            lastdockstatus = .DockedTo
+            RTB_Main.FontFamily = New FontFamily(.Font)
+            RTB_Main.Foreground = New SolidColorBrush(.FontColor)
+            DirectCast(CP_Font.Content, Xceed.Wpf.Toolkit.ColorPicker).SelectedColor = .FontColor
+            RTB_Main.Background = New SolidColorBrush(.BackColor)
+            DirectCast(CP_Back.Content, Xceed.Wpf.Toolkit.ColorPicker).SelectedColor = .BackColor
+            Rec_BG.Fill = New SolidColorBrush(.PaperColor)
+            DirectCast(CP_Paper.Content, Xceed.Wpf.Toolkit.ColorPicker).SelectedColor = .PaperColor
+        End With
 
         'adding fonts to menu
         For Each f In Fonts.SystemFontFamilies
-            Dim mi As New MenuItem With {.Header = f.Source, .FontFamily = f}
-            mi.ToolTip = f.Source
-            If f.Source = My.Settings.Font Then mi.IsChecked = True
-            MI_Font.Items.Add(mi)
+            Dim mi As New ComboBoxItem With {.Content = f.Source, .FontFamily = f, .FontSize = 16, .ToolTip = f.Source} ', .StaysOpenOnClick = True}
+            CB_Font.Items.Add(mi)
+            If f.Source = My.Settings.Font Then mi.IsSelected = True 'mi.IsChecked = True
         Next
-        MI_Font.Items.SortDescriptions.Add(New System.ComponentModel.SortDescription("Header", System.ComponentModel.ListSortDirection.Ascending))
-        AddHandler MI_Font.Click, Sub(s1 As Object, e1 As RoutedEventArgs)
-                                      For Each f As MenuItem In MI_Font.Items
-                                          f.IsChecked = False
-                                      Next
-                                      Dim mi As MenuItem = e1.Source
-                                      If Not RTB_Main.Selection.IsEmpty Then 'only change selected
-                                          RTB_Main.Selection.ApplyPropertyValue(FontFamilyProperty, mi.FontFamily)
-                                      Else 'change every paragraph
-                                          mi.IsChecked = True
-                                          RTB_Main.FontFamily = mi.FontFamily
-                                          My.Settings.Font = mi.FontFamily.Source
-                                          For Each b In RTB_Main.Document.Blocks
-                                              b.FontFamily = mi.FontFamily
-                                          Next
-                                      End If
-                                  End Sub
+        CB_Font.Items.SortDescriptions.Add(New System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending))
+        AddHandler CB_Font.SelectionChanged, Sub(s1 As Object, e1 As SelectionChangedEventArgs)
+                                                 If RTB_Main.ContextMenu.IsOpen AndAlso e1.AddedItems.Count = 1 Then
+                                                     Dim mi As ComboBoxItem = e1.AddedItems(0)
+                                                     If Not RTB_Main.Selection.IsEmpty Then 'only change selected
+                                                         RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily)
+                                                     Else 'change default
+                                                         RTB_Main.FontFamily = mi.FontFamily
+                                                         My.Settings.Font = mi.FontFamily.Source
+                                                     End If
+                                                 End If
+                                             End Sub
+
+        ''changing icons in menu (obslete)
+        'Try
+        '    Dim ass = Reflection.Assembly.GetAssembly(GetType(Xceed.Wpf.Toolkit.RichTextBoxFormatBarManager))
+        '    'Dim aa = ass.GetManifestResourceNames
+        '    Using resstrm = ass.GetManifestResourceStream("Xceed.Wpf.Toolkit.g.resources")
+        '        Using resreader = New System.Resources.ResourceReader(resstrm)
+        '            'Code sample to get a list of embedded resources.
+        '            'Dim dict As IDictionaryEnumerator = resreader.GetEnumerator
+        '            'Dim ctr As Integer
+        '            'Do While dict.MoveNext()
+        '            '    ctr += 1
+        '            '    Debug.Print("{0:00}: {1} = {2}", ctr, dict.Key, dict.Value)
+        '            'Loop
+        '            Dim resmap As New Dictionary(Of String, String)
+        '            Dim ary(,) = {{"richtextboxformatbar/images/leftalign16.png", "Btn_AlignL"},
+        '                         {"richtextboxformatbar/images/rightalign16.png", "Btn_AlignR"},
+        '                         {"richtextboxformatbar/images/centeralign16.png", "Btn_AlignC"},
+        '                         {"richtextboxformatbar/images/justifyalign16.png", "Btn_AlignJ"},
+        '                         {"richtextboxformatbar/images/bold16.png", "Btn_Bold"},
+        '                         {"richtextboxformatbar/images/italic16.png", "Btn_Italic"},
+        '                         {"richtextboxformatbar/images/underline16.png", "Btn_Under"},
+        '                         {"richtextboxformatbar/images/bullets16.png", "Btn_Bullets"},
+        '                         {"richtextboxformatbar/images/numbering16.png", "Btn_Number"}}
+        '            For i = 0 To ary.GetUpperBound(0)
+        '                Dim imgbyte() As Byte = Nothing, restype As String = Nothing
+        '                resreader.GetResourceData(ary(i, 0), restype, imgbyte)
+        '                If restype = "ResourceTypeCode.Stream" Then
+        '                    Dim img As New BitmapImage()
+        '                    '4 bytes of offset when type is ResourceTypeCode.Stream according to https://msdn.microsoft.com/en-us/library/system.resources.resourcereader(v=vs.110).aspx
+        '                    Using mem As New IO.MemoryStream(imgbyte, 4, BitConverter.ToInt32(imgbyte, 0))
+        '                        img.BeginInit()
+        '                        img.CreateOptions = BitmapCreateOptions.PreservePixelFormat
+        '                        img.CacheOption = BitmapCacheOption.OnLoad
+        '                        img.StreamSource = mem
+        '                        img.EndInit()
+        '                    End Using
+        '                    img.Freeze()
+        '                    Dim imgctrl As New Image
+        '                    With imgctrl
+        '                        .Source = img
+        '                        .Stretch = Stretch.None
+        '                    End With
+        '                    DirectCast(Me.FindName(ary(i, 1)), Button).Content = imgctrl
+        '                End If
+        '            Next
+        '        End Using
+        '    End Using
+        'Catch
+        'End Try
 
         'loading contents
         If My.Computer.FileSystem.FileExists(doc_loc) Then
@@ -449,21 +560,25 @@ Class MainWindow
             End Try
         End If
 
-        RTB_Main.IsUndoEnabled = False
-        RTB_Main.IsUndoEnabled = True
-        'without the above two lines, Load actions can be undone.
-
-        If RTB_Main.Document.Blocks.Count > 0 Then 'unifying font size for new paragraghs
+        'unifying font for new paragraghs. without these, wont be able to change fonts after reload.
+        'the following doesnt affect specifically set font sizes in Inlines & Run.
+        If RTB_Main.Document.Blocks.Count > 0 Then
             RTB_Main.FontSize = RTB_Main.Document.Blocks(0).FontSize
             For Each b In RTB_Main.Document.Blocks
-                b.ClearValue(FontSizeProperty)
+                b.ClearValue(TextElement.FontSizeProperty)
+                b.ClearValue(TextElement.FontFamilyProperty)
+                b.ClearValue(TextElement.ForegroundProperty)
+                b.ClearValue(TextElement.BackgroundProperty)
                 'b.SetValue(PaddingProperty, New Thickness(55, 0, 0, 0))
                 'If TypeOf b Is List Then
                 '    RTB_Main.Resources("ListPadding") = b.Padding
                 'End If
             Next
-
         End If
+
+        RTB_Main.IsUndoEnabled = False
+        RTB_Main.IsUndoEnabled = True
+        'without the above two lines, Load actions can be undone.
 
         'check auto dock
         If My.Settings.AutoDock = True Then MI_AutoDock.IsChecked = True
@@ -542,15 +657,42 @@ Class MainWindow
         End SyncLock
     End Sub
 
-    Private Sub Win_Main_Closing(sender As Object, e As ComponentModel.CancelEventArgs) Handles Win_Main.Closing
+    Private Sub Quit(savesetting As Boolean)
         SaveToXamlPkg()
-        My.Settings.Win_Pos = New System.Drawing.Point(Me.Left, Me.Top)
-        My.Settings.Win_Size = New System.Drawing.Size(Me.Width, Me.Height)
-        My.Settings.DockedTo = lastdockstatus
-        My.Settings.Save()
+        If savesetting Then
+            My.Settings.Win_Pos = New System.Drawing.Point(Me.Left, Me.Top)
+            My.Settings.Win_Size = New System.Drawing.Size(Me.Width, Me.Height)
+            My.Settings.DockedTo = lastdockstatus
+            My.Settings.Save()
+        End If
+        Application.Current.Shutdown()
     End Sub
 
-    Private Sub MenuItem_Click(sender As Object, e As RoutedEventArgs)
+    Private Sub ColorChange(sender As Object, e As RoutedPropertyChangedEventArgs(Of System.Nullable(Of System.Windows.Media.Color)))
+        If e.NewValue.HasValue Then
+            Dim cp As ContentPresenter = VisualTreeHelper.GetParent(sender)
+            If cp IsNot Nothing Then
+                Select Case cp.Name
+                    Case "CP_Font"
+                        If Not RTB_Main.Selection.IsEmpty Then 'only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, New SolidColorBrush(e.NewValue.Value))
+                        Else 'change default
+                            RTB_Main.Foreground = New SolidColorBrush(e.NewValue.Value)
+                            My.Settings.FontColor = e.NewValue.Value
+                        End If
+                    Case "CP_Back"
+                        If Not RTB_Main.Selection.IsEmpty Then 'only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, New SolidColorBrush(e.NewValue.Value)) 'the caret color will be changed as well
+                        Else 'change default
+                            RTB_Main.Background = New SolidColorBrush(e.NewValue.Value)
+                            My.Settings.BackColor = e.NewValue.Value
+                        End If
+                    Case "CP_Paper"
+                        Rec_BG.Fill = New SolidColorBrush(e.NewValue.Value)
+                        My.Settings.PaperColor = e.NewValue.Value
+                End Select
+            End If
+        End If
 
     End Sub
 End Class

@@ -148,6 +148,42 @@ Partial Friend NotInheritable Class MySettings
             Me("Font") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("#FF000000")>  _
+    Public Property FontColor() As Global.System.Windows.Media.Color
+        Get
+            Return CType(Me("FontColor"),Global.System.Windows.Media.Color)
+        End Get
+        Set
+            Me("FontColor") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("#00FFFFFF")>  _
+    Public Property BackColor() As Global.System.Windows.Media.Color
+        Get
+            Return CType(Me("BackColor"),Global.System.Windows.Media.Color)
+        End Get
+        Set
+            Me("BackColor") = value
+        End Set
+    End Property
+    
+    <Global.System.Configuration.UserScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("#FFFFF7C5")>  _
+    Public Property PaperColor() As Global.System.Windows.Media.Color
+        Get
+            Return CType(Me("PaperColor"),Global.System.Windows.Media.Color)
+        End Get
+        Set
+            Me("PaperColor") = value
+        End Set
+    End Property
 End Class
 
 Namespace My

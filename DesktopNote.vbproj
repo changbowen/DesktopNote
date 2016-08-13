@@ -63,6 +63,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>.\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="Application.xaml">
@@ -142,6 +146,70 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="stickynote.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Undo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Redo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Copy.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Paste.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\PasteTextOnly.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Cut.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FindText.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Bold.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Italic.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Underline.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Strikethrough.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\TextHighlightColorPicker.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SizeDecrease.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\SizeIncrease.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\FontColor.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Bullets.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Numbering.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AlignCenter.ico" />
+    <Resource Include="Resources\AlignJustify.ico" />
+    <Resource Include="Resources\AlignLeft.ico" />
+    <Resource Include="Resources\AlignRight.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\IndentDecrease.ico" />
+    <Resource Include="Resources\IndentIncrease.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

@@ -26,5 +26,14 @@
     <Setting Name="Font" Type="System.String" Scope="User">
       <Value Profile="(Default)">Segoe Print</Value>
     </Setting>
+    <Setting Name="FontColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FF000000</Value>
+    </Setting>
+    <Setting Name="BackColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#00FFFFFF</Value>
+    </Setting>
+    <Setting Name="PaperColor" Type="System.Windows.Media.Color" Scope="User">
+      <Value Profile="(Default)">#FFFFF7C5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
