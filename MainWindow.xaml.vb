@@ -307,6 +307,8 @@ Class MainWindow
             Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
             Dim img As Image
             Select Case ele.GetType
+                Case GetType(BlockUIContainer)
+                    img = TryCast(DirectCast(ele, BlockUIContainer).Child, Image)
                 Case GetType(InlineUIContainer)
                     img = TryCast(DirectCast(ele, InlineUIContainer).Child, Image)
                 Case GetType(Image)
@@ -329,6 +331,8 @@ Class MainWindow
             Dim ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward)
             Dim img As Image
             Select Case ele.GetType
+                Case GetType(BlockUIContainer)
+                    img = TryCast(DirectCast(ele, BlockUIContainer).Child, Image)
                 Case GetType(InlineUIContainer)
                     img = TryCast(DirectCast(ele, InlineUIContainer).Child, Image)
                 Case GetType(Image)
@@ -420,16 +424,24 @@ Class MainWindow
     Private Sub RTB_Main_ContextMenuOpening(sender As Object, e As ContextMenuEventArgs) Handles RTB_Main.ContextMenuOpening
         'update combobox selection etc
         If Not RTB_Main.Selection.IsEmpty Then
-            Dim caretFont = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty), FontFamily)
-            If caretFont IsNot Nothing Then
-                CB_Font.SelectedValue = caretFont.Source
+            Dim caretfont = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty), FontFamily)
+            If caretfont IsNot Nothing Then
+                CB_Font.SelectedValue = caretfont.Source
             Else 'multiple fonts
                 CB_Font.SelectedIndex = -1
             End If
             CB_Font.ToolTip = "Font (Selection)"
+
+            Dim caretfontcolor = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty), SolidColorBrush)
+            If caretfontcolor IsNot Nothing Then CP_Font.Content.SelectedColor = New Color?(caretfontcolor.Color) Else CP_Font.Content.SelectedColor = Nothing
+
+            Dim caretbackcolor = TryCast(RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty), SolidColorBrush)
+            If caretbackcolor IsNot Nothing Then CP_Back.Content.SelectedColor = New Color?(caretbackcolor.Color) Else CP_Back.Content.SelectedColor = Nothing
         Else
             CB_Font.SelectedValue = My.Settings.Font
             CB_Font.ToolTip = "Font (Default)"
+            CP_Font.Content.SelectedColor = My.Settings.FontColor
+            CP_Back.Content.SelectedColor = My.Settings.BackColor
         End If
     End Sub
 #End Region
@@ -669,7 +681,7 @@ Class MainWindow
     End Sub
 
     Private Sub ColorChange(sender As Object, e As RoutedPropertyChangedEventArgs(Of System.Nullable(Of System.Windows.Media.Color)))
-        If e.NewValue.HasValue Then
+        If e.NewValue.HasValue AndAlso DirectCast(sender, Xceed.Wpf.Toolkit.ColorPicker).IsOpen Then
             Dim cp As ContentPresenter = VisualTreeHelper.GetParent(sender)
             If cp IsNot Nothing Then
                 Select Case cp.Name
