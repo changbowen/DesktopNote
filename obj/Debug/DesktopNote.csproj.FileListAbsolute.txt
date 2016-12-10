@@ -3,3 +3,10 @@ C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\bin\Debug\DesktopNote.
 C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\DesktopNote.csprojResolveAssemblyReference.cache
 C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\App.g.cs
 C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.cache
+F:\GitHub Repos\DesktopNote\bin\Debug\DesktopNote.exe.config
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.csprojResolveAssemblyReference.cache
+F:\GitHub Repos\DesktopNote\obj\Debug\App.baml
+F:\GitHub Repos\DesktopNote\obj\Debug\MainWindow.g.cs
+F:\GitHub Repos\DesktopNote\obj\Debug\App.g.cs
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.cache
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.lref

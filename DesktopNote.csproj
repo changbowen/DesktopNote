@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\stickynote.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -49,6 +52,10 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>Resources\Xceed.Wpf.Toolkit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -94,6 +101,35 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\stickynote.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AlignCenter.ico" />
+    <Resource Include="Resources\AlignJustify.ico" />
+    <Resource Include="Resources\AlignLeft.ico" />
+    <Resource Include="Resources\AlignRight.ico" />
+    <Resource Include="Resources\Bold.ico" />
+    <Resource Include="Resources\Bullets.ico" />
+    <Resource Include="Resources\Copy.ico" />
+    <Resource Include="Resources\Cut.ico" />
+    <Resource Include="Resources\FindText.ico" />
+    <Resource Include="Resources\FontColor.ico" />
+    <Resource Include="Resources\IndentDecrease.ico" />
+    <Resource Include="Resources\IndentIncrease.ico" />
+    <Resource Include="Resources\Italic.ico" />
+    <Resource Include="Resources\Numbering.ico" />
+    <Resource Include="Resources\Paste.ico" />
+    <Resource Include="Resources\PasteTextOnly.ico" />
+    <Resource Include="Resources\Redo.ico" />
+    <Resource Include="Resources\SizeDecrease.ico" />
+    <Resource Include="Resources\SizeIncrease.ico" />
+    <Resource Include="Resources\Strikethrough.ico" />
+    <Resource Include="Resources\TextHighlightColorPicker.ico" />
+    <Resource Include="Resources\Underline.ico" />
+    <Resource Include="Resources\Undo.ico" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
