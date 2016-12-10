@@ -10,3 +10,5 @@ F:\GitHub Repos\DesktopNote\obj\Debug\MainWindow.g.cs
 F:\GitHub Repos\DesktopNote\obj\Debug\App.g.cs
 F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.cache
 F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.lref
+F:\GitHub Repos\DesktopNote\obj\Debug\Win_Search.baml
+F:\GitHub Repos\DesktopNote\obj\Debug\Win_Search.g.cs
