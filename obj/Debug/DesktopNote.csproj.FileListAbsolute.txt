@@ -1,0 +1,5 @@
+C:\Users\Carl Chang\AppData\Local\Temporary Projects\DesktopNote\bin\Debug\DesktopNote.exe.config
+C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\bin\Debug\DesktopNote.exe.config
+C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\DesktopNote.csprojResolveAssemblyReference.cache
+C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\App.g.cs
+C:\Users\Carl Chang\Downloads\新建文件夹\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.cache
