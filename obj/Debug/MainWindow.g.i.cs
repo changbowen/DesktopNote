@@ -166,6 +166,18 @@ namespace DesktopNote {
             {
             case 1:
             this.Win_Main = ((DesktopNote.MainWindow)(target));
+            
+            #line 7 "..\..\MainWindow.xaml"
+            this.Win_Main.MouseEnter += new System.Windows.Input.MouseEventHandler(this.Win_Main_MouseEnter);
+            
+            #line default
+            #line hidden
+            
+            #line 7 "..\..\MainWindow.xaml"
+            this.Win_Main.MouseLeave += new System.Windows.Input.MouseEventHandler(this.Win_Main_MouseLeave);
+            
+            #line default
+            #line hidden
             return;
             case 2:
             this.Rec_BG = ((System.Windows.Shapes.Rectangle)(target));

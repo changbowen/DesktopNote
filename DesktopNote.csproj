@@ -62,6 +62,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GetCurrentMonitor.cs" />
     <Compile Include="Win_Search.xaml.cs">
       <DependentUpon>Win_Search.xaml</DependentUpon>
     </Compile>

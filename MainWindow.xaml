@@ -4,7 +4,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:DesktopNote"
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True" UseLayoutRounding="True">
+        Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True" UseLayoutRounding="True" MouseEnter="Win_Main_MouseEnter" MouseLeave="Win_Main_MouseLeave">
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12">
             <Rectangle.Effect>
