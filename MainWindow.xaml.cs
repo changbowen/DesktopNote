@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -190,6 +192,239 @@ namespace DesktopNote
         }
         #endregion
 
+        private void SaveNotes()
+        {
+            while (true)
+            {
+                while (CountDown<=0)
+                {
+                    Thread.Sleep(1000);
+                }
+                do
+                {
+                    Thread.Sleep(500);
+                    CountDown -= 500;
+                } while (CountDown>0);
+                SaveToXamlPkg();
+            }
+        }
 
+        private void SaveToXamlPkg()
+        {
+            lock (Lock_Save)
+            {
+                TextRange tr = null;
+                bool isUIthread = Dispatcher.CheckAccess();
+                string result;
+                if (isUIthread)
+                    tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+                else
+                    Dispatcher.Invoke(delegate { tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd); });
+
+                try
+                {
+                    if (isUIthread)
+                    {
+                        using (var ms = new FileStream(doc_loc, FileMode.Create))
+                        {
+                            tr.Save(ms, DataFormats.XamlPackage, true);
+                        }
+                        File.WriteAllText(Properties.Settings.Default.Bak_Location, tr.Text);
+                    }
+                    else
+                    {
+                        Dispatcher.Invoke(delegate
+                        {
+                            using (var ms = new FileStream(doc_loc, FileMode.Create))
+                            {
+                                tr.Save(ms, DataFormats.XamlPackage, true);
+                            };
+                            File.WriteAllText(Properties.Settings.Default.Bak_Location, tr.Text);
+                        });
+                    }
+                    result = "Saved";
+                }
+                catch
+                {
+                    result = "Save failed";
+                }
+
+                if (isUIthread)
+                {
+                    TB_Status.Text = result;
+                    TB_Status.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    Dispatcher.Invoke(delegate
+                    {
+                        TB_Status.Text = result;
+                        TB_Status.Visibility = Visibility.Visible;
+                    });
+                }
+            }
+        }
+
+        private void Quit(bool savesetting)
+        {
+            SaveToXamlPkg();
+            var set = Properties.Settings.Default;
+            if (savesetting)
+            {
+                set.Win_Pos = new System.Drawing.Point((int)Left, (int)Top);
+                set.Win_Size = new System.Drawing.Size((int)Width, (int)Height);
+                set.DockedTo = (int)lastdockstatus;
+                set.Save();
+            }
+            App.Current.Shutdown();
+        }
+
+        private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        {
+            if (e.NewValue.HasValue && ((Xceed.Wpf.Toolkit.ColorPicker)sender).IsOpen)
+            {
+                var cp = (ContentPresenter)VisualTreeHelper.GetParent((DependencyObject)sender);
+                if (cp != null)
+                {
+                    switch (cp.Name)
+                    {
+                        case "CP_Font":
+                            if (!RTB_Main.Selection.IsEmpty) //only change selected
+                                RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(e.NewValue.Value));
+                            else //change default
+                            {
+                                RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
+                                Properties.Settings.Default.FontColor = e.NewValue.Value;
+                            }
+                            break;
+                        case "CP_Back":
+                            if (!RTB_Main.Selection.IsEmpty) //only change selected
+                                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(e.NewValue.Value)); //the caret color will be changed as well
+                            else //change default
+                            {
+                                RTB_Main.Background = new SolidColorBrush(e.NewValue.Value);
+                                Properties.Settings.Default.BackColor = e.NewValue.Value;
+                            }
+                            break;
+                        case "CP_Paper":
+                            Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
+                            Properties.Settings.Default.PaperColor = e.NewValue.Value;
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void Win_Main_Loaded(object sender, RoutedEventArgs e)
+        {
+            var set = Properties.Settings.Default;
+            //check and merge previous settings
+            if (set.UpgradeFlag == true)
+            {
+                set.Upgrade();
+                set.UpgradeFlag = false;
+                set.Save();
+            }
+
+            //load settings
+            Width = set.Win_Size.Width;
+            Height = set.Win_Size.Height;
+            if (set.Win_Pos != null)
+            {
+                Left = set.Win_Pos.X;
+                Top = set.Win_Pos.Y;
+            }
+
+            lastdockstatus = (DockStatus)set.DockedTo;
+            RTB_Main.FontFamily = new FontFamily(set.Font);
+            RTB_Main.Foreground = new SolidColorBrush(set.FontColor);
+            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = set.FontColor;
+            RTB_Main.Background = new SolidColorBrush(set.BackColor);
+            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = set.BackColor;
+            Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
+            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Paper.Content).SelectedColor = set.PaperColor;
+
+            //add fonts to menu
+            foreach (var f in Fonts.SystemFontFamilies)
+            {
+                var mi = new ComboBoxItem
+                {
+                    Content = f.Source,
+                    FontFamily = f,
+                    FontSize = this.FontSize + 4,
+                    ToolTip = f.Source
+                };
+                CB_Font.Items.Add(mi);
+                if (f.Source == set.Font) mi.IsSelected = true;
+            }
+            CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
+            CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
+              {
+                  if (RTB_Main.ContextMenu.IsOpen && e1.AddedItems.Count == 1)
+                  {
+                      var mi = (ComboBoxItem)e1.AddedItems[0];
+
+                      if (!RTB_Main.Selection.IsEmpty) //only change selected
+                          RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                      else //change default
+                      {
+                          RTB_Main.FontFamily = mi.FontFamily;
+                          set.Font = mi.FontFamily.Source;
+                      }
+                  }
+              };
+
+            //loading contents
+            if (File.Exists(doc_loc))
+            {
+                try
+                {
+                    var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+                    tr.Load(new FileStream(doc_loc, FileMode.Open), DataFormats.XamlPackage);
+                }
+                catch
+                {
+                    MessageBox.Show("There was an error loading the note contents. Please refer to the following backup file at application root for recovery.\r\n" + set.Bak_Location, "Loading Notes Failed", MessageBoxButton.OK, MessageBoxImage.Stop);
+                }
+            }
+
+            //unifying font for new paragraghs. without these, wont be able to change fonts after reload.
+            //the following doesnt affect specifically set font sizes in Inlines & Run.
+            if (RTB_Main.Document.Blocks.Count > 0)
+            {
+                RTB_Main.FontSize = RTB_Main.Document.Blocks.FirstBlock.FontSize;
+                foreach (var b in RTB_Main.Document.Blocks)
+                {
+                    b.ClearValue(TextElement.FontSizeProperty);
+                    b.ClearValue(TextElement.FontFamilyProperty);
+                    b.ClearValue(TextElement.ForegroundProperty);
+                    b.ClearValue(TextElement.BackgroundProperty);
+                }
+            }
+
+            RTB_Main.IsUndoEnabled = false;
+            RTB_Main.IsUndoEnabled = true;
+            //without the above two lines, Load actions can be undone.
+
+            //check auto dock
+            if (set.AutoDock == true) MI_AutoDock.IsChecked = true;
+
+            //check auto start
+            var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+            string run_value = (string)run.GetValue(assname);
+
+            if (run_value != "")
+            {
+                MI_AutoStart.IsChecked = true;
+                if (run_value != System.Reflection.Assembly.GetExecutingAssembly().Location)
+                    run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
+            }
+
+            currScrnRect = new GetCurrentMonitor().GetInfo();
+
+            var task_save = new Thread(SaveNotes);
+            task_save.IsBackground = true;
+            task_save.Start();
+        }
     }
 }
