@@ -1,5 +1,5 @@
 # DesktopNote
-**//now in C#**
+**//now in C# (WIP)**
 
 The only **simple** yet **rich-featured** desktop note app you'll ever need for your PC.
 
