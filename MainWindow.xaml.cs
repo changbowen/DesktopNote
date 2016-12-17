@@ -192,6 +192,175 @@ namespace DesktopNote
         }
         #endregion
 
+        #region Menu Events
+        private void MenuItem_Help_Click()
+        {
+            if (MessageBox.Show("Available editing features can be accessd from menu or keyboard combination.\r\n" +
+                "Use Ctrl + mouse wheel to change font size.\r\n" +
+                "Change font or font size when there is a selection will only change selected text.\r\n" +
+               "Note content will be auto saved to application root.\r\n" +
+               "You will be directed to the homepage if you click OK.", "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+                System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
+        }
+
+        private void MenuItem_Exit_Click()
+        {
+            Quit(true);
+        }
+
+        private void MenuItem_Bullet_Click()
+        {
+            EditingCommands.ToggleBullets.Execute(null, RTB_Main);
+        }
+
+        private void MI_AutoStart_Click(object sender, RoutedEventArgs e)
+        {
+            var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+            if (MI_AutoStart.IsChecked)
+                run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
+            else
+                run.DeleteValue(assname, false);
+        }
+
+        private void MI_AutoDock_Click(object sender, RoutedEventArgs e)
+        {
+            if (MI_AutoDock.IsChecked)
+            {
+                Properties.Settings.Default.AutoDock = true;
+                DockToSide(true);
+            }
+            else
+            {
+                Properties.Settings.Default.AutoDock = false;
+                Topmost = false;
+            }
+            Properties.Settings.Default.Save();
+        }
+
+        private void MenuItem_ResetFormats_Click(object sender, RoutedEventArgs e)
+        {
+            var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+            tr.ClearAllProperties();
+
+            var cp = (Color)ColorConverter.ConvertFromString((string)Properties.Settings.Default.Properties["PaperColor"].DefaultValue);
+            Properties.Settings.Default.PaperColor = cp;
+            Rec_BG.Fill = new SolidColorBrush(cp);
+        }
+
+        private void MenuItem_ResetSet_Click()
+        {
+            Properties.Settings.Default.Reset();
+            Properties.Settings.Default.Save();
+
+            Close();
+            var win = new MainWindow();
+            App.Current.MainWindow = win;
+            win.Show();
+        }
+
+        private void ToggleStrike()
+        {
+            //strike-through
+            dynamic tdc = RTB_Main.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
+            if (tdc == DependencyProperty.UnsetValue || tdc.Count > 0)
+                tdc = null;
+            else
+                tdc = TextDecorations.Strikethrough;
+            RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc);
+        }
+
+        private void ToggleHighlight()
+        {
+            var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
+            if (tdc != null)
+                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, null);
+            else
+            {
+                RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
+                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Yellow));
+            }
+        }
+
+        private void PasteAsText()
+        {
+            RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText());
+        }
+
+        private void IncreaseSize()
+        {
+            if (RTB_Main.Selection.IsEmpty)
+                RTB_Main.FontSize += 1;
+            else
+            {
+                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
+                Image img = null;
+                switch (ele.GetType().Name)
+                {
+                    case "BlockUIContainer":
+                        img = ((BlockUIContainer)ele).Child as Image;
+                        break;
+                    case "InlineUIContainer":
+                        img = ((InlineUIContainer)ele).Child as Image;
+                        break;
+                    case "Image":
+                        img = (Image)ele;
+                        break;
+                }
+                if (img != null)
+                {
+                    img.Width += 2;
+                    img.Height += 2;
+                }
+                else
+                    EditingCommands.IncreaseFontSize.Execute(null, RTB_Main);
+            }
+        }
+
+        private void DecreaseSize()
+        {
+            if (RTB_Main.Selection.IsEmpty)
+            {
+                if (RTB_Main.FontSize > 1) RTB_Main.FontSize -= 1;
+            }
+            else
+            {
+                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
+                Image img = null;
+                switch (ele.GetType().Name)
+                {
+                    case "BlockUIContainer":
+                        img = ((BlockUIContainer)ele).Child as Image;
+                        break;
+                    case "InlineUIContainer":
+                        img = ((InlineUIContainer)ele).Child as Image;
+                        break;
+                    case "Image":
+                        img = (Image)ele;
+                        break;
+                }
+                if (img != null)
+                {
+                    if (img.Width > 2 && img.Height > 2)
+                    {
+                        img.Width -= 2;
+                        img.Height -= 2;
+                    }
+                }
+                else
+                    EditingCommands.DecreaseFontSize.Execute(null, RTB_Main);
+            }
+        }
+
+        private void Find()
+        {
+            new Win_Search().Show();
+        }
+        #endregion
+
+        #region RichTextBox Events
+
+        #endregion
+
         private void SaveNotes()
         {
             while (true)
@@ -425,6 +594,107 @@ namespace DesktopNote
             var task_save = new Thread(SaveNotes);
             task_save.IsBackground = true;
             task_save.Start();
+        }
+
+        private void RTB_Main_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (RTB_Main.IsFocused)
+            {
+                CountDown = 2000;
+                TB_Status.Visibility = Visibility.Hidden;
+            }
+        }
+
+        private void RTB_Main_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
+                ToggleStrike();
+            else if (e.Key == Key.V && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                PasteAsText();
+            else if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
+                Find();
+            else if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
+                ToggleHighlight();
+        }
+
+        private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            //when padding is set on list, changing font size results in incorrect bullet position.
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                e.Handled = true;
+                if (e.Delta > 0) //wheel up
+                    IncreaseSize();
+                else
+                    DecreaseSize();
+            }
+        }
+
+        private void Rec_BG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Rec_BG.CaptureMouse();
+            if (e.ClickCount == 2)
+            {
+                if (WindowState == WindowState.Normal)
+                    WindowState = WindowState.Maximized;
+                else if (WindowState == WindowState.Maximized)
+                    WindowState = WindowState.Normal;
+            }
+            else
+                mousepos = e.GetPosition(this);
+        }
+
+        private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Rec_BG.ReleaseMouseCapture();
+            if (Properties.Settings.Default.AutoDock) DockToSide(true);
+        }
+
+        private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && mousepos != null)
+            {
+                var pos = e.GetPosition(this);
+                Left += pos.X - mousepos.X;
+                Top += pos.Y - mousepos.Y;
+            }
+        }
+
+        private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (Properties.Settings.Default.AutoDock && App.Current.Windows.Count == 1 && !RTB_Main.ContextMenu.IsOpen)
+                DockToSide();
+        }
+
+        private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            //update combobox selection etc
+            if (!RTB_Main.Selection.IsEmpty)
+            {
+                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
+                if (caretfont != null)
+                    CB_Font.SelectedValue = caretfont.Source;
+                else //multiple fonts
+                    CB_Font.SelectedIndex = -1;
+                CB_Font.ToolTip = "Font (Selection)";
+
+                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
+                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
+                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
+                else fontcolorpicker.SelectedColor = null;
+
+                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
+                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content;
+                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
+                else backcolorpicker.SelectedColor = null;
+            }
+            else
+            {
+                CB_Font.SelectedValue = Properties.Settings.Default.Font;
+                CB_Font.ToolTip = "Font (Default)";
+                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
+                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
+            }
         }
     }
 }
