@@ -4,6 +4,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:DesktopNote"
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:resx="clr-namespace:DesktopNote.Resources"
         Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}"
         ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True" UseLayoutRounding="True" 
         MouseEnter="Win_Main_MouseEnter" MouseLeave="Win_Main_MouseLeave" Loaded="Win_Main_Loaded">
@@ -46,90 +47,91 @@
                                 <TextBlock Text="{Binding Name}" Margin="8,0,0,0"/>
                             </StackPanel>
                         </DataTemplate>-->
-                        <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" AvailableColorsSortingMode="HueSaturationBrightness" ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
+                        <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" AvailableColorsSortingMode="HueSaturationBrightness" 
+                                         ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
                     </ContextMenu.Resources>
                     <MenuItem StaysOpenOnClick="True">
                         <MenuItem.Header>
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Button Command="Undo" ToolTip="Undo (Ctrl + Z)" Margin="0,0,5,0">
+                                    <Button Command="Undo" ToolTip="{x:Static resx:Resource.tooltip_undo}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Undo.ico"/>
                                     </Button>
-                                    <Button Command="Redo" ToolTip="Redo (Ctrl + Y)">
+                                    <Button Command="Redo" ToolTip="{x:Static resx:Resource.tooltip_redo}">
                                         <Image Stretch="None" Source="Resources/Redo.ico"/>
                                     </Button>
                                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,2"/>
-                                    <Button Command="Copy" ToolTip="Copy (Ctrl + C)" Margin="0,0,5,0">
+                                    <Button Command="Copy" ToolTip="{x:Static resx:Resource.tooltip_copy}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Copy.ico"/>
                                     </Button>
-                                    <Button Command="Cut" ToolTip="Cut (Ctrl + X)" Margin="0,0,5,0">
+                                    <Button Command="Cut" ToolTip="{x:Static resx:Resource.tooltip_cut}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Cut.ico"/>
                                     </Button>
-                                    <Button Command="Paste" ToolTip="Paste (Ctrl + V)" Margin="0,0,5,0">
+                                    <Button Command="Paste" ToolTip="{x:Static resx:Resource.tooltip_paste}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Paste.ico"/>
                                     </Button>
-                                    <Button ToolTip="Paste Text Only (Ctrl + Shift + V)" Click="PasteAsText">
+                                    <Button ToolTip="{x:Static resx:Resource.tooltip_paste_text}" Click="PasteAsText">
                                         <Image Stretch="None" Source="Resources/PasteTextOnly.ico"/>
                                     </Button>
                                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,2"/>
-                                    <Button ToolTip="Find (Ctrl + F)" Click="Find">
+                                    <Button ToolTip="{x:Static resx:Resource.tooltip_find}" Click="Find">
                                         <Image Stretch="None" Source="Resources/FindText.ico"/>
                                     </Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                                    <Button Command="ToggleBold" ToolTip="Bold (Ctrl + B)" Margin="0,0,5,0">
+                                    <Button Command="ToggleBold" ToolTip="{x:Static resx:Resource.tooltip_bold}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Bold.ico"/>
                                     </Button>
-                                    <Button Command="ToggleItalic" ToolTip="Italic (Ctrl + I)" Margin="0,0,5,0">
+                                    <Button Command="ToggleItalic" ToolTip="{x:Static resx:Resource.tooltip_italic}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Italic.ico"/>
                                     </Button>
-                                    <Button Command="ToggleUnderline" ToolTip="Underline (Ctrl + U)" Margin="0,0,5,0">
+                                    <Button Command="ToggleUnderline" ToolTip="{x:Static resx:Resource.tooltip_underline}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Underline.ico"/>
                                     </Button>
-                                    <Button Click="ToggleStrike" ToolTip="Strike-through (Ctrl + D)">
+                                    <Button Click="ToggleStrike" ToolTip="{x:Static resx:Resource.tooltip_strikethrough}">
                                         <Image Stretch="None" Source="Resources/Strikethrough.ico"/>
                                     </Button>
                                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,2"/>
-                                    <Button Click="ToggleHighlight" ToolTip="Highlight (Ctrl + H)">
+                                    <Button Click="ToggleHighlight" ToolTip="{x:Static resx:Resource.tooltip_highlight}">
                                         <Image Stretch="None" Source="Resources/TextHighlightColorPicker.ico"/>
                                     </Button>
                                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,2"/>
-                                    <ContentPresenter x:Name="CP_Font" Content="{StaticResource CP_Main}" ToolTip="Font Color" Margin="0,0,5,0"/>
-                                    <ContentPresenter x:Name="CP_Back" Content="{StaticResource CP_Main}" ToolTip="Back Color"/>
+                                    <ContentPresenter x:Name="CP_Font" Content="{StaticResource CP_Main}" ToolTip="{x:Static resx:Resource.tooltip_font_color}" Margin="0,0,5,0"/>
+                                    <ContentPresenter x:Name="CP_Back" Content="{StaticResource CP_Main}" ToolTip="{x:Static resx:Resource.tooltip_back_color}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
                                     <ComboBox x:Name="CB_Font" Width="142" Margin="0,0,5,0" IsEditable="True" SelectedValuePath="Content"/>
-                                    <Button Click="DecreaseSize" ToolTip="Decrease Size (Ctrl + Mousewheel Down)" Margin="0,0,5,0">
+                                    <Button Click="DecreaseSize" ToolTip="{x:Static resx:Resource.tooltip_decrease_size}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/SizeDecrease.ico"/>
                                     </Button>
-                                    <Button Click="IncreaseSize" ToolTip="Increase Size (Ctrl + Mousewheel Up)" Margin="0,0,5,0">
+                                    <Button Click="IncreaseSize" ToolTip="{x:Static resx:Resource.tooltip_increase_size}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/SizeIncrease.ico"/>
                                     </Button>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Command="ToggleBullets" ToolTip="Bullets (Ctrl + Shift + L)" Margin="0,0,5,0">
+                                    <Button Command="ToggleBullets" ToolTip="{x:Static resx:Resource.tooltip_bullets}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Bullets.ico"/>
                                     </Button>
-                                    <Button Command="ToggleNumbering" ToolTip="Numbering (Ctrl + Shift + N)" Margin="0,0,5,0">
+                                    <Button Command="ToggleNumbering" ToolTip="{x:Static resx:Resource.tooltip_numbering}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/Numbering.ico"/>
                                     </Button>
-                                    <Button Command="IncreaseIndentation" ToolTip="Increase Indent (Ctrl + T)" Margin="0,0,5,0">
+                                    <Button Command="IncreaseIndentation" ToolTip="{x:Static resx:Resource.tooltip_increase_indent}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/IndentIncrease.ico"/>
                                     </Button>
-                                    <Button Command="DecreaseIndentation" ToolTip="Decrease Indent (Ctrl + Shift + T)">
+                                    <Button Command="DecreaseIndentation" ToolTip="{x:Static resx:Resource.tooltip_decrease_indent}">
                                         <Image Stretch="None" Source="Resources/IndentDecrease.ico"/>
                                     </Button>
                                     <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="5,2"/>
-                                    <Button Command="AlignLeft" ToolTip="Align Left (Ctrl + L)" Margin="0,0,5,0">
+                                    <Button Command="AlignLeft" ToolTip="{x:Static resx:Resource.tooltip_align_left}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/AlignLeft.ico"/>
                                     </Button>
-                                    <Button Command="AlignCenter" ToolTip="Align Center (Ctrl + E)" Margin="0,0,5,0">
+                                    <Button Command="AlignCenter" ToolTip="{x:Static resx:Resource.tooltip_align_center}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/AlignCenter.ico"/>
                                     </Button>
-                                    <Button Command="AlignRight" ToolTip="Align Right (Ctrl + R)" Margin="0,0,5,0">
+                                    <Button Command="AlignRight" ToolTip="{x:Static resx:Resource.tooltip_align_right}" Margin="0,0,5,0">
                                         <Image Stretch="None" Source="Resources/AlignRight.ico"/>
                                     </Button>
-                                    <Button Command="AlignJustify" ToolTip="Align Justify (Ctrl + J)">
+                                    <Button Command="AlignJustify" ToolTip="{x:Static resx:Resource.tooltip_align_justify}">
                                         <Image Stretch="None" Source="Resources/AlignJustify.ico"/>
                                     </Button>
                                 </StackPanel>
@@ -142,27 +144,27 @@
                     <MenuItem Header="Back Color" ItemsSource="{Binding Source={StaticResource colorPropertiesOdp}}" ItemTemplate="{StaticResource colorTemplate}"/>-->
                     <Separator/>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Paper Color" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock Text="{x:Static resx:Resource.menu_paper_color}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                         <ContentPresenter x:Name="CP_Paper" Content="{StaticResource CP_Main}"/>
                     </StackPanel>
-                    <MenuItem x:Name="MI_AutoStart" Header="Auto Start" IsCheckable="True" Click="MI_AutoStart_Click"/>
-                    <MenuItem x:Name="MI_AutoDock" Header="Auto Dock" IsCheckable="True" Click="MI_AutoDock_Click"/>
-                    <MenuItem Header="Reset Formats" Click="MenuItem_ResetFormats_Click"/>
-                    <MenuItem Header="Reset Settings" Click="MenuItem_ResetSet_Click"/>
-                    <MenuItem Header="Help" Click="MenuItem_Help_Click"/>
-                    <MenuItem Header="Exit" Click="MenuItem_Exit_Click"/>
+                    <MenuItem x:Name="MI_AutoStart" Header="{x:Static resx:Resource.menu_auto_start}" IsCheckable="True" Click="MI_AutoStart_Click"/>
+                    <MenuItem x:Name="MI_AutoDock" Header="{x:Static resx:Resource.menu_auto_dock}" IsCheckable="True" Click="MI_AutoDock_Click"/>
+                    <MenuItem Header="{x:Static resx:Resource.menu_reset_formats}" Click="MenuItem_ResetFormats_Click"/>
+                    <MenuItem Header="{x:Static resx:Resource.menu_reset_settings}" Click="MenuItem_ResetSet_Click"/>
+                    <MenuItem Header="{x:Static resx:Resource.menu_help}" Click="MenuItem_Help_Click"/>
+                    <MenuItem Header="{x:Static resx:Resource.menu_exit}" Click="MenuItem_Exit_Click"/>
                 </ContextMenu>
             </RichTextBox.ContextMenu>
             <FlowDocument>
                 <List>
                     <ListItem>
                         <Paragraph>
-                            <Run Text="Notes here."/>
+                            <Run Text="{x:Static resx:Resource.default_note_text}"/>
                         </Paragraph>
                     </ListItem>
                 </List>
             </FlowDocument>
         </RichTextBox>
-        <TextBlock x:Name="TB_Status" Text="Saved" Margin="18" VerticalAlignment="Bottom" HorizontalAlignment="Right" Opacity="0.5" FontStyle="Italic" FontSize="10" Visibility="Hidden"/>
+        <TextBlock x:Name="TB_Status" Text="{x:Static resx:Resource.status_saved}" Margin="18" VerticalAlignment="Bottom" HorizontalAlignment="Right" Opacity="0.5" FontStyle="Italic" FontSize="10" Visibility="Hidden"/>
     </Grid>
 </Window>

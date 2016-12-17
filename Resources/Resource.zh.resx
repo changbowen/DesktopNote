@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="button_cancel" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="button_ok" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="button_search" xml:space="preserve">
+    <value>查找</value>
+  </data>
+  <data name="default_note_text" xml:space="preserve">
+    <value>在这里输入笔记...</value>
+  </data>
+  <data name="label_search_for" xml:space="preserve">
+    <value>查找内容</value>
+  </data>
+  <data name="menu_auto_dock" xml:space="preserve">
+    <value>屏幕边缘停靠</value>
+  </data>
+  <data name="menu_auto_start" xml:space="preserve">
+    <value>随系统启动</value>
+  </data>
+  <data name="menu_exit" xml:space="preserve">
+    <value>退出</value>
+  </data>
+  <data name="menu_help" xml:space="preserve">
+    <value>帮助</value>
+  </data>
+  <data name="menu_paper_color" xml:space="preserve">
+    <value>纸张颜色</value>
+  </data>
+  <data name="menu_reset_formats" xml:space="preserve">
+    <value>重置格式</value>
+  </data>
+  <data name="menu_reset_settings" xml:space="preserve">
+    <value>重置设置</value>
+  </data>
+  <data name="msgbox_help" xml:space="preserve">
+    <value>编辑功能可通过快捷键或者菜单访问。
+使用Ctrl + 鼠标滚轮来更改文字大小。
+选中文本时更改大小仅对选中的部分生效。
+笔记内容会自动存储在程序所在目录。
+点击确定打开程序主页。</value>
+  </data>
+  <data name="msgbox_load_error" xml:space="preserve">
+    <value>载入笔记内容时发生错误。笔记内容的文本副本可在以下位置找到。</value>
+  </data>
+  <data name="msgbox_run_from_network" xml:space="preserve">
+    <value>请勿从网络位置运行此程序。请将程序复制到本地后再执行。
+点击确定退出。</value>
+  </data>
+  <data name="msgbox_searched_to_end" xml:space="preserve">
+    <value>搜索已达文档末尾。</value>
+  </data>
+  <data name="msgbox_title_load_error" xml:space="preserve">
+    <value>载入错误</value>
+  </data>
+  <data name="status_saved" xml:space="preserve">
+    <value>已保存</value>
+  </data>
+  <data name="status_save_failed" xml:space="preserve">
+    <value>保存失败</value>
+  </data>
+  <data name="tooltip_align_center" xml:space="preserve">
+    <value>居中对齐 (Ctrl + E)</value>
+  </data>
+  <data name="tooltip_align_justify" xml:space="preserve">
+    <value>分散对齐 (Ctrl + J)</value>
+  </data>
+  <data name="tooltip_align_left" xml:space="preserve">
+    <value>左对齐 (Ctrl + L)</value>
+  </data>
+  <data name="tooltip_align_right" xml:space="preserve">
+    <value>右对齐 (Ctrl + R)</value>
+  </data>
+  <data name="tooltip_back_color" xml:space="preserve">
+    <value>背景颜色</value>
+  </data>
+  <data name="tooltip_bold" xml:space="preserve">
+    <value>粗体 (Ctrl + B)</value>
+  </data>
+  <data name="tooltip_bullets" xml:space="preserve">
+    <value>项目符号 (Ctrl + Shift + L)</value>
+  </data>
+  <data name="tooltip_copy" xml:space="preserve">
+    <value>复制 (Ctrl + C)</value>
+  </data>
+  <data name="tooltip_cut" xml:space="preserve">
+    <value>剪切 (Ctrl + X)</value>
+  </data>
+  <data name="tooltip_decrease_indent" xml:space="preserve">
+    <value>减少缩进 (Ctrl + Shift + T)</value>
+  </data>
+  <data name="tooltip_decrease_size" xml:space="preserve">
+    <value>缩小尺寸 (Ctrl + 鼠标滚轮向下)</value>
+  </data>
+  <data name="tooltip_find" xml:space="preserve">
+    <value>查找 (Ctrl + F)</value>
+  </data>
+  <data name="tooltip_font_color" xml:space="preserve">
+    <value>字体颜色</value>
+  </data>
+  <data name="tooltip_font_default" xml:space="preserve">
+    <value>字体 (全局)</value>
+  </data>
+  <data name="tooltip_font_selection" xml:space="preserve">
+    <value>字体 (选区)</value>
+  </data>
+  <data name="tooltip_highlight" xml:space="preserve">
+    <value>高亮 (Ctrl + H)</value>
+  </data>
+  <data name="tooltip_increase_indent" xml:space="preserve">
+    <value>增加缩进 (Ctrl + T)</value>
+  </data>
+  <data name="tooltip_increase_size" xml:space="preserve">
+    <value>增大尺寸 (Ctrl + Mousewheel Up)</value>
+  </data>
+  <data name="tooltip_italic" xml:space="preserve">
+    <value>斜体 (Ctrl + I)</value>
+  </data>
+  <data name="tooltip_numbering" xml:space="preserve">
+    <value>项目编号 (Ctrl + Shift + N)</value>
+  </data>
+  <data name="tooltip_paste" xml:space="preserve">
+    <value>粘贴 (Ctrl + V)</value>
+  </data>
+  <data name="tooltip_paste_text" xml:space="preserve">
+    <value>粘贴文本 (Ctrl + Shift + V)</value>
+  </data>
+  <data name="tooltip_redo" xml:space="preserve">
+    <value>重做 (Ctrl + Y)</value>
+  </data>
+  <data name="tooltip_strikethrough" xml:space="preserve">
+    <value>删除线 (Ctrl + D)</value>
+  </data>
+  <data name="tooltip_underline" xml:space="preserve">
+    <value>下划线 (Ctrl + U)</value>
+  </data>
+  <data name="tooltip_undo" xml:space="preserve">
+    <value>撤销 (Ctrl + Z)</value>
+  </data>
+</root>

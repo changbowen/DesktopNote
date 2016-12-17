@@ -10,6 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using DesktopNote.Resources;
 
 namespace DesktopNote
 {
@@ -192,11 +193,7 @@ namespace DesktopNote
         #region Menu Events
         private void MenuItem_Help_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Available editing features can be accessd from menu or keyboard combination.\r\n" +
-                "Use Ctrl + mouse wheel to change font size.\r\n" +
-                "Change font or font size when there is a selection will only change selected text.\r\n" +
-               "Note content will be auto saved to application root.\r\n" +
-               "You will be directed to the homepage if you click OK.", "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+            if (MessageBox.Show(Resource.msgbox_help, "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
                 System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
         }
 
@@ -412,7 +409,7 @@ namespace DesktopNote
                     CB_Font.SelectedValue = caretfont.Source;
                 else //multiple fonts
                     CB_Font.SelectedIndex = -1;
-                CB_Font.ToolTip = "Font (Selection)";
+                CB_Font.ToolTip = Resource.tooltip_font_selection;
 
                 var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
                 var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
@@ -427,7 +424,7 @@ namespace DesktopNote
             else
             {
                 CB_Font.SelectedValue = Properties.Settings.Default.Font;
-                CB_Font.ToolTip = "Font (Default)";
+                CB_Font.ToolTip = Resource.tooltip_font_default;
                 ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
                 ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
             }
@@ -516,11 +513,11 @@ namespace DesktopNote
                             File.WriteAllText(Properties.Settings.Default.Bak_Location, tr.Text);
                         });
                     }
-                    result = "Saved";
+                    result = Resource.status_saved;
                 }
                 catch
                 {
-                    result = "Save failed";
+                    result = Resource.status_save_failed;
                 }
 
                 if (isUIthread)
@@ -658,7 +655,7 @@ namespace DesktopNote
                 }
                 catch
                 {
-                    MessageBox.Show("There was an error loading the note contents. Please refer to the following backup file at application root for recovery.\r\n" + set.Bak_Location, "Loading Notes Failed", MessageBoxButton.OK, MessageBoxImage.Stop);
+                    MessageBox.Show(Resource.msgbox_load_error + "\r\n" + set.Bak_Location, Resource.msgbox_title_load_error, MessageBoxButton.OK, MessageBoxImage.Stop);
                 }
             }
 

@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+//using System.Collections.Generic;
+//using System.Configuration;
+//using System.Data;
+//using System.Linq;
+//using System.Threading.Tasks;
 using System.Windows;
+using DesktopNote.Resources;
 
 namespace DesktopNote
 {
@@ -35,7 +36,7 @@ namespace DesktopNote
 
             if (PathIsNetworkPathW(System.AppDomain.CurrentDomain.BaseDirectory))
             {
-                MessageBox.Show("Please do not run this program from a network location. Copy to a local drive first./r/n Program will exit now.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show(Resource.msgbox_run_from_network, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Current.Shutdown();
                 return;
             }

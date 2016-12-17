@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using DesktopNote.Resources;
 
 namespace DesktopNote
 {
@@ -50,7 +51,7 @@ namespace DesktopNote
                 if (start == null)
                 {
                     textchanged = true;
-                    MessageBox.Show("Search has reached the end of the document.", "", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(Resource.msgbox_searched_to_end, "", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
         }
