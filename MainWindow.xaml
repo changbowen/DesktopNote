@@ -4,19 +4,22 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:DesktopNote"
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}" ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True" UseLayoutRounding="True" MouseEnter="Win_Main_MouseEnter" MouseLeave="Win_Main_MouseLeave" Loaded="Win_Main_Loaded">
+        Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}"
+        ResizeMode="CanResizeWithGrip" SnapsToDevicePixels="True" UseLayoutRounding="True" 
+        MouseEnter="Win_Main_MouseEnter" MouseLeave="Win_Main_MouseLeave" Loaded="Win_Main_Loaded">
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12"
-                   MouseLeftButtonDown="Rec_BG_MouseLeftButtonDown" MouseLeftButtonUp="Rec_BG_MouseLeftButtonUp" MouseMove="Rec_BG_MouseMove">
+                   MouseLeftButtonDown="Rec_BG_MouseLeftButtonDown" MouseLeftButtonUp="Rec_BG_MouseLeftButtonUp" MouseMove="Rec_BG_MouseMove" Cursor="SizeAll">
             <Rectangle.Effect>
                 <DropShadowEffect ShadowDepth="0" BlurRadius="8"/>
             </Rectangle.Effect>
         </Rectangle>
         <RichTextBox x:Name="RTB_Main" Margin="20" Background="{x:Null}" BorderBrush="{x:Null}" AcceptsTab="True" BorderThickness="0" IsInactiveSelectionHighlightEnabled="True"
-                     TextChanged="RTB_Main_TextChanged" PreviewKeyDown="RTB_Main_PreviewKeyDown" PreviewMouseWheel="RTB_Main_PreviewMouseWheel" LostKeyboardFocus="RTB_Main_LostKeyboardFocus" ContextMenuOpening="RTB_Main_ContextMenuOpening">
-            <wtk:RichTextBoxFormatBarManager.FormatBar>
+                     TextChanged="RTB_Main_TextChanged" PreviewKeyDown="RTB_Main_PreviewKeyDown" PreviewMouseWheel="RTB_Main_PreviewMouseWheel"
+                     LostKeyboardFocus="RTB_Main_LostKeyboardFocus" ContextMenuOpening="RTB_Main_ContextMenuOpening">
+            <!--<wtk:RichTextBoxFormatBarManager.FormatBar>
                 <wtk:RichTextBoxFormatBar/>
-            </wtk:RichTextBoxFormatBarManager.FormatBar>
+            </wtk:RichTextBoxFormatBarManager.FormatBar>-->
             <RichTextBox.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource {x:Static SystemColors.HighlightColorKey}}"/>
                 <!--<Thickness x:Key="ListPadding" Left="16"/>-->

@@ -4,15 +4,15 @@
 winexe
 C#
 .cs
-F:\GitHub Repos\DesktopNote\obj\Debug\
+F:\GitHub Repos\DesktopNote\obj\Release\
 DesktopNote
 none
 false
-DEBUG;TRACE
+TRACE
 F:\GitHub Repos\DesktopNote\App.xaml
 2-90453093
 
-71731031632
+11933069791
 14-53673721
 MainWindow.xaml;Win_Search.xaml;
 

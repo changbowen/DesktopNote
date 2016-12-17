@@ -36,7 +36,7 @@ namespace DesktopNote
         {
             var mi = new MonitorInfo();
             mi.cbSize = (uint)Marshal.SizeOf(typeof(MonitorInfo));
-            var hwmon = MonitorFromWindow(new System.Windows.Interop.WindowInteropHelper(App.Current.MainWindow).EnsureHandle(), MONITOR_DEFAULTTOPRIMERTY);
+            var hwmon = MonitorFromWindow(new System.Windows.Interop.WindowInteropHelper(Application.Current.MainWindow).EnsureHandle(), MONITOR_DEFAULTTOPRIMERTY);
             if (GetMonitorInfo(hwmon, ref mi))
             {
                 //convert to device-independent vaues

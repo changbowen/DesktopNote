@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DesktopNote
 {
@@ -187,13 +182,15 @@ namespace DesktopNote
 
         private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (Properties.Settings.Default.AutoDock && Application.Current.Windows.Count == 1 && !RTB_Main.IsKeyboardFocused && !RTB_Main.ContextMenu.IsOpen)
+            if (Properties.Settings.Default.AutoDock && 
+                Application.Current.Windows.Count == 1 && //to prevent docking when search window is visible.
+                !RTB_Main.IsKeyboardFocused && !RTB_Main.ContextMenu.IsOpen)
                 DockToSide();
         }
         #endregion
 
         #region Menu Events
-        private void MenuItem_Help_Click()
+        private void MenuItem_Help_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Available editing features can be accessd from menu or keyboard combination.\r\n" +
                 "Use Ctrl + mouse wheel to change font size.\r\n" +
@@ -203,12 +200,12 @@ namespace DesktopNote
                 System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
         }
 
-        private void MenuItem_Exit_Click()
+        private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
         {
             Quit(true);
         }
 
-        private void MenuItem_Bullet_Click()
+        private void MenuItem_Bullet_Click(object sender, RoutedEventArgs e)
         {
             EditingCommands.ToggleBullets.Execute(null, RTB_Main);
         }
@@ -239,26 +236,31 @@ namespace DesktopNote
 
         private void MenuItem_ResetFormats_Click(object sender, RoutedEventArgs e)
         {
+            //clear custom formats
             var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
             tr.ClearAllProperties();
 
-            var cp = (Color)ColorConverter.ConvertFromString((string)Properties.Settings.Default.Properties["PaperColor"].DefaultValue);
-            Properties.Settings.Default.PaperColor = cp;
-            Rec_BG.Fill = new SolidColorBrush(cp);
+            //reset global font size
+            RTB_Main.FontSize = FontSize;
+
+            //resetting paper color should be processed with Reset Settings
+            //var cp = (Color)ColorConverter.ConvertFromString((string)Properties.Settings.Default.Properties["PaperColor"].DefaultValue);
+            //Properties.Settings.Default.PaperColor = cp;
+            //Rec_BG.Fill = new SolidColorBrush(cp);
         }
 
-        private void MenuItem_ResetSet_Click()
+        private void MenuItem_ResetSet_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.Reset();
             Properties.Settings.Default.Save();
 
             Close();
             var win = new MainWindow();
-            App.Current.MainWindow = win;
+            Application.Current.MainWindow = win;
             win.Show();
         }
 
-        private void ToggleStrike()
+        private void ToggleStrike(object sender, RoutedEventArgs e)
         {
             //strike-through
             dynamic tdc = RTB_Main.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
@@ -269,7 +271,7 @@ namespace DesktopNote
             RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc);
         }
 
-        private void ToggleHighlight()
+        private void ToggleHighlight(object sender, RoutedEventArgs e)
         {
             var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
             if (tdc != null)
@@ -281,12 +283,12 @@ namespace DesktopNote
             }
         }
 
-        private void PasteAsText()
+        private void PasteAsText(object sender, RoutedEventArgs e)
         {
             RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText());
         }
 
-        private void IncreaseSize()
+        private void IncreaseSize(object sender, RoutedEventArgs e)
         {
             if (RTB_Main.Selection.IsEmpty)
                 RTB_Main.FontSize += 1;
@@ -316,7 +318,7 @@ namespace DesktopNote
             }
         }
 
-        private void DecreaseSize()
+        private void DecreaseSize(object sender, RoutedEventArgs e)
         {
             if (RTB_Main.Selection.IsEmpty)
             {
@@ -351,14 +353,117 @@ namespace DesktopNote
             }
         }
 
-        private void Find()
+        private void Find(object sender, RoutedEventArgs e)
         {
             new Win_Search().Show();
         }
         #endregion
 
         #region RichTextBox Events
+        private void RTB_Main_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (RTB_Main.IsFocused)
+            {
+                CountDown = 2000;
+                TB_Status.Visibility = Visibility.Hidden;
+            }
+        }
 
+        private void RTB_Main_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
+                ToggleStrike(null, null);
+            else if (e.Key == Key.V && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+                PasteAsText(null, null);
+            else if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
+                Find(null, null);
+            else if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
+                ToggleHighlight(null, null);
+        }
+
+        private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            //when padding is set on list, changing font size results in incorrect bullet position.
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                e.Handled = true;
+                if (e.Delta > 0) //wheel up
+                    IncreaseSize(null, null);
+                else
+                    DecreaseSize(null, null);
+            }
+        }
+
+        private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            if (Properties.Settings.Default.AutoDock && 
+                Application.Current.Windows.Count == 1 && 
+                !RTB_Main.ContextMenu.IsOpen)
+                DockToSide();
+        }
+
+        private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            //update combobox selection etc
+            if (!RTB_Main.Selection.IsEmpty)
+            {
+                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
+                if (caretfont != null)
+                    CB_Font.SelectedValue = caretfont.Source;
+                else //multiple fonts
+                    CB_Font.SelectedIndex = -1;
+                CB_Font.ToolTip = "Font (Selection)";
+
+                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
+                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
+                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
+                else fontcolorpicker.SelectedColor = null;
+
+                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
+                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content;
+                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
+                else backcolorpicker.SelectedColor = null;
+            }
+            else
+            {
+                CB_Font.SelectedValue = Properties.Settings.Default.Font;
+                CB_Font.ToolTip = "Font (Default)";
+                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
+                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
+            }
+        }
+        #endregion
+        
+        #region Rect Events
+        private void Rec_BG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            Rec_BG.CaptureMouse();
+            if (e.ClickCount == 2)
+            {
+                if (WindowState == WindowState.Normal)
+                    WindowState = WindowState.Maximized;
+                else if (WindowState == WindowState.Maximized)
+                    WindowState = WindowState.Normal;
+            }
+            else
+                mousepos = e.GetPosition(this);
+        }
+
+        private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Rec_BG.ReleaseMouseCapture();
+            if (Properties.Settings.Default.AutoDock) DockToSide(true);
+        }
+
+        private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && mousepos != null)
+            {
+                var pos = e.GetPosition(this);
+                Left += pos.X - mousepos.X;
+                Top += pos.Y - mousepos.Y;
+            }
+        }
         #endregion
 
         private void SaveNotes()
@@ -445,7 +550,7 @@ namespace DesktopNote
                 set.DockedTo = (int)lastdockstatus;
                 set.Save();
             }
-            App.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -596,105 +701,5 @@ namespace DesktopNote
             task_save.Start();
         }
 
-        private void RTB_Main_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (RTB_Main.IsFocused)
-            {
-                CountDown = 2000;
-                TB_Status.Visibility = Visibility.Hidden;
-            }
-        }
-
-        private void RTB_Main_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
-                ToggleStrike();
-            else if (e.Key == Key.V && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
-                PasteAsText();
-            else if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
-                Find();
-            else if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
-                ToggleHighlight();
-        }
-
-        private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            //when padding is set on list, changing font size results in incorrect bullet position.
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                e.Handled = true;
-                if (e.Delta > 0) //wheel up
-                    IncreaseSize();
-                else
-                    DecreaseSize();
-            }
-        }
-
-        private void Rec_BG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Rec_BG.CaptureMouse();
-            if (e.ClickCount == 2)
-            {
-                if (WindowState == WindowState.Normal)
-                    WindowState = WindowState.Maximized;
-                else if (WindowState == WindowState.Maximized)
-                    WindowState = WindowState.Normal;
-            }
-            else
-                mousepos = e.GetPosition(this);
-        }
-
-        private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Rec_BG.ReleaseMouseCapture();
-            if (Properties.Settings.Default.AutoDock) DockToSide(true);
-        }
-
-        private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed && mousepos != null)
-            {
-                var pos = e.GetPosition(this);
-                Left += pos.X - mousepos.X;
-                Top += pos.Y - mousepos.Y;
-            }
-        }
-
-        private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            if (Properties.Settings.Default.AutoDock && App.Current.Windows.Count == 1 && !RTB_Main.ContextMenu.IsOpen)
-                DockToSide();
-        }
-
-        private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            //update combobox selection etc
-            if (!RTB_Main.Selection.IsEmpty)
-            {
-                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
-                if (caretfont != null)
-                    CB_Font.SelectedValue = caretfont.Source;
-                else //multiple fonts
-                    CB_Font.SelectedIndex = -1;
-                CB_Font.ToolTip = "Font (Selection)";
-
-                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
-                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
-                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
-                else fontcolorpicker.SelectedColor = null;
-
-                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content;
-                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
-                else backcolorpicker.SelectedColor = null;
-            }
-            else
-            {
-                CB_Font.SelectedValue = Properties.Settings.Default.Font;
-                CB_Font.ToolTip = "Font (Default)";
-                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
-                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
-            }
-        }
     }
 }

@@ -21,7 +21,7 @@ namespace DesktopNote
                   var desiredAssembly = new System.Reflection.AssemblyName(e.Name).Name;
                   if (desiredAssembly == "Xceed.Wpf.Toolkit")
                   {
-                      var ressourceName = "DesktopNote." + desiredAssembly + ".dll";
+                      var ressourceName = "DesktopNote.Resources." + desiredAssembly + ".dll";
                       using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(ressourceName))
                       {
                           byte[] assemblyData = new byte[stream.Length];
@@ -40,12 +40,12 @@ namespace DesktopNote
                 return;
             }
 
-            if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
-            {
-                MessageBox.Show("Only one instance of DesktopNote can be running.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                Current.Shutdown();
-                return;
-            }
+            //if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
+            //{
+            //    MessageBox.Show("Only one instance of DesktopNote can be running.", "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            //    Current.Shutdown();
+            //    return;
+            //}
 
             var mainwin = new MainWindow();
             mainwin.Show();

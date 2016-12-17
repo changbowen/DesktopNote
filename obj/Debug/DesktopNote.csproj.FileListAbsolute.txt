@@ -13,3 +13,11 @@ F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote_MarkupCompile.lref
 F:\GitHub Repos\DesktopNote\obj\Debug\Win_Search.baml
 F:\GitHub Repos\DesktopNote\obj\Debug\Win_Search.g.cs
 C:\Users\changbw001\Source\Repos\DesktopNote\bin\Debug\DesktopNote.exe.config
+F:\GitHub Repos\DesktopNote\bin\Debug\DesktopNote.exe
+F:\GitHub Repos\DesktopNote\bin\Debug\DesktopNote.pdb
+F:\GitHub Repos\DesktopNote\obj\Debug\MainWindow.baml
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.g.resources
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.Properties.Resources.resources
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.csproj.GenerateResource.Cache
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.exe
+F:\GitHub Repos\DesktopNote\obj\Debug\DesktopNote.pdb
