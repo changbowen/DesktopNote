@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:DesktopNote.Resources"
-                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xml:space="preserve">
     <sys:String x:Key="button_cancel">Cancel</sys:String>
     <sys:String x:Key="button_ok">OK</sys:String>
     <sys:String x:Key="button_search">Search</sys:String>
