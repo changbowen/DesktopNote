@@ -5,7 +5,6 @@
 //using System.Linq;
 //using System.Threading.Tasks;
 using System.Windows;
-using DesktopNote.Resources;
 
 namespace DesktopNote
 {
@@ -36,7 +35,7 @@ namespace DesktopNote
 
             if (PathIsNetworkPathW(System.AppDomain.CurrentDomain.BaseDirectory))
             {
-                MessageBox.Show(Resource.msgbox_run_from_network, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                MessageBox.Show((string)Resources["msgbox_run_from_network"], "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Current.Shutdown();
                 return;
             }
@@ -47,6 +46,19 @@ namespace DesktopNote
             //    Current.Shutdown();
             //    return;
             //}
+
+            //localization
+            var dict = new ResourceDictionary();
+            switch (System.Threading.Thread.CurrentThread.CurrentCulture.Name.Substring(0, 2))
+            {
+                case "zh":
+                    dict.Source = new Uri(@"Resources\StringResources.zh.xaml", UriKind.Relative);
+                    break;
+                default:
+                    dict.Source = new Uri(@"Resources\StringResources.xaml", UriKind.Relative);
+                    break;
+            }
+            Resources.MergedDictionaries.Add(dict);
 
             var mainwin = new MainWindow();
             mainwin.Show();
