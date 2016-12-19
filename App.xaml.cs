@@ -62,8 +62,6 @@ namespace DesktopNote
             if (!langadded)
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri(@"Resources\StringResources.en.xaml", UriKind.Relative) });
 
-            MessageBox.Show(AppDomain.CurrentDomain.BaseDirectory, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
             //other run checks
             if (PathIsNetworkPath(AppDomain.CurrentDomain.BaseDirectory))
             {
