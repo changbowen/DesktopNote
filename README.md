@@ -3,6 +3,8 @@
 
 The only **simple** yet **rich-featured** desktop note app you'll ever need for your PC.
 
+To get the latest dev build, check bin/Release.
+
 ## Screenshot
 <img src="http://i.imgur.com/UazbLPg.png" alt=""/>
 <img src="http://i.imgur.com/7IXTcSn.png" alt=""/>
