@@ -2,7 +2,7 @@
 //using System.Collections.Generic;
 //using System.Configuration;
 //using System.Data;
-using System.Linq;
+//using System.Linq;
 //using System.Threading.Tasks;
 using System.Windows;
 
@@ -10,7 +10,6 @@ namespace DesktopNote
 {
     public partial class App : Application
     {
-        //Private Declare Unicode Function PathIsNetworkPath Lib "shlwapi" Alias "" (ByVal pszPath As String) As Boolean
         [System.Runtime.InteropServices.DllImport("shlwapi.dll")]
         private static extern bool PathIsNetworkPathW(string pszPath);
 
