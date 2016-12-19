@@ -11,7 +11,7 @@ namespace DesktopNote
     public partial class App : Application
     {
         [System.Runtime.InteropServices.DllImport("shlwapi.dll")]
-        private static extern bool PathIsNetworkPathW(string pszPath);
+        private static extern bool PathIsNetworkPath(string pszPath);
 
         private void RunCheck(object sender1, StartupEventArgs e1)
         {
@@ -62,8 +62,10 @@ namespace DesktopNote
             if (!langadded)
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri(@"Resources\StringResources.en.xaml", UriKind.Relative) });
 
+            MessageBox.Show(AppDomain.CurrentDomain.BaseDirectory, "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
             //other run checks
-            if (PathIsNetworkPathW(System.AppDomain.CurrentDomain.BaseDirectory))
+            if (PathIsNetworkPath(AppDomain.CurrentDomain.BaseDirectory))
             {
                 MessageBox.Show((string)Resources["msgbox_run_from_network"], "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Current.Shutdown();
