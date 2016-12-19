@@ -52,5 +52,5 @@ Program will exit now.</sys:String>
     <sys:String x:Key="tooltip_strikethrough">Strike-through (Ctrl + D)</sys:String>
     <sys:String x:Key="tooltip_underline">Underline (Ctrl + U)</sys:String>
     <sys:String x:Key="tooltip_undo">Undo (Ctrl + Z)</sys:String>
-
+    <sys:String x:Key="msgbox_one_inst">DesktopNote is already running.</sys:String>
 </ResourceDictionary>
