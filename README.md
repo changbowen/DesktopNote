@@ -3,7 +3,9 @@
 
 The only **simple** yet **rich-featured** desktop note app you'll ever need for your PC.
 
-To get the latest dev build, check bin/Release.
+**Always go to bin/Release for the [latest dev build](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
+
+
 
 ## Screenshot
 <img src="http://i.imgur.com/UazbLPg.png" alt=""/>
