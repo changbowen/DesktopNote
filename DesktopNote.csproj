@@ -60,10 +60,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FormatBox.xaml.cs">
+      <DependentUpon>FormatBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GetCurrentMonitor.cs" />
     <Compile Include="Win_Search.xaml.cs">
       <DependentUpon>Win_Search.xaml</DependentUpon>
     </Compile>
+    <Page Include="FormatBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -18,9 +18,10 @@ namespace DesktopNote
         private object Lock_Save = new object();
         private static int CountDown = 0;
         string doc_loc = AppDomain.CurrentDomain.BaseDirectory + Properties.Settings.Default.Doc_Location;
-        string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        public string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
         Point mousepos;
-        
+        private bool fbopen = false;
+                
         public MainWindow()
         {
             InitializeComponent();
@@ -29,7 +30,9 @@ namespace DesktopNote
         #region Docking
         public DockStatus lastdockstatus;
         private Rect currScrnRect;
+
         public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
+
         public DockStatus DockedTo
         {
             get { return (DockStatus)GetValue(DockedToProperty); }
@@ -39,7 +42,7 @@ namespace DesktopNote
         public static readonly DependencyProperty DockedToProperty =
             DependencyProperty.Register("DockedTo", typeof(DockStatus), typeof(MainWindow), new PropertyMetadata(DockStatus.None));
 
-        private void DockToSide(bool changpos = false)
+        internal void DockToSide(bool changpos = false)
         {
             if (DockedTo == DockStatus.None)
             {
@@ -183,175 +186,10 @@ namespace DesktopNote
         private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
         {
             if (Properties.Settings.Default.AutoDock && 
-                Application.Current.Windows.Count == 1 && //to prevent docking when search window is visible.
-                !RTB_Main.IsKeyboardFocused && !RTB_Main.ContextMenu.IsOpen)
+                Application.Current.Windows.Count <= App.MaxWindowCount && //to prevent docking when search window is visible. FormatBox is the 2nd window.
+                !RTB_Main.IsKeyboardFocusWithin &&
+                !fbopen)
                 DockToSide();
-        }
-        #endregion
-
-        #region Menu Events
-        private void MenuItem_Help_Click(object sender, RoutedEventArgs e)
-        {
-            if (MessageBox.Show((string)Application.Current.Resources["msgbox_help"], "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
-                System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
-        }
-
-        private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
-        {
-            Quit(true);
-        }
-
-        private void MenuItem_Bullet_Click(object sender, RoutedEventArgs e)
-        {
-            EditingCommands.ToggleBullets.Execute(null, RTB_Main);
-        }
-
-        private void MI_AutoStart_Click(object sender, RoutedEventArgs e)
-        {
-            var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
-            if (MI_AutoStart.IsChecked)
-                run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
-            else
-                run.DeleteValue(assname, false);
-        }
-
-        private void MI_AutoDock_Click(object sender, RoutedEventArgs e)
-        {
-            if (MI_AutoDock.IsChecked)
-            {
-                Properties.Settings.Default.AutoDock = true;
-                DockToSide(true);
-            }
-            else
-            {
-                Properties.Settings.Default.AutoDock = false;
-                Topmost = false;
-            }
-            Properties.Settings.Default.Save();
-        }
-
-        private void MenuItem_ResetFormats_Click(object sender, RoutedEventArgs e)
-        {
-            //clear custom formats
-            var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-            tr.ClearAllProperties();
-
-            //reset global font size
-            RTB_Main.FontSize = FontSize;
-
-            //resetting paper color should be processed with Reset Settings
-            //var cp = (Color)ColorConverter.ConvertFromString((string)Properties.Settings.Default.Properties["PaperColor"].DefaultValue);
-            //Properties.Settings.Default.PaperColor = cp;
-            //Rec_BG.Fill = new SolidColorBrush(cp);
-        }
-
-        private void MenuItem_ResetSet_Click(object sender, RoutedEventArgs e)
-        {
-            Properties.Settings.Default.Reset();
-            Properties.Settings.Default.Save();
-
-            Close();
-            var win = new MainWindow();
-            Application.Current.MainWindow = win;
-            win.Show();
-        }
-
-        private void ToggleStrike(object sender, RoutedEventArgs e)
-        {
-            //strike-through
-            dynamic tdc = RTB_Main.Selection.GetPropertyValue(Inline.TextDecorationsProperty);
-            if (tdc == DependencyProperty.UnsetValue || tdc.Count > 0)
-                tdc = null;
-            else
-                tdc = TextDecorations.Strikethrough;
-            RTB_Main.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, tdc);
-        }
-
-        private void ToggleHighlight(object sender, RoutedEventArgs e)
-        {
-            var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-            if (tdc != null)
-                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, null);
-            else
-            {
-                RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
-                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Yellow));
-            }
-        }
-
-        private void PasteAsText(object sender, RoutedEventArgs e)
-        {
-            RTB_Main.CaretPosition.InsertTextInRun(Clipboard.GetText());
-        }
-
-        private void IncreaseSize(object sender, RoutedEventArgs e)
-        {
-            if (RTB_Main.Selection.IsEmpty)
-                RTB_Main.FontSize += 1;
-            else
-            {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
-                Image img = null;
-                switch (ele.GetType().Name)
-                {
-                    case "BlockUIContainer":
-                        img = ((BlockUIContainer)ele).Child as Image;
-                        break;
-                    case "InlineUIContainer":
-                        img = ((InlineUIContainer)ele).Child as Image;
-                        break;
-                    case "Image":
-                        img = (Image)ele;
-                        break;
-                }
-                if (img != null)
-                {
-                    img.Width += 2;
-                    img.Height += 2;
-                }
-                else
-                    EditingCommands.IncreaseFontSize.Execute(null, RTB_Main);
-            }
-        }
-
-        private void DecreaseSize(object sender, RoutedEventArgs e)
-        {
-            if (RTB_Main.Selection.IsEmpty)
-            {
-                if (RTB_Main.FontSize > 1) RTB_Main.FontSize -= 1;
-            }
-            else
-            {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
-                Image img = null;
-                switch (ele.GetType().Name)
-                {
-                    case "BlockUIContainer":
-                        img = ((BlockUIContainer)ele).Child as Image;
-                        break;
-                    case "InlineUIContainer":
-                        img = ((InlineUIContainer)ele).Child as Image;
-                        break;
-                    case "Image":
-                        img = (Image)ele;
-                        break;
-                }
-                if (img != null)
-                {
-                    if (img.Width > 2 && img.Height > 2)
-                    {
-                        img.Width -= 2;
-                        img.Height -= 2;
-                    }
-                }
-                else
-                    EditingCommands.DecreaseFontSize.Execute(null, RTB_Main);
-            }
-        }
-
-        private void Find(object sender, RoutedEventArgs e)
-        {
-            new Win_Search().Show();
         }
         #endregion
 
@@ -368,13 +206,13 @@ namespace DesktopNote
         private void RTB_Main_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
-                ToggleStrike(null, null);
+                App.fb.ToggleStrike(null, null);
             else if (e.Key == Key.V && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
-                PasteAsText(null, null);
+                App.fb.PasteAsText(null, null);
             else if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
-                Find(null, null);
+                App.fb.Find(null, null);
             else if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
-                ToggleHighlight(null, null);
+                App.fb.ToggleHighlight(null, null);
         }
 
         private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -384,52 +222,64 @@ namespace DesktopNote
             {
                 e.Handled = true;
                 if (e.Delta > 0) //wheel up
-                    IncreaseSize(null, null);
+                    App.fb.IncreaseSize(null, null);
                 else
-                    DecreaseSize(null, null);
+                    App.fb.DecreaseSize(null, null);
             }
         }
 
         private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (Properties.Settings.Default.AutoDock && 
-                Application.Current.Windows.Count == 1 && 
-                !RTB_Main.ContextMenu.IsOpen)
+            if (Properties.Settings.Default.AutoDock &&
+                Application.Current.Windows.Count <= App.MaxWindowCount &&
+                !fbopen)
                 DockToSide();
         }
 
         private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            //update combobox selection etc
+            fbopen = true;
+            e.Handled = true;
             if (!RTB_Main.Selection.IsEmpty)
             {
                 var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
                 if (caretfont != null)
-                    CB_Font.SelectedValue = caretfont.Source;
+                    App.fb.CB_Font.SelectedValue = caretfont.Source;
                 else //multiple fonts
-                    CB_Font.SelectedIndex = -1;
-                CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_selection"];
+                    App.fb.CB_Font.SelectedIndex = -1;
+                App.fb.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_selection"];
 
                 var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
-                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
+                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content;
                 if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
                 else fontcolorpicker.SelectedColor = null;
 
                 var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content;
+                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content;
                 if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
                 else backcolorpicker.SelectedColor = null;
             }
             else
             {
-                CB_Font.SelectedValue = Properties.Settings.Default.Font;
-                CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_default"];
-                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
-                ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
+                App.fb.CB_Font.SelectedValue = Properties.Settings.Default.Font;
+                App.fb.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_default"];
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
+            }
+            App.fb.Popup();
+        }
+
+        private void RTB_Main_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && App.fb?.Grid_Main?.Opacity == 1)
+            {
+                fbopen = false;
+                App.fb.Unpop();
             }
         }
+
         #endregion
-        
+
         #region Rect Events
         private void Rec_BG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -535,7 +385,7 @@ namespace DesktopNote
             }
         }
 
-        private void Quit(bool savesetting)
+        internal void Quit(bool savesetting)
         {
             SaveToXamlPkg();
             var set = Properties.Settings.Default;
@@ -547,42 +397,6 @@ namespace DesktopNote
                 set.Save();
             }
             Application.Current.Shutdown();
-        }
-
-        private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
-        {
-            if (e.NewValue.HasValue && ((Xceed.Wpf.Toolkit.ColorPicker)sender).IsOpen)
-            {
-                var cp = (ContentPresenter)VisualTreeHelper.GetParent((DependencyObject)sender);
-                if (cp != null)
-                {
-                    switch (cp.Name)
-                    {
-                        case "CP_Font":
-                            if (!RTB_Main.Selection.IsEmpty) //only change selected
-                                RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(e.NewValue.Value));
-                            else //change default
-                            {
-                                RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
-                                Properties.Settings.Default.FontColor = e.NewValue.Value;
-                            }
-                            break;
-                        case "CP_Back":
-                            if (!RTB_Main.Selection.IsEmpty) //only change selected
-                                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(e.NewValue.Value)); //the caret color will be changed as well
-                            else //change default
-                            {
-                                RTB_Main.Background = new SolidColorBrush(e.NewValue.Value);
-                                Properties.Settings.Default.BackColor = e.NewValue.Value;
-                            }
-                            break;
-                        case "CP_Paper":
-                            Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
-                            Properties.Settings.Default.PaperColor = e.NewValue.Value;
-                            break;
-                    }
-                }
-            }
         }
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
@@ -605,44 +419,55 @@ namespace DesktopNote
                 Top = set.Win_Pos.Y;
             }
 
+            bool firstload = false;
+            if (App.fb == null)
+            {
+                App.fb = new FormatBox();
+                firstload = true;
+            }
+            App.fb.Tag = RTB_Main;
+            //App.fb.Owner = this; causing fb to close when mainwin closes.
             lastdockstatus = (DockStatus)set.DockedTo;
             RTB_Main.FontFamily = new FontFamily(set.Font);
             RTB_Main.Foreground = new SolidColorBrush(set.FontColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content).SelectedColor = set.FontColor;
+            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content).SelectedColor = set.FontColor;
             RTB_Main.Background = new SolidColorBrush(set.BackColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content).SelectedColor = set.BackColor;
+            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = set.BackColor;
             Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Paper.Content).SelectedColor = set.PaperColor;
+            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Paper.Content).SelectedColor = set.PaperColor;
 
-            //add fonts to menu
-            foreach (var f in Fonts.SystemFontFamilies)
+            if (firstload)
             {
-                var mi = new ComboBoxItem
+                //add fonts to menu
+                foreach (var f in Fonts.SystemFontFamilies)
                 {
-                    Content = f.Source,
-                    FontFamily = f,
-                    FontSize = this.FontSize + 4,
-                    ToolTip = f.Source
-                };
-                CB_Font.Items.Add(mi);
-                if (f.Source == set.Font) mi.IsSelected = true;
-            }
-            CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
-            CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
-              {
-                  if (RTB_Main.ContextMenu.IsOpen && e1.AddedItems.Count == 1)
-                  {
-                      var mi = (ComboBoxItem)e1.AddedItems[0];
+                    var mi = new ComboBoxItem
+                    {
+                        Content = f.Source,
+                        FontFamily = f,
+                        FontSize = this.FontSize + 4,
+                        ToolTip = f.Source
+                    };
+                    App.fb.CB_Font.Items.Add(mi);
+                    if (f.Source == set.Font) mi.IsSelected = true;
+                }
+                App.fb.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
+                App.fb.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
+                {
+                    if (App.fb.Grid_Main.Opacity == 1 && e1.AddedItems.Count == 1)
+                    {
+                        var mi = (ComboBoxItem)e1.AddedItems[0];
 
-                      if (!RTB_Main.Selection.IsEmpty) //only change selected
-                          RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
-                      else //change default
-                      {
-                          RTB_Main.FontFamily = mi.FontFamily;
-                          set.Font = mi.FontFamily.Source;
-                      }
-                  }
-              };
+                        if (!RTB_Main.Selection.IsEmpty) //only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                        else //change default
+                        {
+                            RTB_Main.FontFamily = mi.FontFamily;
+                            set.Font = mi.FontFamily.Source;
+                        }
+                    }
+                };
+            }            
 
             //loading contents
             if (File.Exists(doc_loc))
@@ -678,15 +503,15 @@ namespace DesktopNote
             //without the above two lines, Load actions can be undone.
 
             //check auto dock
-            if (set.AutoDock == true) MI_AutoDock.IsChecked = true;
+            if (set.AutoDock == true) App.fb.CB_AutoDock.IsChecked = true;
 
             //check auto start
             var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
             string run_value = (string)run.GetValue(assname);
 
-            if (run_value != "")
+            if (!string.IsNullOrEmpty(run_value))
             {
-                MI_AutoStart.IsChecked = true;
+                App.fb.CB_AutoStart.IsChecked = true;
                 if (run_value != System.Reflection.Assembly.GetExecutingAssembly().Location)
                     run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
             }
@@ -697,6 +522,7 @@ namespace DesktopNote
             task_save.IsBackground = true;
             task_save.Start();
         }
+
 
     }
 }

@@ -10,6 +10,10 @@ namespace DesktopNote
 {
     public partial class App : Application
     {
+        public static MainWindow mainwin;
+        public static FormatBox fb;
+        internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
+
         [System.Runtime.InteropServices.DllImport("shlwapi.dll")]
         private static extern bool PathIsNetworkPath(string pszPath);
 
@@ -77,7 +81,8 @@ namespace DesktopNote
                 return;
             }
 
-            var mainwin = new MainWindow();
+            mainwin = new MainWindow();
+            Current.MainWindow = mainwin;
             mainwin.Show();
         }
     }
