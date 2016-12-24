@@ -419,14 +419,9 @@ namespace DesktopNote
                 Top = set.Win_Pos.Y;
             }
 
-            bool firstload = false;
-            if (App.fb == null)
-            {
-                App.fb = new FormatBox();
-                firstload = true;
-            }
+            App.fb = new FormatBox();
             App.fb.Tag = RTB_Main;
-            //App.fb.Owner = this; causing fb to close when mainwin closes.
+            App.fb.Owner = this; //causing fb to close when mainwin closes.
             lastdockstatus = (DockStatus)set.DockedTo;
             RTB_Main.FontFamily = new FontFamily(set.Font);
             RTB_Main.Foreground = new SolidColorBrush(set.FontColor);
@@ -436,38 +431,37 @@ namespace DesktopNote
             Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
             ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Paper.Content).SelectedColor = set.PaperColor;
 
-            if (firstload)
-            {
-                //add fonts to menu
-                foreach (var f in Fonts.SystemFontFamilies)
-                {
-                    var mi = new ComboBoxItem
-                    {
-                        Content = f.Source,
-                        FontFamily = f,
-                        FontSize = this.FontSize + 4,
-                        ToolTip = f.Source
-                    };
-                    App.fb.CB_Font.Items.Add(mi);
-                    if (f.Source == set.Font) mi.IsSelected = true;
-                }
-                App.fb.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
-                App.fb.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
-                {
-                    if (App.fb.Grid_Main.Opacity == 1 && e1.AddedItems.Count == 1)
-                    {
-                        var mi = (ComboBoxItem)e1.AddedItems[0];
 
-                        if (!RTB_Main.Selection.IsEmpty) //only change selected
-                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
-                        else //change default
-                        {
-                            RTB_Main.FontFamily = mi.FontFamily;
-                            set.Font = mi.FontFamily.Source;
-                        }
-                    }
+            //add fonts to menu
+            foreach (var f in Fonts.SystemFontFamilies)
+            {
+                var mi = new ComboBoxItem
+                {
+                    Content = f.Source,
+                    FontFamily = f,
+                    FontSize = this.FontSize + 4,
+                    ToolTip = f.Source
                 };
-            }            
+                App.fb.CB_Font.Items.Add(mi);
+                if (f.Source == set.Font) mi.IsSelected = true;
+            }
+            App.fb.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
+            App.fb.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
+            {
+                if (App.fb.Grid_Main.Opacity == 1 && e1.AddedItems.Count == 1)
+                {
+                    var mi = (ComboBoxItem)e1.AddedItems[0];
+
+                    if (!RTB_Main.Selection.IsEmpty) //only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                    else //change default
+                        {
+                        RTB_Main.FontFamily = mi.FontFamily;
+                        set.Font = mi.FontFamily.Source;
+                    }
+                }
+            };
+               
 
             //loading contents
             if (File.Exists(doc_loc))

@@ -5,7 +5,7 @@
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
         Width="230" Height="250" UseLayoutRounding="True" AllowsTransparency="True"
         WindowStyle="None" Background="{x:Null}" FontSize="10" ShowInTaskbar="False" ShowActivated="False"
-        Topmost="True">
+        Topmost="True" PreviewGotKeyboardFocus="FB1_PreviewGotKeyboardFocus">
     <Window.Resources>
         <Storyboard x:Key="SB_In">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="Grid_Main">
