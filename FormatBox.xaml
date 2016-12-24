@@ -58,15 +58,35 @@
         <Grid.RenderTransform>
             <TransformGroup>
                 <ScaleTransform ScaleX="0" ScaleY="0"/>
+                <!--<ScaleTransform ScaleX="1" ScaleY="1"/>-->
                 <!--<SkewTransform/>
                 <RotateTransform/>
                 <TranslateTransform/>-->
             </TransformGroup>
         </Grid.RenderTransform>
-        <Rectangle x:Name="Rec_BG" Fill="White" Margin="10" RadiusX="8" RadiusY="8" Opacity="0.8">
+        <!--挖空投影层-->
+        <Rectangle Margin="10" RadiusX="8" RadiusY="8" Fill="Black">
             <Rectangle.Effect>
                 <DropShadowEffect ShadowDepth="0" BlurRadius="8"/>
             </Rectangle.Effect>
+            <Rectangle.Clip>
+                <CombinedGeometry GeometryCombineMode="Exclude">
+                    <CombinedGeometry.Geometry1>
+                        <RectangleGeometry Rect="-10,-10,230,250" RadiusX="8" RadiusY="8"/>
+                    </CombinedGeometry.Geometry1>
+                    <CombinedGeometry.Geometry2>
+                        <RectangleGeometry Rect="0,0,210,230" RadiusX="8" RadiusY="8"/>
+                    </CombinedGeometry.Geometry2>
+                </CombinedGeometry>
+            </Rectangle.Clip>
+        </Rectangle>
+        <Rectangle x:Name="Rec_BG" Margin="10" RadiusX="8" RadiusY="8" Opacity="0.8">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="#FFD6D6D6" Offset="1"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
         </Rectangle>
         <Grid x:Name="Grid_Controls" Margin="20">
             <Grid.ColumnDefinitions>
