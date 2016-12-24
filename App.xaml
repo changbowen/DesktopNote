@@ -4,6 +4,6 @@
              Startup="RunCheck"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-        <ResourceDictionary Source="Resources/StringResources.en.xaml"/>
+        <!--<ResourceDictionary Source="Resources/StringResources.en.xaml"/>-->
     </Application.Resources>
 </Application>
