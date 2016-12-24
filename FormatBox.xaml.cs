@@ -283,7 +283,8 @@ namespace DesktopNote
         {
             var txt = Clipboard.GetText();
             RTB_Main.CaretPosition.InsertTextInRun(txt);
-            RTB_Main.CaretPosition = RTB_Main.CaretPosition.GetPositionAtOffset(txt.Length);
+            var newpos = RTB_Main.CaretPosition.GetPositionAtOffset(txt.Length);
+            if (newpos != null) RTB_Main.CaretPosition = newpos;
         }
 
         internal void Find(object sender, RoutedEventArgs e)
