@@ -431,7 +431,6 @@ namespace DesktopNote
             Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
             ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Paper.Content).SelectedColor = set.PaperColor;
 
-
             //add fonts to menu
             foreach (var f in Fonts.SystemFontFamilies)
             {
@@ -462,7 +461,6 @@ namespace DesktopNote
                 }
             };
                
-
             //loading contents
             if (File.Exists(doc_loc))
             {
@@ -502,9 +500,9 @@ namespace DesktopNote
             //check auto start
             var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
             string run_value = (string)run.GetValue(assname);
-
+            
             if (!string.IsNullOrEmpty(run_value))
-            {
+            {//update the exe location if Run contains assname.
                 App.fb.CB_AutoStart.IsChecked = true;
                 if (run_value != System.Reflection.Assembly.GetExecutingAssembly().Location)
                     run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);

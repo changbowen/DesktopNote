@@ -1,4 +1,4 @@
-﻿<Window x:Class="DesktopNote.FormatBox" x:Name="FB1" 
+﻿<Window x:Class="DesktopNote.FormatBox" x:Name="FB1"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:DesktopNote"
@@ -121,7 +121,7 @@
                     <Setter Property="HorizontalAlignment" Value="Center"/>
                     <Setter Property="VerticalAlignment" Value="Center"/>
                 </Style>
-                <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" AvailableColorsSortingMode="HueSaturationBrightness" 
+                <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" ColorMode="ColorCanvas" ShowAdvancedButton="False"
                                  ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
             </Grid.Resources>
             <Button Grid.Column="0" Grid.Row="0" Command="Undo" ToolTip="{StaticResource tooltip_undo}">

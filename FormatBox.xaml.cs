@@ -45,6 +45,7 @@ namespace DesktopNote
 
         private void FB1_PreviewGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
+            System.Diagnostics.Debug.Print("focused" + " @ " + DateTime.Now.ToString());
             e.Handled = true;
             Owner.Focus();
         }
