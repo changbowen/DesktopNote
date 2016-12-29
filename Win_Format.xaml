@@ -1,0 +1,126 @@
+﻿<l:RoundedWindow x:Class="DesktopNote.Win_Format" x:Name="FB1"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:DesktopNote"
+        xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit" CloseBehavior="FadeOutAndHide" Focusable="False"
+        Width="230" Height="176" UseLayoutRounding="True" FontSize="10" ShowInTaskbar="False" ShowActivated="False" ButtonCloseVisible="False"
+        Topmost="True" ResizeMode="NoResize">
+
+    <l:RoundedWindow.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="White" Offset="0"/>
+            <GradientStop Color="#FFD6D6D6" Offset="1"/>
+        </LinearGradientBrush>
+    </l:RoundedWindow.Background>
+    <Grid x:Name="Grid_Controls">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="2"/>
+                <Setter Property="Background" Value="#FFEAEAEA"/>
+                <Setter Property="CommandTarget" Value="{Binding Tag, ElementName=FB1}"/>
+            </Style>
+            <Style TargetType="ContentPresenter">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" ColorMode="ColorCanvas" ShowAdvancedButton="False"
+                         ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
+        </Grid.Resources>
+        
+        <Button Grid.Column="0" Grid.Row="0" Command="Undo" ToolTip="{StaticResource tooltip_undo}">
+            <Image Stretch="None" Source="Resources/Undo.ico"/>
+        </Button>
+        <Button Grid.Column="1" Grid.Row="0" Command="Redo" ToolTip="{StaticResource tooltip_redo}">
+            <Image Stretch="None" Source="Resources/Redo.ico"/>
+        </Button>
+        <Button Grid.Column="2" Grid.Row="0" Command="Copy" ToolTip="{StaticResource tooltip_copy}">
+            <Image Stretch="None" Source="Resources/Copy.ico"/>
+        </Button>
+        <Button Grid.Column="3" Grid.Row="0" Command="Cut" ToolTip="{StaticResource tooltip_cut}">
+            <Image Stretch="None" Source="Resources/Cut.ico"/>
+        </Button>
+        <Button Grid.Column="4" Grid.Row="0" Command="Paste" ToolTip="{StaticResource tooltip_paste}">
+            <Image Stretch="None" Source="Resources/Paste.ico"/>
+        </Button>
+        <Button Grid.Column="5" Grid.Row="0" ToolTip="{StaticResource tooltip_paste_text}" Click="PasteAsText">
+            <Image Stretch="None" Source="Resources/PasteTextOnly.ico"/>
+        </Button>
+        <Button Grid.Column="6" Grid.Row="0" ToolTip="{StaticResource tooltip_find}" Click="Find">
+            <Image Stretch="None" Source="Resources/FindText.ico"/>
+        </Button>
+        <Button Grid.Column="0" Grid.Row="1" Command="ToggleBold" ToolTip="{StaticResource tooltip_bold}">
+            <Image Stretch="None" Source="Resources/Bold.ico"/>
+        </Button>
+        <Button Grid.Column="1" Grid.Row="1" Command="ToggleItalic" ToolTip="{StaticResource tooltip_italic}">
+            <Image Stretch="None" Source="Resources/Italic.ico"/>
+        </Button>
+        <Button Grid.Column="2" Grid.Row="1" Command="ToggleUnderline" ToolTip="{StaticResource tooltip_underline}">
+            <Image Stretch="None" Source="Resources/Underline.ico"/>
+        </Button>
+        <Button Grid.Column="3" Grid.Row="1" Click="ToggleStrike" ToolTip="{StaticResource tooltip_strikethrough}">
+            <Image Stretch="None" Source="Resources/Strikethrough.ico"/>
+        </Button>
+        <Button Grid.Column="4" Grid.Row="1" Click="ToggleHighlight" ToolTip="{StaticResource tooltip_highlight}">
+            <Image Stretch="None" Source="Resources/TextHighlightColorPicker.ico"/>
+        </Button>
+        <ContentPresenter Grid.Column="5" Grid.Row="1" x:Name="CP_Font" Content="{StaticResource CP_Main}" ToolTip="{StaticResource tooltip_font_color}"/>
+        <ContentPresenter Grid.Column="6" Grid.Row="1" x:Name="CP_Back" Content="{StaticResource CP_Main}" ToolTip="{StaticResource tooltip_back_color}"/>
+        <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" x:Name="CB_Font" IsEditable="True" SelectedValuePath="Content" Height="21.6" Margin="2.5,0"/>
+        <Button Grid.Column="6" Grid.Row="3" Click="DecreaseSize" ToolTip="{StaticResource tooltip_decrease_size}">
+            <Image Stretch="None" Source="Resources/SizeDecrease.ico"/>
+        </Button>
+        <Button Grid.Column="6" Grid.Row="2" Click="IncreaseSize" ToolTip="{StaticResource tooltip_increase_size}">
+            <Image Stretch="None" Source="Resources/SizeIncrease.ico"/>
+        </Button>
+        <Button Grid.Column="0" Grid.Row="3" Command="ToggleBullets" ToolTip="{StaticResource tooltip_bullets}">
+            <Image Stretch="None" Source="Resources/Bullets.ico"/>
+        </Button>
+        <Button Grid.Column="1" Grid.Row="3" Command="ToggleNumbering" ToolTip="{StaticResource tooltip_numbering}">
+            <Image Stretch="None" Source="Resources/Numbering.ico"/>
+        </Button>
+        <Button Grid.Column="4" Grid.Row="2" Command="IncreaseIndentation" ToolTip="{StaticResource tooltip_increase_indent}">
+            <Image Stretch="None" Source="Resources/IndentIncrease.ico"/>
+        </Button>
+        <Button Grid.Column="5" Grid.Row="2" Command="DecreaseIndentation" ToolTip="{StaticResource tooltip_decrease_indent}">
+            <Image Stretch="None" Source="Resources/IndentDecrease.ico"/>
+        </Button>
+        <Button Grid.Column="2" Grid.Row="3" Command="AlignLeft" ToolTip="{StaticResource tooltip_align_left}">
+            <Image Stretch="None" Source="Resources/AlignLeft.ico"/>
+        </Button>
+        <Button Grid.Column="3" Grid.Row="3" Command="AlignCenter" ToolTip="{StaticResource tooltip_align_center}">
+            <Image Stretch="None" Source="Resources/AlignCenter.ico"/>
+        </Button>
+        <Button Grid.Column="4" Grid.Row="3" Command="AlignRight" ToolTip="{StaticResource tooltip_align_right}">
+            <Image Stretch="None" Source="Resources/AlignRight.ico"/>
+        </Button>
+        <Button Grid.Column="5" Grid.Row="3" Command="AlignJustify" ToolTip="{StaticResource tooltip_align_justify}">
+            <Image Stretch="None" Source="Resources/AlignJustify.ico"/>
+        </Button>
+
+        <Button Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="3" Content="{StaticResource menu_options}" Click="Button_Options_Click" HorizontalAlignment="Stretch" Margin="2,0,1.6,2" VerticalAlignment="Bottom"/>
+        <Button Grid.Column="4" Grid.Row="8" Grid.ColumnSpan="3" Content="{StaticResource menu_exit}" Click="Button_Exit_Click" HorizontalAlignment="Stretch"/>
+    </Grid>
+</l:RoundedWindow>

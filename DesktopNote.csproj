@@ -9,11 +9,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DesktopNote</RootNamespace>
     <AssemblyName>DesktopNote</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -36,6 +37,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\stickynote.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -60,14 +65,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FormatBox.xaml.cs">
-      <DependentUpon>FormatBox.xaml</DependentUpon>
+    <Compile Include="Win_Format.xaml.cs">
+      <DependentUpon>Win_Format.xaml</DependentUpon>
     </Compile>
     <Compile Include="GetCurrentMonitor.cs" />
+    <Compile Include="RoundedWindow.cs" />
+    <Compile Include="Win_Options.xaml.cs">
+      <DependentUpon>Win_Options.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win_Search.xaml.cs">
       <DependentUpon>Win_Search.xaml</DependentUpon>
     </Compile>
-    <Page Include="FormatBox.xaml">
+    <Page Include="Win_Format.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -88,6 +97,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\StringResources.zh.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Win_Options.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

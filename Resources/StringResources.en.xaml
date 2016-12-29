@@ -53,4 +53,7 @@ Program will exit now.</sys:String>
     <sys:String x:Key="tooltip_underline">Underline (Ctrl + U)</sys:String>
     <sys:String x:Key="tooltip_undo">Undo (Ctrl + Z)</sys:String>
     <sys:String x:Key="msgbox_one_inst">DesktopNote is already running.</sys:String>
+    <sys:String x:Key="menu_options">Options</sys:String>
+    <sys:String x:Key="label_content_path">Content path</sys:String>
+    <sys:String x:Key="label_content_path_txt">Text content path</sys:String>
 </ResourceDictionary>

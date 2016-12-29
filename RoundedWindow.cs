@@ -1,0 +1,284 @@
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.ComponentModel;
+
+namespace DesktopNote
+{
+    public class RectConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            //parameter is the clipped width to preserve
+            var offset = parameter != null ? double.Parse((string)parameter) : 0d;
+            var width = (double)values[0];
+            var height = (double)values[1];
+            return new Rect(new Point(-offset, -offset), new Point(width + offset - 20, height + offset - 20));//20是两边空隙总和
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RoundedWindow : Window
+    {
+        public enum CloseBehaviors { Close, Hide, FadeOutAndHide, FadeOutAndClose }
+
+        #region Properties
+        /// <summary>
+        /// Get or set the background of the rounded rectangle.
+        /// </summary>
+        public new Brush Background
+        {
+            get { return (Brush)GetValue(BackgroundProperty); }
+            set { SetValue(BackgroundProperty, value); }
+        }
+        public static readonly new DependencyProperty BackgroundProperty =
+            DependencyProperty.Register("Background", typeof(Brush), typeof(RoundedWindow), new PropertyMetadata(new SolidColorBrush(Color.FromRgb(255, 247, 197))));
+
+
+        public bool ButtonCloseVisible
+        {
+            get { return (bool)GetValue(ButtonCloseVisibleProperty); }
+            set { SetValue(ButtonCloseVisibleProperty, value); }
+        }
+        public static readonly DependencyProperty ButtonCloseVisibleProperty =
+            DependencyProperty.Register("ButtonCloseVisible", typeof(bool), typeof(RoundedWindow), new PropertyMetadata(true));
+
+
+        public bool ButtonMaxVisible
+        {
+            get { return (bool)GetValue(ButtonMaxVisibleProperty); }
+            set { SetValue(ButtonMaxVisibleProperty, value); }
+        }
+        public static readonly DependencyProperty ButtonMaxVisibleProperty =
+            DependencyProperty.Register("ButtonMaxVisible", typeof(bool), typeof(RoundedWindow), new PropertyMetadata(false));
+
+
+        public bool ButtonMinVisible
+        {
+            get { return (bool)GetValue(ButtonMinVisibleProperty); }
+            set { SetValue(ButtonMinVisibleProperty, value); }
+        }
+        public static readonly DependencyProperty ButtonMinVisibleProperty =
+            DependencyProperty.Register("ButtonMinVisible", typeof(bool), typeof(RoundedWindow), new PropertyMetadata(false));
+
+
+        public CloseBehaviors CloseBehavior
+        {
+            get { return (CloseBehaviors)GetValue(CloseBehaviorProperty); }
+            set { SetValue(CloseBehaviorProperty, value); }
+        }
+        public static readonly DependencyProperty CloseBehaviorProperty =
+            DependencyProperty.Register("CloseBehavior", typeof(CloseBehaviors), typeof(RoundedWindow), new PropertyMetadata(CloseBehaviors.FadeOutAndClose));
+
+        /// <summary>
+        /// If set to false, keyboard focus will be set to the owner when the window gets focus.
+        /// </summary>
+        public new bool Focusable
+        {
+            get { return (bool)GetValue(FocusableProperty); }
+            set { SetValue(FocusableProperty, value); }
+        }
+        public static readonly new DependencyProperty FocusableProperty =
+            DependencyProperty.Register("Focusable", typeof(bool), typeof(RoundedWindow), new PropertyMetadata(true));
+
+        #endregion
+
+
+        static RoundedWindow()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(RoundedWindow), new FrameworkPropertyMetadata(typeof(RoundedWindow)));
+        }
+
+        public static readonly RoutedEvent FadingInEvent = EventManager.RegisterRoutedEvent("FadingIn", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(RoundedWindow));
+        public event RoutedEventHandler FadingIn
+        {
+            add
+            {
+                AddHandler(FadingInEvent, value);
+            }
+            remove
+            {
+                RemoveHandler(FadingInEvent, value);
+            }
+        }
+
+        public static readonly RoutedEvent FadingOutEvent = EventManager.RegisterRoutedEvent("FadingOut", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(RoundedWindow));
+        public event RoutedEventHandler FadingOut
+        {
+            add
+            {
+                AddHandler(FadingOutEvent, value);
+            }
+            remove
+            {
+                RemoveHandler(FadingOutEvent, value);
+            }
+        }
+
+
+
+        public RoundedWindow()
+        {
+            AllowsTransparency = true;
+            WindowStyle = WindowStyle.None;
+            base.Background = null;
+        }
+
+        private Grid Grid_Main;
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            Grid_Main = (Grid)GetTemplateChild("Grid_Main");
+
+            Button minimizeButton = GetTemplateChild("minimizeButton") as Button;
+            if (minimizeButton != null) minimizeButton.Click += MinimizeClick;
+
+            Button restoreButton = GetTemplateChild("restoreButton") as Button;
+            if (restoreButton != null) restoreButton.Click += RestoreClick;
+
+            Button closeButton = GetTemplateChild("closeButton") as Button;
+            if (closeButton != null) closeButton.Click += CloseClick;
+
+            if (!Focusable && Owner != null)
+            {
+                PreviewGotKeyboardFocus += (object sender, KeyboardFocusChangedEventArgs e) =>
+                {
+                    e.Handled = true;
+                    Owner.Focus();
+                };
+            }
+        }
+
+        #region Click Events
+        protected void MinimizeClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        protected void RestoreClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = (WindowState == WindowState.Normal) ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        protected void CloseClick(object sender, RoutedEventArgs e)
+        {
+            //make sure the scale animation ends at the top right corner when close is clicked.
+            Grid_Main.RenderTransformOrigin = new Point(1, 0);
+            Close();
+        }
+        #endregion
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            switch (CloseBehavior)
+            {
+                case CloseBehaviors.Close:
+                    break;
+                case CloseBehaviors.FadeOutAndClose:
+                    e.Cancel = true;
+                    FadeOut(true);
+                    break;
+                case CloseBehaviors.FadeOutAndHide:
+                    e.Cancel = true;
+                    FadeOut();
+                    break;
+                case CloseBehaviors.Hide:
+                    e.Cancel = true;
+                    Hide();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Show the window without fading animation.
+        /// </summary>
+        public new void Show()
+        {
+            base.Show();
+            //ensure the contents are visible when not using fading animation.
+            Grid_Main.RenderTransform = new ScaleTransform(1, 1);
+            Opacity = 1;
+        }
+
+        /// <summary>
+        /// Fade in the window at mouse position. Or the specified Left and Top position.
+        /// </summary>
+        public void FadeIn(double left = double.NaN, double top = double.NaN)
+        {
+            if (!IsLoaded) base.Show();//how to call something similar to initializecomponent?
+            
+            //make sure the scale animation starts from left top corner.
+            Grid_Main.RenderTransformOrigin = new Point(0, 0);
+
+            //compute mouse position or set to existing values
+            Point newpos;
+            Point realpos;
+            if (left.Equals(double.NaN) || top.Equals(double.NaN))//nan==nan returns false.
+            {
+                newpos = PointToScreen(Mouse.GetPosition(this));
+                realpos = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformFromDevice.Transform(newpos);
+            }
+            else
+                realpos = new Point(left, top);
+            
+            if (Opacity == 0)
+            {
+                Left = realpos.X;
+                Top = realpos.Y;
+                base.Show();
+                RaiseEvent(new RoutedEventArgs(FadingInEvent));
+            }
+            else
+            {
+                //move window to the new cursor location
+                var easefunc = new CubicEase() { EasingMode = EasingMode.EaseInOut };
+                var anim_move_x = new DoubleAnimation(realpos.X, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop) { EasingFunction = easefunc };
+                var anim_move_y = new DoubleAnimation(realpos.Y, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop) { EasingFunction = easefunc };
+                BeginAnimation(LeftProperty, anim_move_x);
+                BeginAnimation(TopProperty, anim_move_y);
+            }
+        }
+        /// <summary>
+        /// Fade out the window. This ignores the CloseBehavior setting.
+        /// </summary>
+        /// <param name="closeafterfade">Set to true to close the window after. Otherwise it is only hidden.</param>
+        public async void FadeOut(bool closeafterfade = false)
+        {
+            if (IsLoaded)//without this it will crash at the below line.
+            {
+                RaiseEvent(new RoutedEventArgs(FadingOutEvent));
+                //need to be longer than the fading animation otherwise the window will flash when Show() is called.
+                await Task.Run(() => System.Threading.Thread.Sleep(250));
+                if (closeafterfade)
+                {
+                    CloseBehavior = CloseBehaviors.Close;
+                    Close();
+                }
+                else Hide();
+            }
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (e.ChangedButton == MouseButton.Left && e.ButtonState == MouseButtonState.Pressed) DragMove();
+        }
+    }
+}

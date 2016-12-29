@@ -18,7 +18,6 @@ namespace DesktopNote
         private object Lock_Save = new object();
         private static int CountDown = 0;
         string doc_loc = AppDomain.CurrentDomain.BaseDirectory + Properties.Settings.Default.Doc_Location;
-        public string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
         Point mousepos;
         private bool fbopen = false;
                 
@@ -266,15 +265,15 @@ namespace DesktopNote
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
             }
-            App.fb.Popup();
+            App.fb.FadeIn();
         }
 
         private void RTB_Main_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && App.fb?.Grid_Main?.Opacity == 1)
+            if (e.ChangedButton == MouseButton.Left && App.fb?.Opacity == 1)
             {
                 fbopen = false;
-                App.fb.Unpop();
+                App.fb.FadeOut();
             }
         }
 
@@ -419,7 +418,7 @@ namespace DesktopNote
                 Top = set.Win_Pos.Y;
             }
 
-            App.fb = new FormatBox();
+            App.fb = new Win_Format();
             App.fb.Tag = RTB_Main;
             App.fb.Owner = this; //causing fb to close when mainwin closes.
             lastdockstatus = (DockStatus)set.DockedTo;
@@ -429,7 +428,6 @@ namespace DesktopNote
             RTB_Main.Background = new SolidColorBrush(set.BackColor);
             ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = set.BackColor;
             Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Paper.Content).SelectedColor = set.PaperColor;
 
             //add fonts to menu
             foreach (var f in Fonts.SystemFontFamilies)
@@ -447,7 +445,7 @@ namespace DesktopNote
             App.fb.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
             App.fb.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
             {
-                if (App.fb.Grid_Main.Opacity == 1 && e1.AddedItems.Count == 1)
+                if (App.fb.Opacity == 1 && e1.AddedItems.Count == 1)
                 {
                     var mi = (ComboBoxItem)e1.AddedItems[0];
 
@@ -494,19 +492,6 @@ namespace DesktopNote
             RTB_Main.IsUndoEnabled = true;
             //without the above two lines, Load actions can be undone.
 
-            //check auto dock
-            if (set.AutoDock == true) App.fb.CB_AutoDock.IsChecked = true;
-
-            //check auto start
-            var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
-            string run_value = (string)run.GetValue(assname);
-            
-            if (!string.IsNullOrEmpty(run_value))
-            {//update the exe location if Run contains assname.
-                App.fb.CB_AutoStart.IsChecked = true;
-                if (run_value != System.Reflection.Assembly.GetExecutingAssembly().Location)
-                    run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
-            }
 
             currScrnRect = new GetCurrentMonitor().GetInfo();
 

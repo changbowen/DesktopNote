@@ -4,6 +4,11 @@
              Startup="RunCheck"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
-        <!--<ResourceDictionary Source="Resources/StringResources.en.xaml"/>-->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<ResourceDictionary Source="Resources/StringResources.zh.xaml"/>-->
+                <!--<ResourceDictionary Source="Themes/Generic.xaml" />-->
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

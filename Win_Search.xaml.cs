@@ -9,7 +9,7 @@ namespace DesktopNote
     /// <summary>
     /// Interaction logic for Win_Search.xaml
     /// </summary>
-    public partial class Win_Search : Window
+    public partial class Win_Search : RoundedWindow
     {
         private bool textchanged = true;
 
@@ -27,7 +27,8 @@ namespace DesktopNote
             else
                 searchRange = new TextRange(richTextBox.Document.ContentStart, richTextBox.Document.ContentEnd);
 
-            TextPointer start = searchRange.Start.GetNextContextPosition(LogicalDirection.Forward);
+            TextPointer start = searchRange.Start;
+            //TextPointer start = searchRange.Start.GetNextContextPosition(LogicalDirection.Forward); why?
             while (start != null)
             {
                 var txt = start.GetTextInRun(LogicalDirection.Forward);
@@ -57,15 +58,7 @@ namespace DesktopNote
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var mainwin = (MainWindow)Application.Current.MainWindow;
-            Left = mainwin.Left + (mainwin.Width - Width) / 2;
-            Top = mainwin.Top + (mainwin.Height - Height) / 2;
             TB_Search.Focus();
-        }
-
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left) DragMove();
         }
 
         private void TB_Search_TextChanged(object sender, TextChangedEventArgs e)
@@ -79,15 +72,14 @@ namespace DesktopNote
                 Close();
             else
             {
-                var mainwin = (MainWindow)Application.Current.MainWindow;
                 if (textchanged)
                 {
                     textchanged = false;
-                    MarkTextInRange(mainwin.RTB_Main, TB_Search.Text, false);
+                    MarkTextInRange(App.mainwin.RTB_Main, TB_Search.Text, false);
                 }
                 else
                 {
-                    MarkTextInRange(mainwin.RTB_Main, TB_Search.Text, true);
+                    MarkTextInRange(App.mainwin.RTB_Main, TB_Search.Text, true);
                 }
                 Activate();
             }
