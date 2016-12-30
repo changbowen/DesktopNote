@@ -76,8 +76,12 @@ namespace DesktopNote
 
         private void Button_Help_Click(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show((string)Application.Current.Resources["msgbox_help"], "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
-                System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
+            Close();
+            System.Threading.Tasks.Task.Run(delegate
+            {
+                if (MessageBox.Show((string)Application.Current.Resources["msgbox_help"], "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
+                    System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
+            });
         }
 
         private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -110,6 +114,36 @@ namespace DesktopNote
             //set paper color
             CP_Paper.SelectedColor = set.PaperColor;
 
+            //set path
+            TB_SavePath.Text = set.Doc_Location;
+            TB_SavePathTxt.Text = set.Bak_Location;
+
+        }
+
+        private void TB_SavePath_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var savedlg = new Microsoft.Win32.SaveFileDialog();
+            savedlg.Filter = "DesktopNote Content|*";
+            if (savedlg.ShowDialog(this) == true &&
+                savedlg.FileName != System.IO.Path.GetFullPath(Properties.Settings.Default.Doc_Location))
+            {
+                Properties.Settings.Default.Doc_Location = savedlg.FileName;
+                Properties.Settings.Default.Save();
+                TB_SavePath.Text = savedlg.FileName;
+            }
+        }
+
+        private void TB_SavePathTxt_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var savedlg = new Microsoft.Win32.SaveFileDialog();
+            savedlg.Filter = "DesktopNote Text Content|*.txt";
+            if (savedlg.ShowDialog(this) == true &&
+                savedlg.FileName != System.IO.Path.GetFullPath(Properties.Settings.Default.Bak_Location))
+            {
+                Properties.Settings.Default.Bak_Location = savedlg.FileName;
+                Properties.Settings.Default.Save();
+                TB_SavePathTxt.Text = savedlg.FileName;
+            }
         }
     }
 }

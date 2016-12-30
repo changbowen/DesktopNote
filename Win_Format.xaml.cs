@@ -182,7 +182,7 @@ namespace DesktopNote
         private void Button_Options_Click(object sender, RoutedEventArgs e)
         {
             App.fb.FadeOut();
-            new Win_Options().FadeIn();
+            new Win_Options() { Owner = App.mainwin }.FadeIn();
         }
     }
 }

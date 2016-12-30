@@ -5,9 +5,8 @@
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit" CloseBehavior="FadeOutAndHide" Focusable="False"
         Width="230" Height="176" UseLayoutRounding="True" FontSize="10" ShowInTaskbar="False" ShowActivated="False" ButtonCloseVisible="False"
         Topmost="True" ResizeMode="NoResize">
-
     <l:RoundedWindow.Background>
-        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" Opacity="0.8">
             <GradientStop Color="White" Offset="0"/>
             <GradientStop Color="#FFD6D6D6" Offset="1"/>
         </LinearGradientBrush>

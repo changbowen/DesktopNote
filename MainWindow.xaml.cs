@@ -17,7 +17,6 @@ namespace DesktopNote
     {
         private object Lock_Save = new object();
         private static int CountDown = 0;
-        string doc_loc = AppDomain.CurrentDomain.BaseDirectory + Properties.Settings.Default.Doc_Location;
         Point mousepos;
         private bool fbopen = false;
                 
@@ -344,7 +343,7 @@ namespace DesktopNote
                 {
                     if (isUIthread)
                     {
-                        using (var ms = new FileStream(doc_loc, FileMode.Create))
+                        using (var ms = new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Create))
                         {
                             tr.Save(ms, DataFormats.XamlPackage, true);
                         }
@@ -354,7 +353,7 @@ namespace DesktopNote
                     {
                         Dispatcher.Invoke(delegate
                         {
-                            using (var ms = new FileStream(doc_loc, FileMode.Create))
+                            using (var ms = new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Create))
                             {
                                 tr.Save(ms, DataFormats.XamlPackage, true);
                             };
@@ -460,12 +459,12 @@ namespace DesktopNote
             };
                
             //loading contents
-            if (File.Exists(doc_loc))
+            if (File.Exists(Properties.Settings.Default.Doc_Location))
             {
                 try
                 {
                     var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                    tr.Load(new FileStream(doc_loc, FileMode.Open), DataFormats.XamlPackage);
+                    tr.Load(new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
                 }
                 catch
                 {
