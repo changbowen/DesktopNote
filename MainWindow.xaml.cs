@@ -38,7 +38,14 @@ namespace DesktopNote
         }
 
         public static readonly DependencyProperty DockedToProperty =
-            DependencyProperty.Register("DockedTo", typeof(DockStatus), typeof(MainWindow), new PropertyMetadata(DockStatus.None));
+            DependencyProperty.Register("DockedTo", typeof(DockStatus), typeof(MainWindow), new PropertyMetadata(DockStatus.None, new PropertyChangedCallback(OnDockedToChanged)));
+
+        private static void OnDockedToChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var ds = (DockStatus)e.NewValue;
+            if (ds == DockStatus.None) ((Window)d).ResizeMode = ResizeMode.CanResizeWithGrip;
+            else ((Window)d).ResizeMode = ResizeMode.NoResize;
+        }
 
         internal void DockToSide(bool changpos = false)
         {
