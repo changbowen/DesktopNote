@@ -40,7 +40,7 @@
     </Style>
 
     <ControlTemplate x:Key="RoundedWindowControlTemplate" TargetType="{x:Type l:RoundedWindow}">
-        <Grid x:Name="Grid_Main" RenderTransformOrigin="0,0">
+        <Grid x:Name="Grid_Main" RenderTransformOrigin="{TemplateBinding RenderTransformOrigin_BG}">
             <Grid.CacheMode>
                 <BitmapCache/>
             </Grid.CacheMode>
@@ -202,5 +202,10 @@
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="ResizeMode" Value="CanResizeWithGrip"/>
         <Setter Property="Opacity" Value="0"/>
+        <Setter Property="CacheMode">
+            <Setter.Value>
+                <BitmapCache/>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

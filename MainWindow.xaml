@@ -6,6 +6,9 @@
         Title="Desktop Note" Height="350" Width="300" ShowInTaskbar="False" AllowsTransparency="True" WindowStyle="None" Background="{x:Null}"
         ResizeMode="CanResizeWithGrip" UseLayoutRounding="True" 
         MouseEnter="Win_Main_MouseEnter" MouseLeave="Win_Main_MouseLeave" Loaded="Win_Main_Loaded">
+    <Window.CacheMode>
+        <BitmapCache/>
+    </Window.CacheMode>
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12"
                    MouseLeftButtonDown="Rec_BG_MouseLeftButtonDown" MouseLeftButtonUp="Rec_BG_MouseLeftButtonUp" MouseMove="Rec_BG_MouseMove" Cursor="SizeAll">

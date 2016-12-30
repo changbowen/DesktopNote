@@ -27,7 +27,7 @@ namespace DesktopNote
 
         #region Docking
         public DockStatus lastdockstatus;
-        private Rect currScrnRect;
+        public Rect currScrnRect;
 
         public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
 
@@ -43,8 +43,17 @@ namespace DesktopNote
         private static void OnDockedToChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ds = (DockStatus)e.NewValue;
-            if (ds == DockStatus.None) ((Window)d).ResizeMode = ResizeMode.CanResizeWithGrip;
-            else ((Window)d).ResizeMode = ResizeMode.NoResize;
+            var win = (Window)d;
+            if (ds == DockStatus.None)
+            {
+                win.ResizeMode = ResizeMode.CanResizeWithGrip;
+                win.Topmost = false;
+            }
+            else
+            {
+                win.ResizeMode = ResizeMode.NoResize;
+                win.Topmost = true;
+            }
         }
 
         internal void DockToSide(bool changpos = false)
@@ -88,7 +97,6 @@ namespace DesktopNote
                     else
                     {
                         lastdockstatus = DockStatus.None;
-                        Topmost = false;
                         return;
                     }
                     lastdockstatus = dockto;
@@ -119,7 +127,6 @@ namespace DesktopNote
                     }
                 }
 
-                Topmost = true;
                 var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 500)), FillBehavior.Stop);
                 anim_move.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
                 var anim_fade = new DoubleAnimation(0.4, new Duration(new TimeSpan(0, 0, 0, 0, 300)));
@@ -168,7 +175,6 @@ namespace DesktopNote
                 else
                     return;
 
-                Topmost = true;
                 var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop);
                 anim_move.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
                 var anim_fade = new DoubleAnimationUsingKeyFrames();
@@ -193,7 +199,7 @@ namespace DesktopNote
             if (Properties.Settings.Default.AutoDock && 
                 Application.Current.Windows.Count <= App.MaxWindowCount && //to prevent docking when search window is visible. FormatBox is the 2nd window.
                 !RTB_Main.IsKeyboardFocusWithin &&
-                !fbopen)
+                App.fb.Opacity != 1)
                 DockToSide();
         }
         #endregion
@@ -237,7 +243,7 @@ namespace DesktopNote
         {
             if (Properties.Settings.Default.AutoDock &&
                 Application.Current.Windows.Count <= App.MaxWindowCount &&
-                !fbopen)
+                App.fb.Opacity != 1)
                 DockToSide();
         }
 

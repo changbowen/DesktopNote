@@ -95,6 +95,18 @@ namespace DesktopNote
         public static readonly new DependencyProperty FocusableProperty =
             DependencyProperty.Register("Focusable", typeof(bool), typeof(RoundedWindow), new PropertyMetadata(true));
 
+        /// <summary>
+        /// This maps to the RenderTransformOrigin property of BackgroundGrid.
+        /// </summary>
+        public Point RenderTransformOrigin_BG
+        {
+            get { return (Point)GetValue(RenderTransformOrigin_BGProperty); }
+            set { SetValue(RenderTransformOrigin_BGProperty, value); }
+        }
+        public static readonly DependencyProperty RenderTransformOrigin_BGProperty =
+            DependencyProperty.Register("RenderTransformOrigin_BG", typeof(Point), typeof(RoundedWindow), new PropertyMetadata(new Point(0, 0)));
+
+
         #endregion
 
 
@@ -138,13 +150,16 @@ namespace DesktopNote
             base.Background = null;
         }
 
-        private Grid Grid_Main;
+        /// <summary>
+        /// This is a grid on which the scaling animations are applied.
+        /// </summary>
+        internal Grid BackgroundGrid { get; set; }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
-            Grid_Main = (Grid)GetTemplateChild("Grid_Main");
+            BackgroundGrid = (Grid)GetTemplateChild("Grid_Main");
 
             Button minimizeButton = GetTemplateChild("minimizeButton") as Button;
             if (minimizeButton != null) minimizeButton.Click += MinimizeClick;
@@ -179,7 +194,7 @@ namespace DesktopNote
         protected void CloseClick(object sender, RoutedEventArgs e)
         {
             //make sure the scale animation ends at the top right corner when close is clicked.
-            Grid_Main.RenderTransformOrigin = new Point(1, 0);
+            RenderTransformOrigin_BG = new Point(1, 0);
             Close();
         }
         #endregion
@@ -213,7 +228,7 @@ namespace DesktopNote
         {
             base.Show();
             //ensure the contents are visible when not using fading animation.
-            Grid_Main.RenderTransform = new ScaleTransform(1, 1);
+            BackgroundGrid.RenderTransform = new ScaleTransform(1, 1);
             Opacity = 1;
         }
 
@@ -224,20 +239,47 @@ namespace DesktopNote
         {
             if (!IsLoaded) base.Show();//how to call something similar to initializecomponent?
             
-            //make sure the scale animation starts from left top corner.
-            Grid_Main.RenderTransformOrigin = new Point(0, 0);
-
             //compute mouse position or set to existing values
-            Point newpos;
-            Point realpos;
+            Point newpos, realpos;
+            double currscrnW = App.mainwin.currScrnRect.Right;
+            double currscrnH = App.mainwin.currScrnRect.Bottom;
             if (left.Equals(double.NaN) || top.Equals(double.NaN))//nan==nan returns false.
             {
+                //get the physical pixel-based position.
                 newpos = PointToScreen(Mouse.GetPosition(this));
+                //convert to the actual position considering the DPI settings etc.
                 realpos = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformFromDevice.Transform(newpos);
+
+                //make sure the window is displayed inside the screens.
+                double originX = 0d, originY = 0d;
+                if (currscrnW - realpos.X > ActualWidth)
+                    originX = 0d;
+                else
+                {
+                    originX = 1d;
+                    realpos.X -= ActualWidth;
+                }
+                if (currscrnH - realpos.Y > ActualHeight)
+                    originY = 0d;
+                else
+                {
+                    originY = 1d;
+                    realpos.Y -= ActualHeight;
+                }
+                RenderTransformOrigin_BG = new Point(originX, originY);
             }
             else
+            {
+                //make sure the window is displayed inside the screens.
+                if (left < 0d) left = 0d;
+                if (top < 0d) top = 0d;
+                if (left + ActualWidth > currscrnW)
+                    left = currscrnW - ActualWidth;
+                if (top + ActualHeight > currscrnH)
+                    top = currscrnH - ActualHeight;
                 realpos = new Point(left, top);
-            
+            }
+
             if (Opacity == 0)
             {
                 Left = realpos.X;
