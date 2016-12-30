@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:DesktopNote"
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        Title="{StaticResource menu_options}" Height="200" Width="300" ResizeMode="NoResize" Background="Azure" FontSize="10"
+        Title="{StaticResource menu_options}" Height="200" Width="300" ResizeMode="NoResize" FontSize="10"
         SizeToContent="Height" Loaded="Window_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>

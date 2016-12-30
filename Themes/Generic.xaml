@@ -2,10 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:l="clr-namespace:DesktopNote">
     <l:RectConverter x:Key="RectConverter"/>
-    
-
-
-
 
     <!--system buttons-->
     <Style TargetType="{x:Type Button}" x:Key="WindowButtonStyle">
@@ -195,6 +191,14 @@
     <!--Window style-->
     <Style TargetType="{x:Type l:RoundedWindow}">
         <Setter Property="Template" Value="{StaticResource RoundedWindowControlTemplate}"/>
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" Opacity="0.8">
+                    <GradientStop Color="White" Offset="0"/>
+                    <GradientStop Color="#FFD6D6D6" Offset="1"/>
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
         <Setter Property="UseLayoutRounding" Value="True"/>
         <Setter Property="ResizeMode" Value="CanResizeWithGrip"/>
         <Setter Property="Opacity" Value="0"/>
