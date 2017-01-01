@@ -8,8 +8,7 @@ The only **simple** yet **rich-featured** desktop note app you'll ever need for 
 
 
 ## Screenshot
-<img src="http://i.imgur.com/UazbLPg.png" alt=""/>
-<img src="http://i.imgur.com/7IXTcSn.png" alt=""/>
+<img src="http://i.imgur.com/78EtW85.png" alt=""/>
 
 ## Features
 - Auto saving note contents to application root folder.
