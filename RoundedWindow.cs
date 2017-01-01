@@ -23,7 +23,7 @@ namespace DesktopNote
             var offset = parameter != null ? double.Parse((string)parameter) : 0d;
             var width = (double)values[0];
             var height = (double)values[1];
-            return new Rect(new Point(-offset, -offset), new Point(width + offset - 20, height + offset - 20));//20是两边空隙总和
+            return new Rect(new Point(-offset, -offset), new Point(width + offset - 20d, height + offset - 20d));//20是两边空隙总和
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -104,7 +104,16 @@ namespace DesktopNote
             set { SetValue(RenderTransformOrigin_BGProperty, value); }
         }
         public static readonly DependencyProperty RenderTransformOrigin_BGProperty =
-            DependencyProperty.Register("RenderTransformOrigin_BG", typeof(Point), typeof(RoundedWindow), new PropertyMetadata(new Point(0, 0)));
+            DependencyProperty.Register("RenderTransformOrigin_BG", typeof(Point), typeof(RoundedWindow), new PropertyMetadata(new Point(0d, 0d)));
+
+
+        public double CornerRadius
+        {
+            get { return (double)GetValue(CornerRadiusProperty); }
+            set { SetValue(CornerRadiusProperty, value); }
+        }
+        public static readonly DependencyProperty CornerRadiusProperty =
+            DependencyProperty.Register("CornerRadius", typeof(double), typeof(RoundedWindow), new PropertyMetadata(8d));
 
 
         #endregion
@@ -194,7 +203,7 @@ namespace DesktopNote
         protected void CloseClick(object sender, RoutedEventArgs e)
         {
             //make sure the scale animation ends at the top right corner when close is clicked.
-            RenderTransformOrigin_BG = new Point(1, 0);
+            RenderTransformOrigin_BG = new Point(1d, 0d);
             Close();
         }
         #endregion
@@ -228,7 +237,7 @@ namespace DesktopNote
         {
             base.Show();
             //ensure the contents are visible when not using fading animation.
-            BackgroundGrid.RenderTransform = new ScaleTransform(1, 1);
+            BackgroundGrid.RenderTransform = new ScaleTransform(1d, 1d);
             Opacity = 1;
         }
 

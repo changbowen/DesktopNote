@@ -65,14 +65,16 @@
             </Grid.RenderTransform>
             
             <!--挖空shadow layer-->
-            <Rectangle Margin="10" RadiusX="8" RadiusY="8" Fill="Black">
+            <Rectangle Margin="10" RadiusX="{TemplateBinding CornerRadius}" RadiusY="{TemplateBinding CornerRadius}" Fill="Black">
                 <Rectangle.Effect>
                     <DropShadowEffect ShadowDepth="0" BlurRadius="8"/>
                 </Rectangle.Effect>
                 <Rectangle.Clip>
                     <CombinedGeometry GeometryCombineMode="Exclude">
                         <CombinedGeometry.Geometry1>
-                            <RectangleGeometry RadiusX="8" RadiusY="8">
+                            <!--TemplateBinding doesnt work in below. (Why?)-->
+                            <RectangleGeometry RadiusX="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}}"
+                                               RadiusY="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}}">
                                 <RectangleGeometry.Rect>
                                     <MultiBinding Converter="{StaticResource RectConverter}" ConverterParameter="10">
                                         <Binding Path="Width" RelativeSource="{RelativeSource TemplatedParent}"/>
@@ -82,7 +84,8 @@
                             </RectangleGeometry>
                         </CombinedGeometry.Geometry1>
                         <CombinedGeometry.Geometry2>
-                            <RectangleGeometry RadiusX="8" RadiusY="8">
+                            <RectangleGeometry RadiusX="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}}"
+                                               RadiusY="{Binding CornerRadius, RelativeSource={RelativeSource TemplatedParent}}">
                                 <RectangleGeometry.Rect>
                                     <MultiBinding Converter="{StaticResource RectConverter}">
                                         <Binding Path="Width" RelativeSource="{RelativeSource TemplatedParent}"/>
@@ -96,7 +99,7 @@
             </Rectangle>
 
             <!--background-->
-            <Rectangle Margin="10" RadiusX="8" RadiusY="8" Fill="{TemplateBinding Background}"/>
+            <Rectangle Margin="10" RadiusX="{TemplateBinding CornerRadius}" RadiusY="{TemplateBinding CornerRadius}" Fill="{TemplateBinding Background}"/>
 
             <!--window title-->
             <TextBlock Margin="20,15,0,0" Text="{TemplateBinding Title}" Foreground="Gray" FontSize="10" HorizontalAlignment="Left" VerticalAlignment="Top"/>
