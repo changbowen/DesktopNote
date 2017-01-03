@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 //using System.Collections.Generic;
 //using System.Configuration;
 //using System.Data;
@@ -13,12 +14,20 @@ namespace DesktopNote
         public static MainWindow mainwin;
         public static Win_Format fb;
         internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
+        public const string MutexString = @"{39622D35-176E-453D-B1FD-E4EC1EAF31DC}";
 
-        [System.Runtime.InteropServices.DllImport("shlwapi.dll")]
+        [DllImport("shlwapi.dll")]
         private static extern bool PathIsNetworkPath(string pszPath);
 
         private void RunCheck(object sender1, StartupEventArgs e1)
         {
+            if (SingleInstance.CheckExist(MutexString))
+            {asdfasfasdf
+                SingleInstance.SendNotifyMessage(SingleInstance.HWND_BROADCAST, SingleInstance.RegisteredMsg, IntPtr.Zero, IntPtr.Zero);
+                Current.Shutdown();
+                return;
+            }
+
             AppDomain.CurrentDomain.AssemblyResolve += (object sender, ResolveEventArgs e) =>
               {
                   var desiredAssembly = new System.Reflection.AssemblyName(e.Name).Name;
@@ -70,13 +79,6 @@ namespace DesktopNote
             if (PathIsNetworkPath(AppDomain.CurrentDomain.BaseDirectory))
             {
                 MessageBox.Show((string)Resources["msgbox_run_from_network"], "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                Current.Shutdown();
-                return;
-            }
-
-            if (System.Diagnostics.Process.GetProcessesByName(System.Diagnostics.Process.GetCurrentProcess().ProcessName).Length > 1)
-            {
-                MessageBox.Show((string)Resources["msgbox_one_inst"], "", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 Current.Shutdown();
                 return;
             }

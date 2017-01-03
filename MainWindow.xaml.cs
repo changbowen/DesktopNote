@@ -18,8 +18,7 @@ namespace DesktopNote
         private object Lock_Save = new object();
         private static int CountDown = 0;
         Point mousepos;
-        private bool fbopen = false;
-                
+                        
         public MainWindow()
         {
             InitializeComponent();
@@ -249,7 +248,6 @@ namespace DesktopNote
 
         private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            fbopen = true;
             e.Handled = true;
             if (!RTB_Main.Selection.IsEmpty)
             {
@@ -284,7 +282,6 @@ namespace DesktopNote
         {
             if (e.ChangedButton == MouseButton.Left && App.fb?.Opacity == 1)
             {
-                fbopen = false;
                 App.fb.FadeOut();
             }
         }
@@ -510,6 +507,18 @@ namespace DesktopNote
             var task_save = new Thread(SaveNotes);
             task_save.IsBackground = true;
             task_save.Start();
+
+            var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
+            source.AddHook(WndProc);
+        }
+
+        private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == SingleInstance.RegisteredMsg)
+            {
+                MessageBox.Show("Body text", "Title text", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+            return IntPtr.Zero;
         }
 
 

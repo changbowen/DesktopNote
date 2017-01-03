@@ -65,6 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="SingleInstance.cs" />
     <Compile Include="Win_Format.xaml.cs">
       <DependentUpon>Win_Format.xaml</DependentUpon>
     </Compile>
