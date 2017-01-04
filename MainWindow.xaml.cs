@@ -18,7 +18,7 @@ namespace DesktopNote
         private object Lock_Save = new object();
         private static int CountDown = 0;
         Point mousepos;
-                        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -501,7 +501,6 @@ namespace DesktopNote
             RTB_Main.IsUndoEnabled = true;
             //without the above two lines, Load actions can be undone.
 
-
             currScrnRect = new GetCurrentMonitor().GetInfo();
 
             var task_save = new Thread(SaveNotes);
@@ -514,9 +513,10 @@ namespace DesktopNote
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == SingleInstance.RegisteredMsg)
+            if (msg == SingleInstance.RegisteredWM)
             {
-                MessageBox.Show("Body text", "Title text", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                Activate();
+                UnDock();
             }
             return IntPtr.Zero;
         }

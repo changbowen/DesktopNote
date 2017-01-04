@@ -15,15 +15,16 @@ namespace DesktopNote
         public static Win_Format fb;
         internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
         public const string MutexString = @"{39622D35-176E-453D-B1FD-E4EC1EAF31DC}";
+        private System.Threading.Mutex mtx;
 
         [DllImport("shlwapi.dll")]
         private static extern bool PathIsNetworkPath(string pszPath);
 
         private void RunCheck(object sender1, StartupEventArgs e1)
         {
-            if (SingleInstance.CheckExist(MutexString))
-            {asdfasfasdf
-                SingleInstance.SendNotifyMessage(SingleInstance.HWND_BROADCAST, SingleInstance.RegisteredMsg, IntPtr.Zero, IntPtr.Zero);
+            if (SingleInstance.CheckExist(MutexString, ref mtx))
+            {
+                SingleInstance.SendNotifyMessage(SingleInstance.HWND_BROADCAST, SingleInstance.RegisteredWM, IntPtr.Zero, IntPtr.Zero);
                 Current.Shutdown();
                 return;
             }
@@ -88,6 +89,11 @@ namespace DesktopNote
             mainwin.Show();
         }
 
-        
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            mtx?.Close();
+        }
+
     }
 }

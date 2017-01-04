@@ -11,7 +11,9 @@ namespace DesktopNote
     class SingleInstance
     {
         public static readonly IntPtr HWND_BROADCAST = (IntPtr)0xffff;
-        public static readonly int RegisteredMsg = RegisterWindowMessage("WM_SHOW_DESKTOPNOTE");
+        //from MSDN: If two different applications register the same message string, the applications return the same message value.
+        //The message remains registered until the session ends.
+        public static readonly int RegisteredWM = RegisterWindowMessage("WM_SHOW_DESKTOPNOTE");
         //[DllImport("user32")] //not working when ShowInTaskbar set to false.
         //public static extern bool PostMessage(IntPtr hwnd, int msg, IntPtr wparam, IntPtr lparam);
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
@@ -22,12 +24,16 @@ namespace DesktopNote
         public enum MutexScope { Local, Global }
 
         /// <summary>
-        /// Return created mutex if the mutex name does not exist. Returns null if the mutex name exists.
+        /// Return false and the created mutex if the mutex name does not exist. Otherwise returns true and null.
         /// </summary>
-        public static bool CheckExist(string uniquestr, MutexScope scope = MutexScope.Global)
-        {sdrsfsdf
+        public static bool CheckExist(string uniquestr, ref Mutex mtx, MutexScope scope = MutexScope.Global)
+        {
             bool createdNew;
-            new Mutex(true, scope.ToString() + @"\" + uniquestr, out createdNew);
+            var newmtx = new Mutex(false, scope.ToString() + @"\" + uniquestr, out createdNew);
+            if (createdNew)
+                mtx = newmtx;
+            else
+                newmtx.Close();
             return !createdNew;
         }
     }
