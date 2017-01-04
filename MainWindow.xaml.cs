@@ -515,7 +515,12 @@ namespace DesktopNote
         {
             if (msg == SingleInstance.RegisteredWM)
             {
+                //activate and reset dock status when a second instance is requested
+                //in case of resolution changes etc that might cause the main window to be "lost".
                 Activate();
+                currScrnRect = new GetCurrentMonitor().GetInfo();
+                lastdockstatus = DockStatus.Left;
+                DockedTo = DockStatus.Left;
                 UnDock();
             }
             return IntPtr.Zero;
