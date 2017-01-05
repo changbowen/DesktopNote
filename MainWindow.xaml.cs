@@ -190,7 +190,7 @@ namespace DesktopNote
         private void Win_Main_MouseEnter(object sender, MouseEventArgs e)
         {
             //undocking
-            if (Properties.Settings.Default.AutoDock) UnDock();
+            if (Properties.Settings.Default.AutoDock && DockedTo != DockStatus.None) UnDock();
         }
 
         private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
@@ -519,6 +519,8 @@ namespace DesktopNote
                 //in case of resolution changes etc that might cause the main window to be "lost".
                 Activate();
                 currScrnRect = new GetCurrentMonitor().GetInfo();
+                BeginAnimation(DockedToProperty, null); //required to modify the DockedTo property.
+                Top = currScrnRect.Top; //in case it was docked to bottom or top.
                 lastdockstatus = DockStatus.Left;
                 DockedTo = DockStatus.Left;
                 UnDock();
