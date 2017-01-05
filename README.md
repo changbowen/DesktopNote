@@ -5,7 +5,7 @@ The only **simple** yet **rich-featured** desktop note app you'll ever need for 
 
 **Always go to bin/Release for the [latest dev build](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
 
-
+**最新开发版本[链接](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
 
 ## Screenshot
 <img src="https://i.imgur.com/1DdJ4Sr.png" alt=""/>
