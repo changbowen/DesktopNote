@@ -7,6 +7,8 @@ The only **simple** yet **rich-featured** desktop note app you'll ever need for 
 
 **最新开发版本[链接](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
 
+If you really like it [![PayPal](https://img.shields.io/badge/%24-PayPal-blue.svg)](https://www.paypal.me/BowenChang)
+
 ## Screenshot
 <img src="https://i.imgur.com/1DdJ4Sr.png" alt=""/>
 
