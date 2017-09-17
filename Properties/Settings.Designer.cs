@@ -12,7 +12,7 @@ namespace DesktopNote.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,10 +25,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300, 350")]
-        public global::System.Drawing.Size Win_Size {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>300, 350</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Win_Size {
             get {
-                return ((global::System.Drawing.Size)(this["Win_Size"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["Win_Size"]));
             }
             set {
                 this["Win_Size"] = value;
@@ -37,10 +39,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0, 0")]
-        public global::System.Drawing.Point Win_Pos {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>0, 0</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Win_Pos {
             get {
-                return ((global::System.Drawing.Point)(this["Win_Pos"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["Win_Pos"]));
             }
             set {
                 this["Win_Pos"] = value;
@@ -49,10 +53,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DesktopNoteContent")]
-        public string Doc_Location {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>DesktopNoteContent</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Doc_Location {
             get {
-                return ((string)(this["Doc_Location"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["Doc_Location"]));
             }
             set {
                 this["Doc_Location"] = value;
@@ -61,10 +67,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DesktopNoteContent.txt")]
-        public string Bak_Location {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>DesktopNoteContent.txt</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Bak_Location {
             get {
-                return ((string)(this["Bak_Location"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["Bak_Location"]));
             }
             set {
                 this["Bak_Location"] = value;
@@ -73,10 +81,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AutoDock {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>True</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection AutoDock {
             get {
-                return ((bool)(this["AutoDock"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["AutoDock"]));
             }
             set {
                 this["AutoDock"] = value;
@@ -97,10 +107,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int DockedTo {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>0</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection DockedTo {
             get {
-                return ((int)(this["DockedTo"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["DockedTo"]));
             }
             set {
                 this["DockedTo"] = value;
@@ -109,10 +121,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Segoe Print")]
-        public string Font {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>Segoe Print</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection Font {
             get {
-                return ((string)(this["Font"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["Font"]));
             }
             set {
                 this["Font"] = value;
@@ -121,10 +135,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#FF000000")]
-        public global::System.Windows.Media.Color FontColor {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>#FF000000</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection FontColor {
             get {
-                return ((global::System.Windows.Media.Color)(this["FontColor"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["FontColor"]));
             }
             set {
                 this["FontColor"] = value;
@@ -133,10 +149,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#00FFFFFF")]
-        public global::System.Windows.Media.Color BackColor {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>#00FFFFFF</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection BackColor {
             get {
-                return ((global::System.Windows.Media.Color)(this["BackColor"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["BackColor"]));
             }
             set {
                 this["BackColor"] = value;
@@ -145,10 +163,12 @@ namespace DesktopNote.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("#FFFFF7C5")]
-        public global::System.Windows.Media.Color PaperColor {
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>#FFFFF7C5</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection PaperColor {
             get {
-                return ((global::System.Windows.Media.Color)(this["PaperColor"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["PaperColor"]));
             }
             set {
                 this["PaperColor"] = value;

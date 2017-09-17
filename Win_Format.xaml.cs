@@ -9,6 +9,7 @@ using System.Windows.Controls;
 //using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Collections.Specialized;
 //using System.Windows.Media.Imaging;
 //using System.Windows.Navigation;
 //using System.Windows.Shapes;
@@ -17,11 +18,16 @@ namespace DesktopNote
 {
     public partial class Win_Format : RoundedWindow
     {
-        RichTextBox RTB_Main = App.mainwin.RTB_Main;
+        public MainWindow MainWin;
+        public RichTextBox RTB_Main;
 
-        public Win_Format()
+        /// <param name="owner">Setting owner causes Win_Format to close when the owner window closes.</param>
+        public Win_Format(Window owner, MainWindow mainwin)
         {
             InitializeComponent();
+            if (owner != null) Owner = owner;
+            MainWin = mainwin;
+            RTB_Main = MainWin.RTB_Main;
         }
 
         #region Menu Events
@@ -40,7 +46,7 @@ namespace DesktopNote
                             else //change default
                             {
                                 RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
-                                Properties.Settings.Default.FontColor = e.NewValue.Value;
+                                MainWin.CurrentSetting.FontColor = e.NewValue.Value;
                             }
                             break;
                         case "CP_Back":
@@ -49,7 +55,7 @@ namespace DesktopNote
                             else //change default
                             {
                                 RTB_Main.Background = new SolidColorBrush(e.NewValue.Value);
-                                Properties.Settings.Default.BackColor = e.NewValue.Value;
+                                MainWin.CurrentSetting.BackColor = e.NewValue.Value;
                             }
                             break;
                         //moved to Win_Options.
@@ -64,7 +70,7 @@ namespace DesktopNote
 
         private void Button_Exit_Click(object sender, RoutedEventArgs e)
         {
-            App.mainwin.Quit(true);
+            MainWin.Quit(true);
         }
 
         internal void ToggleStrike(object sender, RoutedEventArgs e)
@@ -165,12 +171,11 @@ namespace DesktopNote
 
         internal void Find(object sender, RoutedEventArgs e)
         {
-            App.fb.FadeOut();
-            var win = new Win_Search();
-            win.Owner = App.mainwin;
+            FadeOut();
+            var win = new Win_Search(MainWin);
             win.FadeIn(
-                App.mainwin.Left + (App.mainwin.Width - win.Width) / 2, 
-                App.mainwin.Top + (App.mainwin.Height - win.Height) / 2
+                MainWin.Left + (MainWin.Width - win.Width) / 2,
+                MainWin.Top + (MainWin.Height - win.Height) / 2
                 );
         }
 
@@ -178,8 +183,96 @@ namespace DesktopNote
 
         private void Button_Options_Click(object sender, RoutedEventArgs e)
         {
-            App.fb.FadeOut();
-            new Win_Options() { Owner = App.mainwin }.FadeIn();
+            FadeOut();
+            new Win_Options(MainWin).FadeIn();
+        }
+
+        private void FB1_FadingIn(object sender, RoutedEventArgs e)
+        {
+            //loading formats
+            if (!RTB_Main.Selection.IsEmpty)
+            {
+                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
+                if (caretfont != null)
+                    App.FormatWindow.CB_Font.SelectedValue = caretfont.Source;
+                else //multiple fonts
+                    App.FormatWindow.CB_Font.SelectedIndex = -1;
+                App.FormatWindow.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_selection"];
+
+                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
+                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content;
+                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
+                else fontcolorpicker.SelectedColor = null;
+
+                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
+                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content;
+                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
+                else backcolorpicker.SelectedColor = null;
+            }
+            else
+            {
+                App.FormatWindow.CB_Font.SelectedValue = MainWin.CurrentSetting.Font;
+                App.FormatWindow.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_default"];
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = MainWin.CurrentSetting.FontColor;
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = MainWin.CurrentSetting.BackColor;
+            }
+        }
+
+        private void Button_NewNote_Click(object sender, RoutedEventArgs e)
+        {
+            var set = Properties.Settings.Default;
+            try
+            {
+                int newidx = 0;
+                int curidx = MainWin.CurrentSetting.SettingIndex;
+                foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
+                {
+                    if (propval.Property.PropertyType == typeof(StringCollection))
+                    {
+                        newidx = ((StringCollection)propval.PropertyValue).Add(((StringCollection)propval.PropertyValue)[curidx]);
+                    }
+                }
+
+                //set location to new
+                var now = DateTime.Now.ToString("yyyyMMddHHmmss");
+                var path = Environment.CurrentDirectory + "\\" + "DesktopNoteContent" + @"_" + now;
+                set.Doc_Location[newidx] = path;
+                set.Bak_Location[newidx] = path + @".txt";
+
+                var win = new MainWindow(newidx);
+                App.MainWindows.Add(win);
+                win.Show();
+            }
+            catch { }
+        }
+
+        private void Button_Close_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show((string)Application.Current.Resources["msgbox_delete_confirm"], "", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
+            var set = Properties.Settings.Default;
+            try
+            {
+                switch (result)
+                {
+                    case MessageBoxResult.Cancel:
+                        break;
+                    case MessageBoxResult.Yes:
+                        System.IO.File.Delete(MainWin.CurrentSetting.Doc_Location);
+                        System.IO.File.Delete(MainWin.CurrentSetting.Bak_Location);
+                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
+                        set.Save();
+                        MainWin.Close();
+                        FadeOut();
+                        break;
+                    case MessageBoxResult.No:
+                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
+                        set.Save();
+                        MainWin.Close();
+                        FadeOut();
+                        break;
+                }
+            }
+            catch { }
         }
     }
 }

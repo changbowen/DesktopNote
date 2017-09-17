@@ -10,6 +10,7 @@
     <sys:String x:Key="menu_auto_dock">Auto Dock</sys:String>
     <sys:String x:Key="menu_auto_start">Auto Start</sys:String>
     <sys:String x:Key="menu_exit">Exit</sys:String>
+    <sys:String x:Key="menu_close">Close</sys:String>
     <sys:String x:Key="menu_help">Help</sys:String>
     <sys:String x:Key="menu_paper_color">Paper Color</sys:String>
     <sys:String x:Key="menu_reset_formats">Reset Formats</sys:String>
@@ -52,8 +53,9 @@ Program will exit now.</sys:String>
     <sys:String x:Key="tooltip_strikethrough">Strike-through (Ctrl + D)</sys:String>
     <sys:String x:Key="tooltip_underline">Underline (Ctrl + U)</sys:String>
     <sys:String x:Key="tooltip_undo">Undo (Ctrl + Z)</sys:String>
-    <!--<sys:String x:Key="msgbox_one_inst">DesktopNote is already running.</sys:String>-->
     <sys:String x:Key="menu_options">Options</sys:String>
     <sys:String x:Key="label_content_path">Content path</sys:String>
     <sys:String x:Key="label_content_path_txt">Text content path</sys:String>
+    <sys:String x:Key="menu_newnote">New Note</sys:String>
+    <sys:String x:Key="msgbox_delete_confirm">Do you also want to delete the note content and backup files?</sys:String>
 </ResourceDictionary>

@@ -10,6 +10,7 @@
     <sys:String x:Key="menu_auto_dock">屏幕边缘停靠</sys:String>
     <sys:String x:Key="menu_auto_start">随系统启动</sys:String>
     <sys:String x:Key="menu_exit">退出</sys:String>
+    <sys:String x:Key="menu_close">关闭</sys:String>
     <sys:String x:Key="menu_help">帮助</sys:String>
     <sys:String x:Key="menu_paper_color">纸张颜色</sys:String>
     <sys:String x:Key="menu_reset_formats">重置格式</sys:String>
@@ -52,8 +53,9 @@
     <sys:String x:Key="tooltip_strikethrough">删除线 (Ctrl + D)</sys:String>
     <sys:String x:Key="tooltip_underline">下划线 (Ctrl + U)</sys:String>
     <sys:String x:Key="tooltip_undo">撤销 (Ctrl + Z)</sys:String>
-    <!--<sys:String x:Key="msgbox_one_inst">DesktopNote已经在运行。</sys:String>-->
     <sys:String x:Key="menu_options">选项</sys:String>
     <sys:String x:Key="label_content_path">笔记保存路径</sys:String>
     <sys:String x:Key="label_content_path_txt">文本保存路径</sys:String>
+    <sys:String x:Key="menu_newnote">新笔记</sys:String>
+    <sys:String x:Key="msgbox_delete_confirm">是否需要一起删除笔记内容和备份文件？</sys:String>
 </ResourceDictionary>

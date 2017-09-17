@@ -6,16 +6,17 @@ using System.Windows.Input;
 
 namespace DesktopNote
 {
-    /// <summary>
-    /// Interaction logic for Win_Search.xaml
-    /// </summary>
     public partial class Win_Search : RoundedWindow
     {
+        private readonly MainWindow MainWin;
         private bool textchanged = true;
 
-        public Win_Search()
+        public Win_Search(MainWindow owner)
         {
             InitializeComponent();
+            Owner = owner;
+            MainWin = owner;
+            App.SearchWindow = this;
         }
 
         private void MarkTextInRange(RichTextBox richTextBox, string searchText, bool searchNext)
@@ -75,11 +76,11 @@ namespace DesktopNote
                 if (textchanged)
                 {
                     textchanged = false;
-                    MarkTextInRange(App.mainwin.RTB_Main, TB_Search.Text, false);
+                    MarkTextInRange(MainWin.RTB_Main, TB_Search.Text, false);
                 }
                 else
                 {
-                    MarkTextInRange(App.mainwin.RTB_Main, TB_Search.Text, true);
+                    MarkTextInRange(MainWin.RTB_Main, TB_Search.Text, true);
                 }
                 Activate();
             }
@@ -88,6 +89,12 @@ namespace DesktopNote
         private void Btn_Cancel_Click(object sender, RoutedEventArgs e)
         {
             Close();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            App.SearchWindow = null;
         }
     }
 }

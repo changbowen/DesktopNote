@@ -16,12 +16,16 @@ namespace DesktopNote
 {
     public partial class Win_Options : RoundedWindow
     {
-        RichTextBox RTB_Main = App.mainwin.RTB_Main;
+        private readonly MainWindow MainWin;
+        private readonly RichTextBox RTB_Main;
         private string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
-        public Win_Options()
+        public Win_Options(MainWindow owner)
         {
             InitializeComponent();
+            Owner = owner;
+            MainWin = owner;
+            RTB_Main = MainWin.RTB_Main;
         }
 
         private void CB_AutoStart_Click(object sender, RoutedEventArgs e)
@@ -37,15 +41,15 @@ namespace DesktopNote
         {
             if (CB_AutoDock.IsChecked == true)
             {
-                Properties.Settings.Default.AutoDock = true;
-                App.mainwin.DockToSide(true);
+                MainWin.CurrentSetting.AutoDock = true;
+                MainWin.DockToSide(true);
             }
             else
             {
-                Properties.Settings.Default.AutoDock = false;
-                App.mainwin.Topmost = false;
+                MainWin.CurrentSetting.AutoDock = false;
+                MainWin.Topmost = false;
             }
-            Properties.Settings.Default.Save();
+            MainWin.CurrentSetting.Save();
         }
 
         internal void Button_ResetFormats_Click(object sender, RoutedEventArgs e)
@@ -55,23 +59,27 @@ namespace DesktopNote
             tr.ClearAllProperties();
 
             //reset global font size
-            RTB_Main.FontSize = App.mainwin.FontSize;
+            RTB_Main.FontSize = MainWin.FontSize;
 
             //resetting paper color should be processed with Reset Settings
-            //var cp = (Color)ColorConverter.ConvertFromString((string)Properties.Settings.Default.Properties["PaperColor"].DefaultValue);
-            //Properties.Settings.Default.PaperColor = cp;
+            //var cp = (Color)ColorConverter.ConvertFromString((string)MainWin.CurrentSetting.Properties["PaperColor"].DefaultValue);
+            //MainWin.CurrentSetting.PaperColor = cp;
             //Rec_BG.Fill = new SolidColorBrush(cp);
         }
 
         private void Button_ResetSet_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.Reset();
-            Properties.Settings.Default.Save();
+            MainWin.CurrentSetting.Reset();
+            MainWin.CurrentSetting.Save();
 
-            App.mainwin.Close();
-            App.mainwin = new MainWindow();
-            Application.Current.MainWindow = App.mainwin;
-            App.mainwin.Show();
+            var win = new MainWindow(MainWin.CurrentSetting.SettingIndex);
+            App.MainWindows[MainWin.CurrentSetting.SettingIndex] = win;
+            MainWin.Close();
+            win.Show();
+
+            var optwin = new Win_Options(win);
+            Close();
+            optwin.Show();
         }
 
         private void Button_Help_Click(object sender, RoutedEventArgs e)
@@ -88,17 +96,15 @@ namespace DesktopNote
         {
             if (e.NewValue.HasValue && ((Xceed.Wpf.Toolkit.ColorPicker)sender).IsOpen)
             {
-                App.mainwin.Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
-                Properties.Settings.Default.PaperColor = e.NewValue.Value;
+                MainWin.Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
+                MainWin.CurrentSetting.PaperColor = e.NewValue.Value;
             }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var set = Properties.Settings.Default;
-
             //check auto dock
-            if (set.AutoDock == true) CB_AutoDock.IsChecked = true;
+            if (MainWin.CurrentSetting.AutoDock == true) CB_AutoDock.IsChecked = true;
 
             //check auto start
             var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
@@ -112,11 +118,11 @@ namespace DesktopNote
             }
 
             //set paper color
-            CP_Paper.SelectedColor = set.PaperColor;
+            CP_Paper.SelectedColor = MainWin.CurrentSetting.PaperColor;
 
             //set path
-            TB_SavePath.Text = set.Doc_Location;
-            TB_SavePathTxt.Text = set.Bak_Location;
+            TB_SavePath.Text = MainWin.CurrentSetting.Doc_Location;
+            TB_SavePathTxt.Text = MainWin.CurrentSetting.Bak_Location;
 
         }
 
@@ -125,10 +131,10 @@ namespace DesktopNote
             var savedlg = new Microsoft.Win32.SaveFileDialog();
             savedlg.Filter = "DesktopNote Content|*";
             if (savedlg.ShowDialog(this) == true &&
-                savedlg.FileName != System.IO.Path.GetFullPath(Properties.Settings.Default.Doc_Location))
+                savedlg.FileName != System.IO.Path.GetFullPath(MainWin.CurrentSetting.Doc_Location))
             {
-                Properties.Settings.Default.Doc_Location = savedlg.FileName;
-                Properties.Settings.Default.Save();
+                MainWin.CurrentSetting.Doc_Location = savedlg.FileName;
+                MainWin.CurrentSetting.Save();
                 TB_SavePath.Text = savedlg.FileName;
             }
         }
@@ -138,10 +144,10 @@ namespace DesktopNote
             var savedlg = new Microsoft.Win32.SaveFileDialog();
             savedlg.Filter = "DesktopNote Text Content|*.txt";
             if (savedlg.ShowDialog(this) == true &&
-                savedlg.FileName != System.IO.Path.GetFullPath(Properties.Settings.Default.Bak_Location))
+                savedlg.FileName != System.IO.Path.GetFullPath(MainWin.CurrentSetting.Bak_Location))
             {
-                Properties.Settings.Default.Bak_Location = savedlg.FileName;
-                Properties.Settings.Default.Save();
+                MainWin.CurrentSetting.Bak_Location = savedlg.FileName;
+                MainWin.CurrentSetting.Save();
                 TB_SavePathTxt.Text = savedlg.FileName;
             }
         }

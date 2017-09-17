@@ -250,14 +250,14 @@ namespace DesktopNote
             
             //compute mouse position or set to existing values
             Point newpos, realpos;
-            double currscrnW = App.mainwin.currScrnRect.Right;
-            double currscrnH = App.mainwin.currScrnRect.Bottom;
+            double currscrnW = App.CurrScrnRect.Right;
+            double currscrnH = App.CurrScrnRect.Bottom;
             if (left.Equals(double.NaN) || top.Equals(double.NaN))//nan==nan returns false.
             {
                 //get the physical pixel-based position.
                 newpos = PointToScreen(Mouse.GetPosition(this));
                 //convert to the actual position considering the DPI settings etc.
-                realpos = PresentationSource.FromVisual(Application.Current.MainWindow).CompositionTarget.TransformFromDevice.Transform(newpos);
+                realpos = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(newpos);
 
                 //make sure the window is displayed inside the screens.
                 double originX = 0d, originY = 0d;

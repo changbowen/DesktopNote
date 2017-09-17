@@ -4,7 +4,7 @@
         xmlns:l="clr-namespace:DesktopNote"
         xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit" CloseBehavior="FadeOutAndHide" Focusable="False"
         Width="230" Height="176" UseLayoutRounding="True" FontSize="10" ShowInTaskbar="False" ShowActivated="False" ButtonCloseVisible="False"
-        Topmost="True" ResizeMode="NoResize">
+        Topmost="True" ResizeMode="NoResize" FadingIn="FB1_FadingIn">
     <Grid x:Name="Grid_Controls">
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -113,7 +113,9 @@
             <Image Stretch="None" Source="Resources/AlignJustify.ico"/>
         </Button>
 
-        <Button Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="3" Content="{StaticResource menu_options}" Click="Button_Options_Click" HorizontalAlignment="Stretch" Margin="2,0,1.6,2" VerticalAlignment="Bottom"/>
+        <Button Grid.Column="0" Grid.Row="7" Grid.ColumnSpan="3" Content="{StaticResource menu_newnote}" Click="Button_NewNote_Click" HorizontalAlignment="Stretch"/>
+        <Button Grid.Column="4" Grid.Row="7" Grid.ColumnSpan="3" Content="{StaticResource menu_close}" Click="Button_Close_Click" HorizontalAlignment="Stretch"/>
+        <Button Grid.Column="0" Grid.Row="8" Grid.ColumnSpan="3" Content="{StaticResource menu_options}" Click="Button_Options_Click" HorizontalAlignment="Stretch"/>
         <Button Grid.Column="4" Grid.Row="8" Grid.ColumnSpan="3" Content="{StaticResource menu_exit}" Click="Button_Exit_Click" HorizontalAlignment="Stretch"/>
     </Grid>
 </l:RoundedWindow>

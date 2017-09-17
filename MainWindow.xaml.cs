@@ -15,18 +15,19 @@ namespace DesktopNote
 {
     public partial class MainWindow : Window
     {
+        public Setting CurrentSetting;
         private object Lock_Save = new object();
-        private static int CountDown = 0;
-        Point mousepos;
+        private int CountDown = 0;
+        private Point mousepos;
 
-        public MainWindow()
+        public MainWindow(int setidx)
         {
             InitializeComponent();
+            CurrentSetting = new Setting(setidx);
         }
 
         #region Docking
         public DockStatus lastdockstatus;
-        public Rect currScrnRect;
 
         public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
 
@@ -35,9 +36,9 @@ namespace DesktopNote
             get { return (DockStatus)GetValue(DockedToProperty); }
             set { SetValue(DockedToProperty, value); }
         }
-
         public static readonly DependencyProperty DockedToProperty =
             DependencyProperty.Register("DockedTo", typeof(DockStatus), typeof(MainWindow), new PropertyMetadata(DockStatus.None, new PropertyChangedCallback(OnDockedToChanged)));
+
 
         private static void OnDockedToChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -65,31 +66,31 @@ namespace DesktopNote
                 DockStatus dockto;
                 if (changpos)
                 {
-                    currScrnRect = new GetCurrentMonitor().GetInfo();
-                    if (Left <= currScrnRect.Left) //dock left
+                    App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
+                    if (Left <= App.CurrScrnRect.Left) //dock left
                     {
-                        toval = currScrnRect.Left - ActualWidth + pad;
+                        toval = App.CurrScrnRect.Left - ActualWidth + pad;
                         tgtpro = LeftProperty;
                         dockto = DockStatus.Left;
                     }
 
-                    else if (Left + ActualWidth >= currScrnRect.Right) //dock right
+                    else if (Left + ActualWidth >= App.CurrScrnRect.Right) //dock right
                     {
-                        toval = currScrnRect.Right - pad;
+                        toval = App.CurrScrnRect.Right - pad;
                         tgtpro = LeftProperty;
                         dockto = DockStatus.Right;
                     }
 
-                    else if (Top <= currScrnRect.Top) //dock top
+                    else if (Top <= App.CurrScrnRect.Top) //dock top
                     {
-                        toval = currScrnRect.Top - ActualHeight + pad;
+                        toval = App.CurrScrnRect.Top - ActualHeight + pad;
                         tgtpro = TopProperty;
                         dockto = DockStatus.Top;
                     }
 
-                    else if (Top + ActualHeight >= currScrnRect.Bottom) //dock bottom
+                    else if (Top + ActualHeight >= App.CurrScrnRect.Bottom) //dock bottom
                     {
-                        toval = currScrnRect.Bottom - pad;
+                        toval = App.CurrScrnRect.Bottom - pad;
                         tgtpro = TopProperty;
                         dockto = DockStatus.Bottom;
                     }
@@ -106,19 +107,19 @@ namespace DesktopNote
                     switch (lastdockstatus)
                     {
                         case DockStatus.Left:
-                            toval = currScrnRect.Left - ActualWidth + pad;
+                            toval = App.CurrScrnRect.Left - ActualWidth + pad;
                             tgtpro = LeftProperty;
                             break;
                         case DockStatus.Right:
-                            toval = currScrnRect.Right - pad;
+                            toval = App.CurrScrnRect.Right - pad;
                             tgtpro = LeftProperty;
                             break;
                         case DockStatus.Top:
-                            toval = currScrnRect.Top - ActualHeight + pad;
+                            toval = App.CurrScrnRect.Top - ActualHeight + pad;
                             tgtpro = TopProperty;
                             break;
                         case DockStatus.Bottom:
-                            toval = currScrnRect.Bottom - pad;
+                            toval = App.CurrScrnRect.Bottom - pad;
                             tgtpro = TopProperty;
                             break;
                         default:
@@ -147,27 +148,27 @@ namespace DesktopNote
                 DependencyProperty tgtpro;
                 //double pad = 15d;
                 DockStatus dockto;
-                if (DockedTo == DockStatus.Left) //Me.Left = currScrnRect.left - Me.ActualWidth + pad Then
+                if (DockedTo == DockStatus.Left) //Me.Left = App.CurrScrnRect.left - Me.ActualWidth + pad Then
                 {
-                    toval = currScrnRect.Left;
+                    toval = App.CurrScrnRect.Left;
                     tgtpro = LeftProperty;
                     dockto = DockStatus.None;
                 }
-                else if (DockedTo == DockStatus.Right) //Me.Left = currScrnRect.right - pad Then
+                else if (DockedTo == DockStatus.Right) //Me.Left = App.CurrScrnRect.right - pad Then
                 {
-                    toval = currScrnRect.Right - ActualWidth;
+                    toval = App.CurrScrnRect.Right - ActualWidth;
                     tgtpro = LeftProperty;
                     dockto = DockStatus.None;
                 }
-                else if (DockedTo == DockStatus.Top) //Me.Top = currScrnRect.top - Me.ActualHeight + pad Then
+                else if (DockedTo == DockStatus.Top) //Me.Top = App.CurrScrnRect.top - Me.ActualHeight + pad Then
                 {
-                    toval = currScrnRect.Top;
+                    toval = App.CurrScrnRect.Top;
                     tgtpro = TopProperty;
                     dockto = DockStatus.None;
                 }
-                else if (DockedTo == DockStatus.Bottom) //Me.Top = currScrnRect.bottom - pad Then
+                else if (DockedTo == DockStatus.Bottom) //Me.Top = App.CurrScrnRect.bottom - pad Then
                 {
-                    toval = currScrnRect.Bottom - ActualHeight;
+                    toval = App.CurrScrnRect.Bottom - ActualHeight;
                     tgtpro = TopProperty;
                     dockto = DockStatus.None;
                 }
@@ -190,15 +191,15 @@ namespace DesktopNote
         private void Win_Main_MouseEnter(object sender, MouseEventArgs e)
         {
             //undocking
-            if (Properties.Settings.Default.AutoDock && DockedTo != DockStatus.None) UnDock();
+            if (CurrentSetting.AutoDock && DockedTo != DockStatus.None) UnDock();
         }
 
         private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (Properties.Settings.Default.AutoDock && 
-                Application.Current.Windows.Count <= App.MaxWindowCount && //to prevent docking when search window is visible. FormatBox is the 2nd window.
+            if (CurrentSetting.AutoDock && 
                 !RTB_Main.IsKeyboardFocusWithin &&
-                App.fb.Opacity != 1)
+                App.FormatWindow.Opacity != 1 &&
+                App.SearchWindow == null)
                 DockToSide();
         }
         #endregion
@@ -216,13 +217,13 @@ namespace DesktopNote
         private void RTB_Main_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
-                App.fb.ToggleStrike(null, null);
+                App.FormatWindow.ToggleStrike(null, null);
             else if (e.Key == Key.V && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
-                App.fb.PasteAsText(null, null);
+                App.FormatWindow.PasteAsText(null, null);
             else if (e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
-                App.fb.Find(null, null);
+                App.FormatWindow.Find(null, null);
             else if (e.Key == Key.H && Keyboard.Modifiers == ModifierKeys.Control)
-                App.fb.ToggleHighlight(null, null);
+                App.FormatWindow.ToggleHighlight(null, null);
         }
 
         private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -232,57 +233,34 @@ namespace DesktopNote
             {
                 e.Handled = true;
                 if (e.Delta > 0) //wheel up
-                    App.fb.IncreaseSize(null, null);
+                    App.FormatWindow.IncreaseSize(null, null);
                 else
-                    App.fb.DecreaseSize(null, null);
+                    App.FormatWindow.DecreaseSize(null, null);
             }
         }
 
         private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
         {
-            if (Properties.Settings.Default.AutoDock &&
-                Application.Current.Windows.Count <= App.MaxWindowCount &&
-                App.fb.Opacity != 1)
+            if (CurrentSetting.AutoDock &&
+                App.FormatWindow.Opacity != 1 &&
+                App.SearchWindow == null)
                 DockToSide();
         }
 
         private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             e.Handled = true;
-            if (!RTB_Main.Selection.IsEmpty)
-            {
-                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
-                if (caretfont != null)
-                    App.fb.CB_Font.SelectedValue = caretfont.Source;
-                else //multiple fonts
-                    App.fb.CB_Font.SelectedIndex = -1;
-                App.fb.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_selection"];
-
-                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
-                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content;
-                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
-                else fontcolorpicker.SelectedColor = null;
-
-                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content;
-                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
-                else backcolorpicker.SelectedColor = null;
-            }
-            else
-            {
-                App.fb.CB_Font.SelectedValue = Properties.Settings.Default.Font;
-                App.fb.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_default"];
-                ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content).SelectedColor = Properties.Settings.Default.FontColor;
-                ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = Properties.Settings.Default.BackColor;
-            }
-            App.fb.FadeIn();
+            //update caller
+            App.FormatWindow.MainWin = this;
+            App.FormatWindow.RTB_Main = RTB_Main;
+            App.FormatWindow.FadeIn();
         }
 
         private void RTB_Main_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && App.fb?.Opacity == 1)
+            if (e.ChangedButton == MouseButton.Left && App.FormatWindow?.Opacity == 1)
             {
-                App.fb.FadeOut();
+                App.FormatWindow.FadeOut();
             }
         }
 
@@ -306,7 +284,7 @@ namespace DesktopNote
         private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Rec_BG.ReleaseMouseCapture();
-            if (Properties.Settings.Default.AutoDock) DockToSide(true);
+            if (CurrentSetting.AutoDock) DockToSide(true);
         }
 
         private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
@@ -353,21 +331,21 @@ namespace DesktopNote
                 {
                     if (isUIthread)
                     {
-                        using (var ms = new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Create))
+                        using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                         {
                             tr.Save(ms, DataFormats.XamlPackage, true);
                         }
-                        File.WriteAllText(Properties.Settings.Default.Bak_Location, tr.Text);
+                        File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                     }
                     else
                     {
                         Dispatcher.Invoke(delegate
                         {
-                            using (var ms = new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Create))
+                            using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                             {
                                 tr.Save(ms, DataFormats.XamlPackage, true);
                             };
-                            File.WriteAllText(Properties.Settings.Default.Bak_Location, tr.Text);
+                            File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                         });
                     }
                     result = (string)Application.Current.Resources["status_saved"];
@@ -396,89 +374,86 @@ namespace DesktopNote
         internal void Quit(bool savesetting)
         {
             SaveToXamlPkg();
-            var set = Properties.Settings.Default;
             if (savesetting)
             {
-                set.Win_Pos = new System.Drawing.Point((int)Left, (int)Top);
-                set.Win_Size = new System.Drawing.Size((int)Width, (int)Height);
-                set.DockedTo = (int)lastdockstatus;
-                set.Save();
+                CurrentSetting.Win_Pos = new Point(Left, Top);
+                CurrentSetting.Win_Size = new Size(Width, Height);
+                CurrentSetting.DockedTo = (int)lastdockstatus;
+                CurrentSetting.Save();
             }
             Application.Current.Shutdown();
         }
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
         {
-            var set = Properties.Settings.Default;
             //check and merge previous settings
-            if (set.UpgradeFlag == true)
+            if (Properties.Settings.Default.UpgradeFlag == true)
             {
-                set.Upgrade();
-                set.UpgradeFlag = false;
-                set.Save();
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpgradeFlag = false;
+                Properties.Settings.Default.Save();
             }
 
             //load settings
-            Width = set.Win_Size.Width;
-            Height = set.Win_Size.Height;
-            if (set.Win_Pos != null)
-            {
-                Left = set.Win_Pos.X;
-                Top = set.Win_Pos.Y;
-            }
+            Width = CurrentSetting.Win_Size.Width;
+            Height = CurrentSetting.Win_Size.Height;
+            Left = CurrentSetting.Win_Pos.X;
+            Top = CurrentSetting.Win_Pos.Y;
 
-            App.fb = new Win_Format();
-            App.fb.Tag = RTB_Main;
-            App.fb.Owner = this; //causing fb to close when mainwin closes.
-            lastdockstatus = (DockStatus)set.DockedTo;
-            RTB_Main.FontFamily = new FontFamily(set.Font);
-            RTB_Main.Foreground = new SolidColorBrush(set.FontColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Font.Content).SelectedColor = set.FontColor;
-            RTB_Main.Background = new SolidColorBrush(set.BackColor);
-            ((Xceed.Wpf.Toolkit.ColorPicker)App.fb.CP_Back.Content).SelectedColor = set.BackColor;
-            Rec_BG.Fill = new SolidColorBrush(set.PaperColor);
+            lastdockstatus = (DockStatus)CurrentSetting.DockedTo;
+            RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
+            RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
+            RTB_Main.Background = new SolidColorBrush(CurrentSetting.BackColor);
+            Rec_BG.Fill = new SolidColorBrush(CurrentSetting.PaperColor);
 
-            //add fonts to menu
-            foreach (var f in Fonts.SystemFontFamilies)
+            if (App.FormatWindow == null)
             {
-                var mi = new ComboBoxItem
+                App.FormatWindow = new Win_Format(null, this) { Tag = RTB_Main };
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = CurrentSetting.FontColor;
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = CurrentSetting.BackColor;
+
+                //add fonts to menu
+                foreach (var f in Fonts.SystemFontFamilies)
                 {
-                    Content = f.Source,
-                    FontFamily = f,
-                    FontSize = this.FontSize + 4,
-                    ToolTip = f.Source
-                };
-                App.fb.CB_Font.Items.Add(mi);
-                if (f.Source == set.Font) mi.IsSelected = true;
-            }
-            App.fb.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
-            App.fb.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
-            {
-                if (App.fb.Opacity == 1 && e1.AddedItems.Count == 1)
-                {
-                    var mi = (ComboBoxItem)e1.AddedItems[0];
-
-                    if (!RTB_Main.Selection.IsEmpty) //only change selected
-                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
-                    else //change default
-                        {
-                        RTB_Main.FontFamily = mi.FontFamily;
-                        set.Font = mi.FontFamily.Source;
-                    }
+                    var mi = new ComboBoxItem
+                    {
+                        Content = f.Source,
+                        FontFamily = f,
+                        FontSize = FontSize + 4,
+                        ToolTip = f.Source
+                    };
+                    App.FormatWindow.CB_Font.Items.Add(mi);
+                    if (f.Source == CurrentSetting.Font) mi.IsSelected = true;
                 }
-            };
+                App.FormatWindow.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
+                App.FormatWindow.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
+                {
+                    if (App.FormatWindow.Opacity == 1 && e1.AddedItems.Count == 1)
+                    {
+                        var mi = (ComboBoxItem)e1.AddedItems[0];
+
+                        if (!RTB_Main.Selection.IsEmpty) //only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                        else //change default
+                        {
+                            RTB_Main.FontFamily = mi.FontFamily;
+                            CurrentSetting.Font = mi.FontFamily.Source;
+                        }
+                    }
+                };
+            }
                
             //loading contents
-            if (File.Exists(Properties.Settings.Default.Doc_Location))
+            if (File.Exists(CurrentSetting.Doc_Location))
             {
                 try
                 {
                     var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                    tr.Load(new FileStream(Properties.Settings.Default.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
+                    tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
                 }
                 catch
                 {
-                    MessageBox.Show((string)Application.Current.Resources["msgbox_load_error"] + "\r\n" + set.Bak_Location,
+                    MessageBox.Show((string)Application.Current.Resources["msgbox_load_error"] + "\r\n" + CurrentSetting.Bak_Location,
                         (string)Application.Current.Resources["msgbox_title_load_error"], MessageBoxButton.OK, MessageBoxImage.Stop);
                 }
             }
@@ -501,10 +476,9 @@ namespace DesktopNote
             RTB_Main.IsUndoEnabled = true;
             //without the above two lines, Load actions can be undone.
 
-            currScrnRect = new GetCurrentMonitor().GetInfo();
+            App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
 
-            var task_save = new Thread(SaveNotes);
-            task_save.IsBackground = true;
+            var task_save = new Thread(SaveNotes) { IsBackground = true };
             task_save.Start();
 
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
@@ -518,9 +492,9 @@ namespace DesktopNote
                 //activate and reset dock status when a second instance is requested
                 //in case of resolution changes etc that might cause the main window to be "lost".
                 Activate();
-                currScrnRect = new GetCurrentMonitor().GetInfo();
+                App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
                 BeginAnimation(DockedToProperty, null); //required to modify the DockedTo property.
-                Top = currScrnRect.Top; //in case it was docked to bottom or top.
+                Top = App.CurrScrnRect.Top; //in case it was docked to bottom or top.
                 lastdockstatus = DockStatus.Left;
                 DockedTo = DockStatus.Left;
                 UnDock();

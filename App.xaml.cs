@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-//using System.Collections.Generic;
+using System.Collections.Specialized;
 //using System.Configuration;
 //using System.Data;
 //using System.Linq;
@@ -11,9 +12,11 @@ namespace DesktopNote
 {
     public partial class App : Application
     {
-        public static MainWindow mainwin;
-        public static Win_Format fb;
-        internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
+        public static List<MainWindow> MainWindows = new List<MainWindow>();
+        public static Win_Format FormatWindow;
+        public static Win_Search SearchWindow;
+        public static Rect CurrScrnRect;
+        //internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
         public const string MutexString = @"{39622D35-176E-453D-B1FD-E4EC1EAF31DC}";
         private System.Threading.Mutex mtx;
 
@@ -60,8 +63,10 @@ namespace DesktopNote
                 {
                     if ((string)resource.Key == @"resources/stringresources." + lang + ".baml")
                     {
-                        var dict = new ResourceDictionary();
-                        dict.Source = new Uri(@"Resources\StringResources." + lang + ".xaml", UriKind.Relative);
+                        var dict = new ResourceDictionary
+                        {
+                            Source = new Uri(@"Resources\StringResources." + lang + ".xaml", UriKind.Relative)
+                        };
                         Resources.MergedDictionaries.Add(dict);
                         langadded = true;
                         break;
@@ -84,9 +89,28 @@ namespace DesktopNote
                 return;
             }
 
-            mainwin = new MainWindow();
-            Current.MainWindow = mainwin;
-            mainwin.Show();
+            //remove deleted notes from settings
+            var set = DesktopNote.Properties.Settings.Default;
+            for (int i = set.Doc_Location.Count - 1; i >= 0; i--)
+            {
+                if (string.IsNullOrWhiteSpace(set.Doc_Location[i]))
+                    foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
+                    {
+                        if (propval.Property.PropertyType == typeof(StringCollection))
+                            ((StringCollection)propval.PropertyValue).RemoveAt(i);
+                    }
+            }
+            set.Save();
+
+            //load notes
+            for (int i = 0; i < set.Doc_Location.Count; i++)
+            {
+                var newmainwin = new MainWindow(i);
+                MainWindows.Add(newmainwin);
+                //Current.MainWindow = mainwin;
+                newmainwin.Show();
+            }
+
         }
 
         protected override void OnExit(ExitEventArgs e)
