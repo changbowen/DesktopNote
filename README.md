@@ -13,7 +13,7 @@ If you really like it [![PayPal](https://img.shields.io/badge/%24-PayPal-blue.sv
 <img src="https://i.imgur.com/1DdJ4Sr.png" alt=""/>
 
 ## Features
-- Multiple note window supported.
+- **Multiple note windows supported**.
 - Auto saving note contents to application root folder.
 - Supports images as content.
 - Search function.
