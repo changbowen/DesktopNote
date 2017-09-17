@@ -77,9 +77,9 @@ namespace DesktopNote
             MainWin.Close();
             win.Show();
 
-            var optwin = new Win_Options(win);
-            Close();
-            optwin.Show();
+            FadeOut(true);
+            //var optwin = new Win_Options(win);
+            //optwin.Show();
         }
 
         private void Button_Help_Click(object sender, RoutedEventArgs e)

@@ -151,8 +151,11 @@ namespace DesktopNote
                 if (val.Name == nameof(set.Doc_Location) || val.Name == nameof(set.Bak_Location)) continue;
                 try
                 {
-                    var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
-                    ((StringCollection)val.PropertyValue)[setidx] = defval;
+                    if (val.Property.PropertyType == typeof(StringCollection))
+                    {
+                        var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
+                        ((StringCollection)val.PropertyValue)[setidx] = defval;
+                    }
                 }
                 catch { }
             }

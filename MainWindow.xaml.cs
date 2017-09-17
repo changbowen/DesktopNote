@@ -429,21 +429,25 @@ namespace DesktopNote
                     }
                 };
             }
-               
+
             //loading contents
-            if (File.Exists(CurrentSetting.Doc_Location))
+            lock (Lock_Save)
             {
-                try
+                if (File.Exists(CurrentSetting.Doc_Location))
                 {
-                    var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                    tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
-                }
-                catch
-                {
-                    MessageBox.Show((string)Application.Current.Resources["msgbox_load_error"] + "\r\n" + CurrentSetting.Bak_Location,
-                        (string)Application.Current.Resources["msgbox_title_load_error"], MessageBoxButton.OK, MessageBoxImage.Stop);
+                    try
+                    {
+                        var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
+                    }
+                    catch
+                    {
+                        MessageBox.Show((string)Application.Current.Resources["msgbox_load_error"] + "\r\n" + CurrentSetting.Bak_Location,
+                            (string)Application.Current.Resources["msgbox_title_load_error"], MessageBoxButton.OK, MessageBoxImage.Stop);
+                    }
                 }
             }
+            
 
             //unifying font for new paragraghs. without these, wont be able to change fonts after reload.
             //the following doesnt affect specifically set font sizes in Inlines & Run.

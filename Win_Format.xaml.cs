@@ -242,6 +242,7 @@ namespace DesktopNote
                 var win = new MainWindow(newidx);
                 App.MainWindows.Add(win);
                 win.Show();
+                win.Top += 20d; win.Left += 20d;
             }
             catch { }
         }
