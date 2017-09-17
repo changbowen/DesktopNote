@@ -43,15 +43,15 @@
         <CheckBox Grid.Row="4" x:Name="CB_AutoDock" Margin="5,2" Content="{StaticResource menu_auto_dock}" Click="CB_AutoDock_Click" VerticalAlignment="Center"/>
         <Button Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3" Margin="5,2" Content="{StaticResource menu_reset_formats}" Click="Button_ResetFormats_Click" HorizontalAlignment="Stretch"/>
         <Button Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="3" Margin="5,2" Content="{StaticResource menu_reset_settings}" Click="Button_ResetSet_Click" HorizontalAlignment="Stretch"/>
-        <Button Grid.Row="4" Grid.Column="4" Grid.ColumnSpan="3" Margin="5,2" Click="Button_Help_Click" HorizontalAlignment="Stretch">
-            <TextBlock>
+        <Button Grid.Row="4" Grid.Column="4" Grid.ColumnSpan="3" Margin="5,2" Content="{StaticResource menu_help}" Click="Button_Help_Click" HorizontalAlignment="Stretch">
+            <!--<TextBlock>
                 <TextBlock.Text>
                     <MultiBinding StringFormat="{}{0} / {1}">
                         <Binding Source="{StaticResource menu_help}"/>
                         <Binding Source="{StaticResource menu_exit}"/>
                     </MultiBinding>
                 </TextBlock.Text>
-            </TextBlock>
+            </TextBlock>-->
         </Button>
     </Grid>
 </l:RoundedWindow>

@@ -70,7 +70,7 @@ namespace DesktopNote
 
         private void Button_Exit_Click(object sender, RoutedEventArgs e)
         {
-            MainWin.Quit(true);
+            App.Quit(true);
         }
 
         internal void ToggleStrike(object sender, RoutedEventArgs e)

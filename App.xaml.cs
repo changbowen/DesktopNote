@@ -113,6 +113,22 @@ namespace DesktopNote
 
         }
 
+        public static void Quit(bool savesetting)
+        {
+            foreach (var win in MainWindows)
+            {
+                win.SaveToXamlPkg();
+                if (savesetting)
+                {
+                    win.CurrentSetting.Win_Pos = new Point(win.Left, win.Top);
+                    win.CurrentSetting.Win_Size = new Size(win.Width, win.Height);
+                    win.CurrentSetting.DockedTo = (int)win.lastdockstatus;
+                }
+            }
+            DesktopNote.Properties.Settings.Default.Save();
+            Current.Shutdown();
+        }
+
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);

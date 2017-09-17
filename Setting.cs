@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Media;
+using System.Configuration;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace DesktopNote
 {
@@ -138,11 +141,46 @@ namespace DesktopNote
         }
 
         /// <summary>
-        /// For now this is the same as calling Properties.Settings.Default.Reset().
+        /// Reset the setting for specified index. Leave default to reset current.
         /// </summary>
-        public void Reset()
+        public void Reset(int setidx = -1)
         {
-            set.Reset();
+            if (setidx == -1) setidx = SettingIndex;
+            foreach (SettingsPropertyValue val in set.PropertyValues)
+            {
+                if (val.Name == nameof(set.Doc_Location) || val.Name == nameof(set.Bak_Location)) continue;
+                try
+                {
+                    var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
+                    ((StringCollection)val.PropertyValue)[setidx] = defval;
+                }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// Do not use Properties.Settings.Default.Reset() as it will remove also the additional note entries.
+        /// </summary>
+        public void ResetAll()
+        {
+            //need to check before use
+            var notecount = set.Doc_Location.Count;
+            try
+            {
+                foreach (SettingsPropertyValue val in set.PropertyValues)
+                {
+                    if (val.Name == nameof(set.Doc_Location) || val.Name == nameof(set.Bak_Location)) continue;
+                    if (val.Property.PropertyType == typeof(StringCollection))
+                    {
+                        var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
+                        for (int i = 0; i < notecount; i++)
+                        {
+                            ((StringCollection)val.PropertyValue)[i] = defval;
+                        }
+                    }
+                }
+            }
+            catch { }
         }
     }
 }

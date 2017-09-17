@@ -315,7 +315,7 @@ namespace DesktopNote
             }
         }
 
-        private void SaveToXamlPkg()
+        internal void SaveToXamlPkg()
         {
             lock (Lock_Save)
             {
@@ -369,19 +369,6 @@ namespace DesktopNote
                     });
                 }
             }
-        }
-
-        internal void Quit(bool savesetting)
-        {
-            SaveToXamlPkg();
-            if (savesetting)
-            {
-                CurrentSetting.Win_Pos = new Point(Left, Top);
-                CurrentSetting.Win_Size = new Size(Width, Height);
-                CurrentSetting.DockedTo = (int)lastdockstatus;
-                CurrentSetting.Save();
-            }
-            Application.Current.Shutdown();
         }
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
