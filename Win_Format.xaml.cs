@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Collections.Specialized;
+using System.Linq;
+using System.Xml.Linq;
 //using System.Windows.Media.Imaging;
 //using System.Windows.Navigation;
 //using System.Windows.Shapes;
@@ -218,18 +220,25 @@ namespace DesktopNote
             }
         }
 
-        private void Button_NewNote_Click(object sender, RoutedEventArgs e)
+        public static void NewNote(int refidx = -1)
         {
             var set = Properties.Settings.Default;
             try
             {
                 int newidx = 0;
-                int curidx = MainWin.CurrentSetting.SettingIndex;
                 foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
                 {
                     if (propval.Property.PropertyType == typeof(StringCollection))
                     {
-                        newidx = ((StringCollection)propval.PropertyValue).Add(((StringCollection)propval.PropertyValue)[curidx]);
+                        if (refidx == -1)//create from default
+                        {
+                            var defval = XElement.Parse((string)propval.Property.DefaultValue).Element("string").Value;
+                            newidx = ((StringCollection)propval.PropertyValue).Add(defval);
+                        }
+                        else//create from specified index
+                        {
+                            newidx = ((StringCollection)propval.PropertyValue).Add(((StringCollection)propval.PropertyValue)[refidx]);
+                        }
                     }
                 }
 
@@ -247,6 +256,11 @@ namespace DesktopNote
             catch { }
         }
 
+        private void Button_NewNote_Click(object sender, RoutedEventArgs e)
+        {
+            NewNote(MainWin.CurrentSetting.SettingIndex);
+        }
+
         private void Button_Close_Click(object sender, RoutedEventArgs e)
         {
             var result = MessageBox.Show((string)Application.Current.Resources["msgbox_delete_confirm"], "", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
@@ -262,15 +276,22 @@ namespace DesktopNote
                         System.IO.File.Delete(MainWin.CurrentSetting.Bak_Location);
                         set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
                         set.Save();
+                        App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;
                     case MessageBoxResult.No:
                         set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
                         set.Save();
+                        App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;
+                }
+                //check if the last window was closed
+                if (!App.MainWindows.Where(w => w != null).Any())
+                {
+                    NewNote();
                 }
             }
             catch { }

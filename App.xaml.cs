@@ -111,12 +111,14 @@ namespace DesktopNote
                 newmainwin.Show();
             }
 
-        }
+            if (MainWindows.Count == 0) Win_Format.NewNote();
+    }
 
         public static void Quit(bool savesetting)
         {
             foreach (var win in MainWindows)
             {
+                if (win == null) continue;
                 win.SaveToXamlPkg();
                 if (savesetting)
                 {
