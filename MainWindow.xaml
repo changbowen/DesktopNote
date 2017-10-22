@@ -9,6 +9,13 @@
     <Window.CacheMode>
         <BitmapCache/>
     </Window.CacheMode>
+    <Window.Resources>
+        <ContextMenu x:Key="TrayMenu">
+            <MenuItem Header="{StaticResource menu_newnote}" Click="TM_NewNote_Click"/>
+            <MenuItem Header="{StaticResource menu_reset_positions}" Click="TM_ResetPos_Click"/>
+            <MenuItem Header="{StaticResource menu_exit}" Click="TM_Exit_Click"/>
+        </ContextMenu>
+    </Window.Resources>
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12"
                    MouseLeftButtonDown="Rec_BG_MouseLeftButtonDown" MouseLeftButtonUp="Rec_BG_MouseLeftButtonUp" MouseMove="Rec_BG_MouseMove" Cursor="SizeAll">

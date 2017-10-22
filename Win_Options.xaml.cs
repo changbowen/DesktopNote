@@ -48,12 +48,12 @@ namespace DesktopNote
             {
                 MainWin.CurrentSetting.AutoDock = false;
                 MainWin.UnDock();
-                //MainWin.Topmost = false;
+                MainWin.Topmost = false;
             }
             MainWin.CurrentSetting.Save();
         }
 
-        internal void Button_ResetFormats_Click(object sender, RoutedEventArgs e)
+        private void Button_ResetFormats_Click(object sender, RoutedEventArgs e)
         {
             //clear custom formats
             var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);

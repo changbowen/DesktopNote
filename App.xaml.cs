@@ -127,7 +127,7 @@ namespace DesktopNote
                 {
                     win.CurrentSetting.Win_Pos = new Point(win.Left, win.Top);
                     win.CurrentSetting.Win_Size = new Size(win.Width, win.Height);
-                    win.CurrentSetting.DockedTo = (int)win.lastdockstatus;
+                    win.CurrentSetting.DockedTo = (int)win.DockedTo;
                 }
             }
             DesktopNote.Properties.Settings.Default.Save();
@@ -139,6 +139,5 @@ namespace DesktopNote
             base.OnExit(e);
             mtx?.Close();
         }
-
     }
 }

@@ -15,6 +15,7 @@
     <sys:String x:Key="menu_paper_color">Paper Color</sys:String>
     <sys:String x:Key="menu_reset_formats">Reset Formats</sys:String>
     <sys:String x:Key="menu_reset_settings">Reset Settings</sys:String>
+    <sys:String x:Key="menu_reset_positions">Reset Positions</sys:String>
     <sys:String x:Key="msgbox_help">Available editing features can be accessd from menu or keyboard combination.
 Use Ctrl + mouse wheel to change font size.
 Change font or font size when there is a selection will only change selected text.

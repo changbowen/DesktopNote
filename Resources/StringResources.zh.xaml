@@ -15,6 +15,7 @@
     <sys:String x:Key="menu_paper_color">纸张颜色</sys:String>
     <sys:String x:Key="menu_reset_formats">重置格式</sys:String>
     <sys:String x:Key="menu_reset_settings">重置设置</sys:String>
+    <sys:String x:Key="menu_reset_positions">重置位置</sys:String>
     <sys:String x:Key="msgbox_help">编辑功能可通过快捷键或者菜单访问。
 使用Ctrl + 鼠标滚轮来更改文字大小。
 选中文本时更改大小仅对选中的部分生效。

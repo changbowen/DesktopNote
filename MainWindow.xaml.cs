@@ -48,7 +48,8 @@ namespace DesktopNote
             if (ds == DockStatus.None)
             {
                 win.ResizeMode = ResizeMode.CanResizeWithGrip;
-                win.Topmost = false;
+                if (!win.CurrentSetting.AutoDock) win.Topmost = false;
+                else win.Topmost = true;
             }
             else
             {
@@ -386,9 +387,20 @@ namespace DesktopNote
                     App.TrayIcon = new TaskbarIcon
                     {
                         Icon = new System.Drawing.Icon(stream),
-                        ToolTipText = nameof(DesktopNote)
+                        ToolTipText = nameof(DesktopNote),
+                        ContextMenu = (ContextMenu)Resources["TrayMenu"],
                     };
                 }
+
+                //tray icon double click
+                App.TrayIcon.TrayMouseDoubleClick += (obj, args) =>
+                {
+                    foreach (var win in App.MainWindows)
+                    {
+                        win.Activate();
+                        win.UnDock();
+                    }
+                };
             }
 
             //check and merge previous settings
@@ -508,10 +520,44 @@ namespace DesktopNote
                 //Top = App.CurrScrnRect.Top; //in case it was docked to bottom or top.
                 //lastdockstatus = DockStatus.Left;
                 //DockedTo = DockStatus.Left;
-                //resetting docking position was moved to tray menu.
+                //resetting position was moved to tray menu.
                 UnDock();
             }
             return IntPtr.Zero;
         }
+
+
+        #region TrayIcon Events
+        private void TM_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            App.Quit(true);
+        }
+
+        private void TM_ResetPos_Click(object sender, RoutedEventArgs e)
+        {
+            App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
+            var i = 0;
+            foreach (var win in App.MainWindows)
+            {
+                var delta = i * 20;
+                win.BeginAnimation(LeftProperty, null); //might be required to change position.
+                win.BeginAnimation(TopProperty, null);
+                win.BeginAnimation(DockedToProperty, null);
+                win.BeginAnimation(OpacityProperty, null);
+                win.Top = App.CurrScrnRect.Top + delta;
+                win.Left = App.CurrScrnRect.Left + +delta;
+                win.DockedTo = DockStatus.None;
+                win.lastdockstatus = DockStatus.None;
+                i += 1;
+            }
+        }
+
+        private void TM_NewNote_Click(object sender, RoutedEventArgs e)
+        {
+            Win_Format.NewNote();
+        }
+        #endregion
+
+
     }
 }

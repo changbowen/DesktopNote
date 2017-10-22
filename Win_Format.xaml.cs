@@ -205,6 +205,7 @@ namespace DesktopNote
         /// </summary>
         internal void LoadValues()
         {
+            WinAPI.BringToTop(this);
             if (!RTB_Main.Selection.IsEmpty)
             {
                 var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
