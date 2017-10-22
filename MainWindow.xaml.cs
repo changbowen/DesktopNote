@@ -393,14 +393,7 @@ namespace DesktopNote
                 }
 
                 //tray icon double click
-                App.TrayIcon.TrayMouseDoubleClick += (obj, args) =>
-                {
-                    foreach (var win in App.MainWindows)
-                    {
-                        win.Activate();
-                        win.UnDock();
-                    }
-                };
+                App.TrayIcon.TrayMouseDoubleClick += TrayIcon_TrayMouseDoubleClick;
             }
 
             //check and merge previous settings
@@ -418,7 +411,7 @@ namespace DesktopNote
             Top = CurrentSetting.Win_Pos.Y;
 
             lastdockstatus = (DockStatus)CurrentSetting.DockedTo;
-            DockedTo = lastdockstatus;
+            //DockedTo = DockStatus.None;
             RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
             RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
             RTB_Main.Background = new SolidColorBrush(CurrentSetting.BackColor);
@@ -498,7 +491,7 @@ namespace DesktopNote
             RTB_Main.IsUndoEnabled = true;
             //without the above two lines, Load actions can be undone.
 
-            App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
+            if (CurrentSetting.AutoDock) DockToSide(true);
 
             var task_save = new Thread(SaveNotes) { IsBackground = true };
             task_save.Start();
@@ -507,7 +500,7 @@ namespace DesktopNote
             source.AddHook(WndProc);
 
         }
-
+       
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == SingleInstance.RegisteredWM)
@@ -555,6 +548,15 @@ namespace DesktopNote
         private void TM_NewNote_Click(object sender, RoutedEventArgs e)
         {
             Win_Format.NewNote();
+        }
+
+        private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
+        {
+            foreach (var win in App.MainWindows)
+            {
+                win.Activate();
+                win.UnDock();
+            }
         }
         #endregion
 

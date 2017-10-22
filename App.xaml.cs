@@ -127,7 +127,7 @@ namespace DesktopNote
                 {
                     win.CurrentSetting.Win_Pos = new Point(win.Left, win.Top);
                     win.CurrentSetting.Win_Size = new Size(win.Width, win.Height);
-                    win.CurrentSetting.DockedTo = (int)win.DockedTo;
+                    win.CurrentSetting.DockedTo = (int)win.lastdockstatus;
                 }
             }
             DesktopNote.Properties.Settings.Default.Save();
