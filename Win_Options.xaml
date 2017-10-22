@@ -35,7 +35,7 @@
         <TextBlock Grid.Row="1" Grid.Column="0" Text="{StaticResource label_content_path_txt}" VerticalAlignment="Center" Margin="5,2"/>
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="TB_SavePathTxt" VerticalAlignment="Center" Margin="5,2" IsReadOnly="True" PreviewMouseDoubleClick="TB_SavePathTxt_PreviewMouseDoubleClick"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2" Margin="5,2">
-            <wtk:ColorPicker x:Name="CP_Paper" Margin="0,0,5,0" Width="22" ColorMode="ColorCanvas" ShowAdvancedButton="False"
+            <wtk:ColorPicker x:Name="CP_Paper" Margin="0,0,5,0" Width="22" ColorMode="ColorCanvas"
                                  ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
             <TextBlock Text="{StaticResource menu_paper_color}" VerticalAlignment="Center"/>
         </StackPanel>

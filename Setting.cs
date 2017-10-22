@@ -67,7 +67,7 @@ namespace DesktopNote
             }
             set
             {
-                set.Bak_Location[SettingIndex] = value.ToString();
+                set.AutoDock[SettingIndex] = value.ToString();
             }
         }
         public int DockedTo

@@ -19,6 +19,7 @@ namespace DesktopNote
         //internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
         public const string MutexString = @"{39622D35-176E-453D-B1FD-E4EC1EAF31DC}";
         private System.Threading.Mutex mtx;
+        public static Hardcodet.Wpf.TaskbarNotification.TaskbarIcon TrayIcon;
 
         [DllImport("shlwapi.dll")]
         private static extern bool PathIsNetworkPath(string pszPath);
@@ -35,18 +36,20 @@ namespace DesktopNote
             AppDomain.CurrentDomain.AssemblyResolve += (object sender, ResolveEventArgs e) =>
               {
                   var desiredAssembly = new System.Reflection.AssemblyName(e.Name).Name;
-                  if (desiredAssembly == "Xceed.Wpf.Toolkit")
+                  switch (desiredAssembly)
                   {
-                      var ressourceName = "DesktopNote.Resources." + desiredAssembly + ".dll";
-                      using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(ressourceName))
-                      {
-                          byte[] assemblyData = new byte[stream.Length];
-                          stream.Read(assemblyData, 0, assemblyData.Length);
-                          return System.Reflection.Assembly.Load(assemblyData);
-                      }
+                      case "Xceed.Wpf.Toolkit":
+                      case "Hardcodet.Wpf.TaskbarNotification":
+                          var ressourceName = "DesktopNote.Resources." + desiredAssembly + ".dll";
+                          using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(ressourceName))
+                          {
+                              byte[] assemblyData = new byte[stream.Length];
+                              stream.Read(assemblyData, 0, assemblyData.Length);
+                              return System.Reflection.Assembly.Load(assemblyData);
+                          }
+                      default:
+                          return null;
                   }
-                  else
-                      return null;
               };
 
             //localization
@@ -112,7 +115,7 @@ namespace DesktopNote
             }
 
             if (MainWindows.Count == 0) Win_Format.NewNote();
-    }
+        }
 
         public static void Quit(bool savesetting)
         {

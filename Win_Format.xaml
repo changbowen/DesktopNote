@@ -39,7 +39,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
             </Style>
 
-            <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" ColorMode="ColorCanvas" ShowAdvancedButton="False"
+            <wtk:ColorPicker x:Key="CP_Main" x:Shared="False" Width="22" ColorMode="ColorCanvas"
                          ShowRecentColors="True" SelectedColorChanged="ColorChange" SelectedColor="Black" ShowDropDownButton="False"/>
         </Grid.Resources>
         

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hardcodet.Wpf.TaskbarNotification;
+using System;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
@@ -43,7 +44,7 @@ namespace DesktopNote
         private static void OnDockedToChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var ds = (DockStatus)e.NewValue;
-            var win = (Window)d;
+            var win = (MainWindow)d;
             if (ds == DockStatus.None)
             {
                 win.ResizeMode = ResizeMode.CanResizeWithGrip;
@@ -140,7 +141,7 @@ namespace DesktopNote
             }
         }
 
-        private void UnDock()
+        internal void UnDock()
         {
             if (DockedTo != DockStatus.Docking && DockedTo != DockStatus.None)
             {
@@ -182,6 +183,7 @@ namespace DesktopNote
                 var anim_prop = new ObjectAnimationUsingKeyFrames();
                 anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
                 anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
+
                 BeginAnimation(tgtpro, anim_move);
                 BeginAnimation(OpacityProperty, anim_fade);
                 BeginAnimation(DockedToProperty, anim_prop);
@@ -251,9 +253,10 @@ namespace DesktopNote
         {
             e.Handled = true;
             //update caller
-            App.FormatWindow.MainWin = this;
-            App.FormatWindow.RTB_Main = RTB_Main;
+            App.FormatWindow.UpdateCaller(this, this);
             App.FormatWindow.FadeIn();
+            if (App.FormatWindow.Opacity == 1)//refresh values manually when the window is already visible.
+                App.FormatWindow.LoadValues();
         }
 
         private void RTB_Main_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -373,6 +376,21 @@ namespace DesktopNote
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
         {
+            //WinAPI.SetToolWindow(this);
+
+            //create tray icon
+            if (App.TrayIcon == null)
+            {
+                using (var stream = Application.GetResourceStream(new Uri("pack://application:,,,/DesktopNote;component/Resources/stickynote.ico")).Stream)
+                {
+                    App.TrayIcon = new TaskbarIcon
+                    {
+                        Icon = new System.Drawing.Icon(stream),
+                        ToolTipText = nameof(DesktopNote)
+                    };
+                }
+            }
+
             //check and merge previous settings
             if (Properties.Settings.Default.UpgradeFlag == true)
             {
@@ -388,6 +406,7 @@ namespace DesktopNote
             Top = CurrentSetting.Win_Pos.Y;
 
             lastdockstatus = (DockStatus)CurrentSetting.DockedTo;
+            DockedTo = lastdockstatus;
             RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
             RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
             RTB_Main.Background = new SolidColorBrush(CurrentSetting.BackColor);
@@ -474,6 +493,7 @@ namespace DesktopNote
 
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
             source.AddHook(WndProc);
+
         }
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -483,16 +503,15 @@ namespace DesktopNote
                 //activate and reset dock status when a second instance is requested
                 //in case of resolution changes etc that might cause the main window to be "lost".
                 Activate();
-                App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
-                BeginAnimation(DockedToProperty, null); //required to modify the DockedTo property.
-                Top = App.CurrScrnRect.Top; //in case it was docked to bottom or top.
-                lastdockstatus = DockStatus.Left;
-                DockedTo = DockStatus.Left;
+                //App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
+                //BeginAnimation(DockedToProperty, null); //required to modify the DockedTo property.
+                //Top = App.CurrScrnRect.Top; //in case it was docked to bottom or top.
+                //lastdockstatus = DockStatus.Left;
+                //DockedTo = DockStatus.Left;
+                //resetting docking position was moved to tray menu.
                 UnDock();
             }
             return IntPtr.Zero;
         }
-
-
     }
 }

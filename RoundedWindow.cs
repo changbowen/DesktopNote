@@ -184,7 +184,8 @@ namespace DesktopNote
                 PreviewGotKeyboardFocus += (object sender, KeyboardFocusChangedEventArgs e) =>
                 {
                     e.Handled = true;
-                    Owner.Focus();
+                    var o = sender as Window;
+                    if (o != null && o != this) o.Focus();
                 };
             }
         }
@@ -243,6 +244,7 @@ namespace DesktopNote
 
         /// <summary>
         /// Fade in the window at mouse position. Or the specified Left and Top position.
+        /// If the window is already faded in, move the window to the new position. In this case the FadingInEvent will not be raised.
         /// </summary>
         public void FadeIn(double left = double.NaN, double top = double.NaN)
         {

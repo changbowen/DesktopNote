@@ -47,7 +47,8 @@ namespace DesktopNote
             else
             {
                 MainWin.CurrentSetting.AutoDock = false;
-                MainWin.Topmost = false;
+                MainWin.UnDock();
+                //MainWin.Topmost = false;
             }
             MainWin.CurrentSetting.Save();
         }

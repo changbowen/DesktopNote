@@ -27,9 +27,14 @@ namespace DesktopNote
         public Win_Format(Window owner, MainWindow mainwin)
         {
             InitializeComponent();
+            UpdateCaller(owner, mainwin);
+        }
+
+        public void UpdateCaller(Window owner, MainWindow mainwin)
+        {
             if (owner != null) Owner = owner;
             MainWin = mainwin;
-            RTB_Main = MainWin.RTB_Main;
+            RTB_Main = mainwin.RTB_Main;
         }
 
         #region Menu Events
@@ -191,7 +196,15 @@ namespace DesktopNote
 
         private void FB1_FadingIn(object sender, RoutedEventArgs e)
         {
-            //loading formats
+            //initialize values
+            LoadValues();
+        }
+
+        /// <summary>
+        /// Manually refresh control values.
+        /// </summary>
+        internal void LoadValues()
+        {
             if (!RTB_Main.Selection.IsEmpty)
             {
                 var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
