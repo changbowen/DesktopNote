@@ -254,7 +254,7 @@ namespace DesktopNote
         {
             e.Handled = true;
             //update caller
-            App.FormatWindow.UpdateCaller(this, this);
+            App.FormatWindow.UpdateTargets(this);
             App.FormatWindow.FadeIn();
             if (App.FormatWindow.Opacity == 1)//refresh values manually when the window is already visible.
                 App.FormatWindow.LoadValues();
@@ -426,7 +426,7 @@ namespace DesktopNote
 
             if (App.FormatWindow == null)
             {
-                App.FormatWindow = new Win_Format(null, this) { Tag = RTB_Main };
+                App.FormatWindow = new Win_Format(this) { Tag = RTB_Main };
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = CurrentSetting.FontColor;
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = CurrentSetting.BackColor;
 

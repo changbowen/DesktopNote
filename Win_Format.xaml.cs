@@ -23,16 +23,14 @@ namespace DesktopNote
         public MainWindow MainWin;
         public RichTextBox RTB_Main;
 
-        /// <param name="owner">Setting owner causes Win_Format to close when the owner window closes.</param>
-        public Win_Format(Window owner, MainWindow mainwin)
+        public Win_Format(MainWindow mainwin)
         {
             InitializeComponent();
-            UpdateCaller(owner, mainwin);
+            UpdateTargets(mainwin);
         }
 
-        public void UpdateCaller(Window owner, MainWindow mainwin)
+        public void UpdateTargets(MainWindow mainwin)
         {
-            if (owner != null) Owner = owner;
             MainWin = mainwin;
             RTB_Main = mainwin.RTB_Main;
         }
