@@ -240,17 +240,16 @@ namespace DesktopNote
                 int newidx = 0;
                 foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
                 {
-                    if (propval.Property.PropertyType == typeof(StringCollection))
+                    if (propval.Property.PropertyType != typeof(StringCollection)) continue;
+                    var strCol = (StringCollection)propval.PropertyValue;
+                    if (refidx == -1)//create from default
                     {
-                        if (refidx == -1)//create from default
-                        {
-                            var defval = XElement.Parse((string)propval.Property.DefaultValue).Element("string").Value;
-                            newidx = ((StringCollection)propval.PropertyValue).Add(defval);
-                        }
-                        else//create from specified index
-                        {
-                            newidx = ((StringCollection)propval.PropertyValue).Add(((StringCollection)propval.PropertyValue)[refidx]);
-                        }
+                        var defval = XElement.Parse((string)propval.Property.DefaultValue).Element("string").Value;
+                        newidx = strCol.Add(defval);
+                    }
+                    else//create from specified index
+                    {
+                        newidx = strCol.Add(strCol[refidx]);
                     }
                 }
 
@@ -286,16 +285,18 @@ namespace DesktopNote
                     case MessageBoxResult.Yes:
                         System.IO.File.Delete(MainWin.CurrentSetting.Doc_Location);
                         System.IO.File.Delete(MainWin.CurrentSetting.Bak_Location);
-                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
+                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
                         set.Save();
-                        App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
+                        App.MainWindows.Remove(MainWin);
+                        //App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;
                     case MessageBoxResult.No:
-                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//deletion will be done after restart
+                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
                         set.Save();
-                        App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
+                        App.MainWindows.Remove(MainWin);
+                        //App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;

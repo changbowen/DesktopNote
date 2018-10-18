@@ -96,12 +96,12 @@ namespace DesktopNote
             var set = DesktopNote.Properties.Settings.Default;
             for (int i = set.Doc_Location.Count - 1; i >= 0; i--)
             {
-                if (string.IsNullOrWhiteSpace(set.Doc_Location[i]))
-                    foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
-                    {
-                        if (propval.Property.PropertyType == typeof(StringCollection))
-                            ((StringCollection)propval.PropertyValue).RemoveAt(i);
-                    }
+                if (!string.IsNullOrWhiteSpace(set.Doc_Location[i])) continue;
+                foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
+                {
+                    if (propval.Property.PropertyType == typeof(StringCollection))
+                        ((StringCollection)propval.PropertyValue).RemoveAt(i);
+                }
             }
             set.Save();
 
