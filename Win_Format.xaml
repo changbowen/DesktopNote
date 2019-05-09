@@ -81,7 +81,8 @@
         </Button>
         <ContentPresenter Grid.Column="5" Grid.Row="1" x:Name="CP_Font" Content="{StaticResource CP_Main}" ToolTip="{StaticResource tooltip_font_color}"/>
         <ContentPresenter Grid.Column="6" Grid.Row="1" x:Name="CP_Back" Content="{StaticResource CP_Main}" ToolTip="{StaticResource tooltip_back_color}"/>
-        <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" x:Name="CB_Font" IsEditable="True" SelectedValuePath="Content" Height="21.6" Margin="2.5,0"/>
+        <ComboBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4" x:Name="CB_Font" IsEditable="True" SelectedValuePath="Content" Height="21.6" Margin="2.5,0"
+                  SelectionChanged="CB_Font_SelectionChanged"/>
         <Button Grid.Column="6" Grid.Row="3" Click="DecreaseSize" ToolTip="{StaticResource tooltip_decrease_size}">
             <Image Stretch="None" Source="Resources/SizeDecrease.ico"/>
         </Button>

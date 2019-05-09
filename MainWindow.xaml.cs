@@ -437,21 +437,21 @@ namespace DesktopNote
                     if (f.Source == CurrentSetting.Font) mi.IsSelected = true;
                 }
                 App.FormatWindow.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
-                App.FormatWindow.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
-                {
-                    if (App.FormatWindow.Opacity == 1 && e1.AddedItems.Count == 1)
-                    {
-                        var mi = (ComboBoxItem)e1.AddedItems[0];
+                //App.FormatWindow.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
+                //{
+                //    if (App.FormatWindow.Opacity == 1 && e1.AddedItems.Count == 1)
+                //    {
+                //        var mi = (ComboBoxItem)e1.AddedItems[0];
 
-                        if (!RTB_Main.Selection.IsEmpty) //only change selected
-                            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
-                        else //change default
-                        {
-                            RTB_Main.FontFamily = mi.FontFamily;
-                            CurrentSetting.Font = mi.FontFamily.Source;
-                        }
-                    }
-                };
+                //        if (!RTB_Main.Selection.IsEmpty) //only change selected
+                //            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                //        else //change default
+                //        {
+                //            RTB_Main.FontFamily = mi.FontFamily;
+                //            CurrentSetting.Font = mi.FontFamily.Source;
+                //        }
+                //    }
+                //};
             }
 
             //loading contents

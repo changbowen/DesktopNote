@@ -309,5 +309,21 @@ namespace DesktopNote
             }
             catch { }
         }
+
+        private void CB_Font_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (App.FormatWindow.Opacity == 1 && e.AddedItems.Count == 1)
+            {
+                var mi = (ComboBoxItem)e.AddedItems[0];
+
+                if (!RTB_Main.Selection.IsEmpty) //only change selected
+                    RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
+                else //change default
+                {
+                    RTB_Main.FontFamily = mi.FontFamily;
+                    MainWin.CurrentSetting.Font = mi.FontFamily.Source;
+                }
+            }
+        }
     }
 }
