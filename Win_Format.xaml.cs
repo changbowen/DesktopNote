@@ -21,7 +21,16 @@ namespace DesktopNote
     public partial class Win_Format : RoundedWindow
     {
         public MainWindow MainWin;
-        public RichTextBox RTB_Main;
+        //public RichTextBox RTB_Main;
+
+        public RichTextBox RTB_Main
+        {
+            get { return (RichTextBox)GetValue(RTB_MainProperty); }
+            set { SetValue(RTB_MainProperty, value); }
+        }
+        public static readonly DependencyProperty RTB_MainProperty =
+            DependencyProperty.Register("RTB_Main", typeof(RichTextBox), typeof(Win_Format), new PropertyMetadata(null));
+
 
         public Win_Format(MainWindow mainwin)
         {
@@ -288,7 +297,6 @@ namespace DesktopNote
                         set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
                         set.Save();
                         App.MainWindows.Remove(MainWin);
-                        //App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;
@@ -296,7 +304,6 @@ namespace DesktopNote
                         set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
                         set.Save();
                         App.MainWindows.Remove(MainWin);
-                        //App.MainWindows[MainWin.CurrentSetting.SettingIndex] = null;
                         MainWin.Close();
                         FadeOut();
                         break;

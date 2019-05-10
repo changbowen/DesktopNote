@@ -15,6 +15,7 @@
             <MenuItem Header="{StaticResource menu_reset_positions}" Click="TM_ResetPos_Click"/>
             <MenuItem Header="{StaticResource menu_exit}" Click="TM_Exit_Click"/>
         </ContextMenu>
+        <local:MarkerPaddingConverter x:Key="MarkerPaddingConverter"/>
     </Window.Resources>
     <Grid>
         <Rectangle x:Name="Rec_BG" Fill="#FFFFF7C5" Margin="10" RadiusX="12" RadiusY="12"
@@ -33,8 +34,10 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{StaticResource {x:Static SystemColors.HighlightColorKey}}"/>
                 <Style TargetType="{x:Type List}">
                     <Setter Property="Margin" Value="0"/>
-                    <Setter Property="Padding" Value="16,0,0,0"/>
-                    <Setter Property="MarkerOffset" Value="10"/>
+                    <!--marker padding according to the type of the marker
+                    if the marker is not a fixed length character, give more space to the marker-->
+                    <Setter Property="Padding" Value="{Binding RelativeSource={RelativeSource AncestorType=RichTextBox}, Path=FontSize, Mode=OneWay, Converter={StaticResource MarkerPaddingConverter}}"/>
+                    <!--<Setter Property="MarkerOffset" Value="{Binding RelativeSource={RelativeSource AncestorType=RichTextBox}, Path=FontSize, Mode=OneWay, Converter={StaticResource BulletLocationConverter}}"/>-->
                 </Style>
                 <Style TargetType="{x:Type Paragraph}">
                     <Setter Property="Margin" Value="0"/>

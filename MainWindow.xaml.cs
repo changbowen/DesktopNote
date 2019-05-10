@@ -1,5 +1,6 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using System;
+using System.Globalization;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -14,6 +16,20 @@ using System.Windows.Media.Animation;
 
 namespace DesktopNote
 {
+    public class MarkerPaddingConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return new Thickness((double)value * 3, 0d, 0d, 0d);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
     public partial class MainWindow : Window
     {
         public Setting CurrentSetting;
@@ -267,7 +283,6 @@ namespace DesktopNote
                 App.FormatWindow.FadeOut();
             }
         }
-
         #endregion
 
         #region Rect Events
@@ -419,7 +434,7 @@ namespace DesktopNote
 
             if (App.FormatWindow == null)
             {
-                App.FormatWindow = new Win_Format(this) { Tag = RTB_Main };
+                App.FormatWindow = new Win_Format(this);
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = CurrentSetting.FontColor;
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = CurrentSetting.BackColor;
 
@@ -437,21 +452,6 @@ namespace DesktopNote
                     if (f.Source == CurrentSetting.Font) mi.IsSelected = true;
                 }
                 App.FormatWindow.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
-                //App.FormatWindow.CB_Font.SelectionChanged += (object s1, SelectionChangedEventArgs e1) =>
-                //{
-                //    if (App.FormatWindow.Opacity == 1 && e1.AddedItems.Count == 1)
-                //    {
-                //        var mi = (ComboBoxItem)e1.AddedItems[0];
-
-                //        if (!RTB_Main.Selection.IsEmpty) //only change selected
-                //            RTB_Main.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, mi.FontFamily);
-                //        else //change default
-                //        {
-                //            RTB_Main.FontFamily = mi.FontFamily;
-                //            CurrentSetting.Font = mi.FontFamily.Source;
-                //        }
-                //    }
-                //};
             }
 
             //loading contents
@@ -498,7 +498,6 @@ namespace DesktopNote
 
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
             source.AddHook(WndProc);
-
         }
        
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

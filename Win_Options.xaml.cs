@@ -74,8 +74,9 @@ namespace DesktopNote
             MainWin.CurrentSetting.Save();
 
             var win = new MainWindow(MainWin.CurrentSetting.SettingIndex);
-            App.MainWindows[MainWin.CurrentSetting.SettingIndex] = win;
+            App.MainWindows.Remove(MainWin);
             MainWin.Close();
+            App.MainWindows.Add(win);
             win.Show();
 
             FadeOut(true);

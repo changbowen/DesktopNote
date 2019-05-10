@@ -32,7 +32,7 @@
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Margin" Value="2"/>
                 <Setter Property="Background" Value="#FFEAEAEA"/>
-                <Setter Property="CommandTarget" Value="{Binding Tag, ElementName=FB1}"/>
+                <Setter Property="CommandTarget" Value="{Binding RTB_Main, ElementName=FB1, Mode=OneWay}"/>
             </Style>
             <Style TargetType="ContentPresenter">
                 <Setter Property="HorizontalAlignment" Value="Center"/>

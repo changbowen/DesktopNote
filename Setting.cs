@@ -141,7 +141,7 @@ namespace DesktopNote
         }
 
         /// <summary>
-        /// Reset the setting for specified index. Leave default to reset current.
+        /// Reset the setting for specified index. Leave setidx default to reset current.
         /// </summary>
         public void Reset(int setidx = -1)
         {
