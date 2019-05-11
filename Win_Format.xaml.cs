@@ -116,7 +116,8 @@ namespace DesktopNote
                 RTB_Main.FontSize += 1;
             else
             {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
+                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
+                if (ele == null) return;
                 Image img = null;
                 switch (ele.GetType().Name)
                 {
@@ -148,7 +149,8 @@ namespace DesktopNote
             }
             else
             {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward).GetAdjacentElement(LogicalDirection.Forward);
+                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
+                if (ele == null) return;
                 Image img = null;
                 switch (ele.GetType().Name)
                 {
@@ -309,7 +311,7 @@ namespace DesktopNote
                         break;
                 }
                 //check if the last window was closed
-                if (!App.MainWindows.Where(w => w != null).Any())
+                if (App.MainWindows.All(w => w == null))
                 {
                     NewNote();
                 }

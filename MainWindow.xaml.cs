@@ -24,7 +24,6 @@ namespace DesktopNote
             if (parameter == null) p = new Thickness(1);
             else p = (Thickness) new System.Windows.ThicknessConverter().ConvertFrom(parameter);
             var d = (double) value;
-            System.Diagnostics.Debug.Print(new Thickness(d * p.Left, d * p.Top, d * p.Right, d * p.Bottom).ToString());
             return new Thickness(d * p.Left, d * p.Top, d * p.Right, d * p.Bottom);
         }
 

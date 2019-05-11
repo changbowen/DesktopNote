@@ -37,13 +37,12 @@
                     <Setter Property="Padding" Value="{Binding
                         RelativeSource={RelativeSource AncestorType=RichTextBox}, Path=FontSize, Mode=OneWay,
                         Converter={StaticResource ThicknessConverter}, ConverterParameter='1.5 0 0 0'}"/>
-                    <!--<Setter Property="MarkerOffset" Value="{Binding RelativeSource={RelativeSource AncestorType=RichTextBox}, Path=FontSize, Mode=OneWay, Converter={StaticResource BulletLocationConverter}}"/>-->
                     <!--marker padding according to the type of the marker. if the marker is not a fixed length character, give more space to the marker-->
                     <Style.Triggers>
                         <Trigger Property="MarkerStyle" Value="Decimal">
                             <Setter Property="Padding" Value="{Binding
                                 RelativeSource={RelativeSource AncestorType=RichTextBox}, Path=FontSize, Mode=OneWay,
-                                Converter={StaticResource ThicknessConverter}, ConverterParameter='3 0 0 0'}"/>
+                                Converter={StaticResource ThicknessConverter}, ConverterParameter='2.5 0 0 0'}"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>
