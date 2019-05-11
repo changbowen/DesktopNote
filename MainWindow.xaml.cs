@@ -16,11 +16,16 @@ using System.Windows.Media.Animation;
 
 namespace DesktopNote
 {
-    public class MarkerPaddingConverter : IValueConverter
+    public class ThicknessConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return new Thickness((double)value * 3, 0d, 0d, 0d);
+            Thickness p;
+            if (parameter == null) p = new Thickness(1);
+            else p = (Thickness) new System.Windows.ThicknessConverter().ConvertFrom(parameter);
+            var d = (double) value;
+            System.Diagnostics.Debug.Print(new Thickness(d * p.Left, d * p.Top, d * p.Right, d * p.Bottom).ToString());
+            return new Thickness(d * p.Left, d * p.Top, d * p.Right, d * p.Bottom);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -352,7 +357,7 @@ namespace DesktopNote
                     {
                         using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                         {
-                            tr.Save(ms, DataFormats.XamlPackage, true);
+                            tr.Save(ms, DataFormats.Xaml, true);
                         }
                         File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                     }
@@ -362,7 +367,7 @@ namespace DesktopNote
                         {
                             using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                             {
-                                tr.Save(ms, DataFormats.XamlPackage, true);
+                                tr.Save(ms, DataFormats.Xaml, true);
                             };
                             File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                         });
@@ -412,7 +417,7 @@ namespace DesktopNote
             }
 
             //check and merge previous settings
-            if (Properties.Settings.Default.UpgradeFlag == true)
+            if (Properties.Settings.Default.UpgradeFlag)
             {
                 Properties.Settings.Default.Upgrade();
                 Properties.Settings.Default.UpgradeFlag = false;
@@ -462,7 +467,7 @@ namespace DesktopNote
                     try
                     {
                         var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
+                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.Xaml);
                     }
                     catch
                     {
@@ -472,18 +477,24 @@ namespace DesktopNote
                 }
             }
             
-
-            //unifying font for new paragraghs. without these, wont be able to change fonts after reload.
-            //the following doesnt affect specifically set font sizes in Inlines & Run.
+            //reset dependency property values saved explicitly
+            //this is to reduce format inconsistency across reloads
             if (RTB_Main.Document.Blocks.Count > 0)
             {
                 RTB_Main.FontSize = RTB_Main.Document.Blocks.FirstBlock.FontSize;
                 foreach (var b in RTB_Main.Document.Blocks)
                 {
+                    //unify font for new paragraghs. otherwise wont be able to change fonts after reload.
+                    //doesnt affect specifically set font sizes in Inlines & Run.
                     b.ClearValue(TextElement.FontSizeProperty);
                     b.ClearValue(TextElement.FontFamilyProperty);
                     b.ClearValue(TextElement.ForegroundProperty);
                     b.ClearValue(TextElement.BackgroundProperty);
+                }
+
+                //reset Padding on List
+                foreach (var block in RTB_Main.Document.Blocks) {
+                    resetPadding(block);
                 }
             }
 
@@ -499,7 +510,23 @@ namespace DesktopNote
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
             source.AddHook(WndProc);
         }
-       
+
+        private void resetPadding(TextElement ele) {
+            switch (ele) {
+                case List lst:
+                    lst.ClearValue(Block.PaddingProperty);
+                    foreach (var lstItem in lst.ListItems) {
+                        resetPadding(lstItem);
+                    }
+                    break;
+                case ListItem lstItem:
+                    foreach (var blk in lstItem.Blocks) {
+                        resetPadding(blk);
+                    }
+                    break;
+            }
+        }
+
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == SingleInstance.RegisteredWM)
