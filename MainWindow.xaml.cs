@@ -356,7 +356,7 @@ namespace DesktopNote
                     {
                         using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                         {
-                            tr.Save(ms, DataFormats.Xaml, true);
+                            tr.Save(ms, DataFormats.XamlPackage, true);
                         }
                         File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                     }
@@ -366,7 +366,7 @@ namespace DesktopNote
                         {
                             using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
                             {
-                                tr.Save(ms, DataFormats.Xaml, true);
+                                tr.Save(ms, DataFormats.XamlPackage, true);
                             };
                             File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
                         });
@@ -466,7 +466,7 @@ namespace DesktopNote
                     try
                     {
                         var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.Xaml);
+                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
                     }
                     catch
                     {
