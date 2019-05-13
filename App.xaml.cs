@@ -122,7 +122,10 @@ namespace DesktopNote
             foreach (var win in MainWindows)
             {
                 if (win == null) continue;
-                win.SaveToXamlPkg();
+                var exMsg = win.SaveToXamlPkg();
+                if (exMsg != null &&
+                    MessageBox.Show(exMsg + "\r\n" + (string)App.Current.Resources["msgbox_not_saved_confirm"], "", MessageBoxButton.YesNo, MessageBoxImage.Exclamation) != MessageBoxResult.Yes)
+                    return;
                 if (savesetting)
                 {
                     win.CurrentSetting.Win_Pos = new Point(win.Left, win.Top);

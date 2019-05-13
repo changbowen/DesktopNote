@@ -270,6 +270,11 @@ namespace DesktopNote
                 DockToSide();
         }
 
+        private void RTB_Main_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            App.FormatWindow.UpdateTargets(this);
+        }
+
         private void RTB_Main_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             e.Handled = true;
@@ -338,60 +343,43 @@ namespace DesktopNote
             }
         }
 
-        internal void SaveToXamlPkg()
+        private string TextRangeSave()
         {
+            string statusText, exMsg = null;
+            try
+            {
+                var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+                using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
+                {
+                    tr.Save(ms, DataFormats.XamlPackage, true);
+                }
+                File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
+                statusText = (string)Application.Current.Resources["status_saved"];
+            }
+            catch (Exception ex)
+            {
+                statusText = (string)Application.Current.Resources["status_save_failed"];
+                exMsg = ex.ToString();
+            }
+
+            TB_Status.Text = statusText;
+            TB_Status.Visibility = Visibility.Visible;
+            return exMsg;
+        }
+
+        /// <returns>Non-null string if there are errors when saving.</returns>
+        internal string SaveToXamlPkg()
+        {
+            string exMsg = null;
             lock (Lock_Save)
             {
-                TextRange tr = null;
                 bool isUIthread = Dispatcher.CheckAccess();
-                string result;
                 if (isUIthread)
-                    tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
+                    exMsg = TextRangeSave();
                 else
-                    Dispatcher.Invoke(delegate { tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd); });
-
-                try
-                {
-                    if (isUIthread)
-                    {
-                        using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
-                        {
-                            tr.Save(ms, DataFormats.XamlPackage, true);
-                        }
-                        File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
-                    }
-                    else
-                    {
-                        Dispatcher.Invoke(delegate
-                        {
-                            using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
-                            {
-                                tr.Save(ms, DataFormats.XamlPackage, true);
-                            };
-                            File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
-                        });
-                    }
-                    result = (string)Application.Current.Resources["status_saved"];
-                }
-                catch
-                {
-                    result = (string)Application.Current.Resources["status_save_failed"];
-                }
-
-                if (isUIthread)
-                {
-                    TB_Status.Text = result;
-                    TB_Status.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    Dispatcher.Invoke(delegate
-                    {
-                        TB_Status.Text = result;
-                        TB_Status.Visibility = Visibility.Visible;
-                    });
-                }
+                    exMsg = Dispatcher.Invoke(() => TextRangeSave());
             }
+            return exMsg;
         }
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
@@ -583,8 +571,8 @@ namespace DesktopNote
                 win.UnDock();
             }
         }
-        #endregion
 
+        #endregion
 
     }
 }

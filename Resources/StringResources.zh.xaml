@@ -59,4 +59,5 @@
     <sys:String x:Key="label_content_path_txt">文本保存路径</sys:String>
     <sys:String x:Key="menu_newnote">新笔记</sys:String>
     <sys:String x:Key="msgbox_delete_confirm">是否需要一起删除笔记内容和备份文件？</sys:String>
+    <sys:String x:Key="msgbox_not_saved_confirm">当前笔记内容并未保存，退出会丢失更改的内容。确定要退出吗？</sys:String>
 </ResourceDictionary>
