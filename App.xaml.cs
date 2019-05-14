@@ -15,6 +15,7 @@ namespace DesktopNote
         public static List<MainWindow> MainWindows = new List<MainWindow>();
         public static Win_Format FormatWindow;
         public static Win_Search SearchWindow;
+        public static Win_Options OptionsWindow;
         public static Rect CurrScrnRect;
         //internal const int MaxWindowCount = 2;//need to set this to 4 while debugging if you use live debug toolbar in vs2015.
         public const string MutexString = @"{39622D35-176E-453D-B1FD-E4EC1EAF31DC}";
@@ -130,7 +131,7 @@ namespace DesktopNote
                 {
                     win.CurrentSetting.Win_Pos = new Point(win.Left, win.Top);
                     win.CurrentSetting.Win_Size = new Size(win.Width, win.Height);
-                    win.CurrentSetting.DockedTo = (int)win.lastdockstatus;
+                    win.CurrentSetting.DockedTo = (int)win.LastDockStatus;
                 }
             }
             DesktopNote.Properties.Settings.Default.Save();

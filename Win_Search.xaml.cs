@@ -8,15 +8,21 @@ namespace DesktopNote
 {
     public partial class Win_Search : RoundedWindow
     {
-        private readonly MainWindow MainWin;
+        public readonly MainWindow MainWin;
         private bool textchanged = true;
 
-        public Win_Search(MainWindow owner)
+        public Win_Search(MainWindow mainwin)
         {
             InitializeComponent();
-            Owner = owner;
-            MainWin = owner;
+            Owner = mainwin;
+            MainWin = mainwin;
             App.SearchWindow = this;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            App.SearchWindow = null;
         }
 
         private void MarkTextInRange(RichTextBox richTextBox, string searchText, bool searchNext)
@@ -91,10 +97,5 @@ namespace DesktopNote
             Close();
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            App.SearchWindow = null;
-        }
     }
 }

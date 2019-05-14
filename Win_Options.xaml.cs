@@ -3,6 +3,7 @@
 //using System.Linq;
 //using System.Text;
 //using System.Threading.Tasks;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 //using System.Windows.Data;
@@ -16,16 +17,23 @@ namespace DesktopNote
 {
     public partial class Win_Options : RoundedWindow
     {
-        private readonly MainWindow MainWin;
+        public readonly MainWindow MainWin;
         private readonly RichTextBox RTB_Main;
         private string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
 
-        public Win_Options(MainWindow owner)
+        public Win_Options(MainWindow mainwin)
         {
             InitializeComponent();
-            Owner = owner;
-            MainWin = owner;
+            Owner = mainwin;
+            MainWin = mainwin;
             RTB_Main = MainWin.RTB_Main;
+            App.OptionsWindow = this;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            App.OptionsWindow = null;
         }
 
         private void CB_AutoStart_Click(object sender, RoutedEventArgs e)

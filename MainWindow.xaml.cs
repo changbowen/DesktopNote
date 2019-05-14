@@ -6,6 +6,7 @@ using System.Globalization;
 //using System.Text;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +14,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace DesktopNote
 {
@@ -40,6 +42,9 @@ namespace DesktopNote
         private object Lock_Save = new object();
         private int CountDown = 0;
         private Point mousepos;
+        private DispatcherTimer DockTimer;
+        private int DockTimerCountDown;
+        private bool IsResizing;
 
         public MainWindow(int setidx)
         {
@@ -48,7 +53,7 @@ namespace DesktopNote
         }
 
         #region Docking
-        public DockStatus lastdockstatus;
+        public DockStatus LastDockStatus;
 
         public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
 
@@ -78,7 +83,11 @@ namespace DesktopNote
             }
         }
 
-        internal void DockToSide(bool changpos = false)
+        /// <summary>
+        /// Dock the MainWindow based on its location.
+        /// </summary>
+        /// <param name="changePos">Update LastDockStatus if set to True.</param>
+        internal void DockToSide(bool changePos = false)
         {
             if (DockedTo == DockStatus.None)
             {
@@ -86,7 +95,7 @@ namespace DesktopNote
                 DependencyProperty tgtpro;
                 double pad = 15d;
                 DockStatus dockto;
-                if (changpos)
+                if (changePos)
                 {
                     App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
                     if (Left <= App.CurrScrnRect.Left) //dock left
@@ -118,15 +127,15 @@ namespace DesktopNote
                     }
                     else
                     {
-                        lastdockstatus = DockStatus.None;
+                        LastDockStatus = DockStatus.None;
                         return;
                     }
-                    lastdockstatus = dockto;
+                    LastDockStatus = dockto;
                 }
                 else //'restore last docking position
                 {
-                    dockto = lastdockstatus;
-                    switch (lastdockstatus)
+                    dockto = LastDockStatus;
+                    switch (LastDockStatus)
                     {
                         case DockStatus.Left:
                             toval = App.CurrScrnRect.Left - ActualWidth + pad;
@@ -149,10 +158,12 @@ namespace DesktopNote
                     }
                 }
 
-                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 500)), FillBehavior.Stop);
-                anim_move.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
-                var anim_fade = new DoubleAnimation(0.4, new Duration(new TimeSpan(0, 0, 0, 0, 300)));
-                anim_fade.BeginTime = new TimeSpan(0, 0, 0, 0, 200);
+                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 500))) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                var anim_fade = new DoubleAnimation(0.4, new Duration(new TimeSpan(0, 0, 0, 0, 300))) {
+                    BeginTime = new TimeSpan(0, 0, 0, 0, 200)
+                };
                 var anim_prop = new ObjectAnimationUsingKeyFrames();
                 anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
                 anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
@@ -164,7 +175,7 @@ namespace DesktopNote
 
         internal void UnDock()
         {
-            if (DockedTo != DockStatus.Docking && DockedTo != DockStatus.None)
+            if ((int)DockedTo > 1)
             {
                 double toval;
                 DependencyProperty tgtpro;
@@ -197,8 +208,9 @@ namespace DesktopNote
                 else
                     return;
 
-                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop);
-                anim_move.EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut };
+                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop) {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
                 var anim_fade = new DoubleAnimationUsingKeyFrames();
                 anim_fade.KeyFrames.Add(new DiscreteDoubleKeyFrame(1, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
                 var anim_prop = new ObjectAnimationUsingKeyFrames();
@@ -211,20 +223,80 @@ namespace DesktopNote
             }
         }
 
+        /// <summary>
+        /// Check whether MainWindow should dock based on various mouse, keyboard and window conditions.
+        /// Should be used with DockToSide(false) as when changePos is true, additional conditions will cause LastDockStatus update to be ignored.
+        /// </summary>
+        private bool ShouldDock()
+        {
+#if DEBUG
+            System.Diagnostics.Debug.Print(
+                (LastDockStatus != DockStatus.None) + ", " +
+                !RTB_Main.IsKeyboardFocusWithin + ", " +
+                !Win_Main.IsMouseOver + ", " +
+                !IsResizing + ", " +
+                (App.FormatWindow == null || !App.FormatWindow.MainWin.Equals(this) || App.FormatWindow.Opacity == 0) + ", " +
+                (App.SearchWindow == null || !App.SearchWindow.MainWin.Equals(this) || App.SearchWindow.Opacity == 0) + ", " +
+                (App.OptionsWindow == null || !App.OptionsWindow.MainWin.Equals(this) || App.OptionsWindow.Opacity == 0));
+#endif
+            if (CurrentSetting.AutoDock &&
+                LastDockStatus != DockStatus.None &&
+                !RTB_Main.IsKeyboardFocusWithin &&
+                !Win_Main.IsMouseOver &&
+                !IsResizing &&
+                (App.FormatWindow == null || !App.FormatWindow.MainWin.Equals(this) || App.FormatWindow.Opacity == 0) &&
+                (App.SearchWindow == null || !App.SearchWindow.MainWin.Equals(this) || App.SearchWindow.Opacity == 0) &&
+                (App.OptionsWindow == null || !App.OptionsWindow.MainWin.Equals(this) || App.OptionsWindow.Opacity == 0))
+                return true;
+            return false;
+        }
+
         private void Win_Main_MouseEnter(object sender, MouseEventArgs e)
         {
             //undocking
-            if (CurrentSetting.AutoDock && DockedTo != DockStatus.None) UnDock();
+            if (CurrentSetting.AutoDock && (DockedTo != DockStatus.None || (int)LastDockStatus > 1))
+            {
+                UnDock();
+                //dock if conditions met in 1 min
+                if (DockTimer != null && DockTimer.IsEnabled) return;
+                DockTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(2) };
+                DockTimerCountDown = 60;
+                DockTimer.Tick += (s1, e1) => {
+                    DockTimerCountDown -= 2;
+                    if (DockTimerCountDown <= 0 || (int)DockedTo > 1 || (int)LastDockStatus < 2)
+                    {
+                        DockTimer.Stop();
+                        DockTimer = null;
+                        return;
+                    }
+
+                    if (ShouldDock())
+                    {
+                        DockToSide();
+                        DockTimer.Stop();
+                        DockTimer = null;
+                        return;
+                    }
+                };
+                DockTimer.Start();
+            }
         }
 
-        private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
+        private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (CurrentSetting.AutoDock && 
-                !RTB_Main.IsKeyboardFocusWithin &&
-                App.FormatWindow.Opacity != 1 &&
-                App.SearchWindow == null)
-                DockToSide();
+            Rec_BG.ReleaseMouseCapture();
+            if (CurrentSetting.AutoDock) DockToSide(true);
         }
+
+        //private void Win_Main_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    if (ShouldDock()) DockToSide();
+        //}
+
+        //private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        //{
+        //    if (ShouldDock()) DockToSide();
+        //}
         #endregion
 
         #region RichTextBox Events
@@ -260,14 +332,6 @@ namespace DesktopNote
                 else
                     App.FormatWindow.DecreaseSize(null, null);
             }
-        }
-
-        private void RTB_Main_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            if (CurrentSetting.AutoDock &&
-                App.FormatWindow.Opacity != 1 &&
-                App.SearchWindow == null)
-                DockToSide();
         }
 
         private void RTB_Main_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
@@ -307,12 +371,6 @@ namespace DesktopNote
             }
             else
                 mousepos = e.GetPosition(this);
-        }
-
-        private void Rec_BG_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Rec_BG.ReleaseMouseCapture();
-            if (CurrentSetting.AutoDock) DockToSide(true);
         }
 
         private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
@@ -417,7 +475,7 @@ namespace DesktopNote
             Left = CurrentSetting.Win_Pos.X;
             Top = CurrentSetting.Win_Pos.Y;
 
-            lastdockstatus = (DockStatus)CurrentSetting.DockedTo;
+            LastDockStatus = (DockStatus)CurrentSetting.DockedTo;
             //DockedTo = DockStatus.None;
             RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
             RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
@@ -489,7 +547,10 @@ namespace DesktopNote
             RTB_Main.IsUndoEnabled = true;
             //without the above two lines, Load actions can be undone.
 
-            if (CurrentSetting.AutoDock) DockToSide(true);
+            if (CurrentSetting.AutoDock)
+            {
+                Task.Run(() => { Thread.Sleep(2000); Dispatcher.Invoke(() => DockToSide(true)); });
+            }
 
             var task_save = new Thread(SaveNotes) { IsBackground = true };
             task_save.Start();
@@ -529,6 +590,11 @@ namespace DesktopNote
                 //resetting position was moved to tray menu.
                 UnDock();
             }
+            else if (msg == 0x231) //WM_ENTERSIZEMOVE
+                IsResizing = true;
+            else if (msg == 0x232) //WM_EXITSIZEMOVE
+                IsResizing = false;
+
             return IntPtr.Zero;
         }
 
@@ -553,7 +619,7 @@ namespace DesktopNote
                 win.Top = App.CurrScrnRect.Top + delta;
                 win.Left = App.CurrScrnRect.Left + +delta;
                 win.DockedTo = DockStatus.None;
-                win.lastdockstatus = DockStatus.None;
+                win.LastDockStatus = DockStatus.None;
                 i += 1;
             }
         }
