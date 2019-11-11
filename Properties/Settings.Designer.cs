@@ -12,7 +12,7 @@ namespace DesktopNote.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.3.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.2.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -27,69 +27,13 @@ namespace DesktopNote.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
             "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>300, 350</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Win_Size {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Win_Size"]));
-            }
-            set {
-                this["Win_Size"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>0, 0</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Win_Pos {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Win_Pos"]));
-            }
-            set {
-                this["Win_Pos"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
             "tring>DesktopNoteContent</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Doc_Location {
+        public global::System.Collections.Specialized.StringCollection NoteList {
             get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Doc_Location"]));
+                return ((global::System.Collections.Specialized.StringCollection)(this["NoteList"]));
             }
             set {
-                this["Doc_Location"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>DesktopNoteContent.txt</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Bak_Location {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Bak_Location"]));
-            }
-            set {
-                this["Bak_Location"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>True</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection AutoDock {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["AutoDock"]));
-            }
-            set {
-                this["AutoDock"] = value;
+                this["NoteList"] = value;
             }
         }
         
@@ -102,76 +46,6 @@ namespace DesktopNote.Properties {
             }
             set {
                 this["UpgradeFlag"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>0</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection DockedTo {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["DockedTo"]));
-            }
-            set {
-                this["DockedTo"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>Segoe Print</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection Font {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["Font"]));
-            }
-            set {
-                this["Font"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>#FF000000</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection FontColor {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["FontColor"]));
-            }
-            set {
-                this["FontColor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>#00FFFFFF</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection BackColor {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["BackColor"]));
-            }
-            set {
-                this["BackColor"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
-            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
-            "tring>#FFFFF7C5</string>\r\n</ArrayOfString>")]
-        public global::System.Collections.Specialized.StringCollection PaperColor {
-            get {
-                return ((global::System.Collections.Specialized.StringCollection)(this["PaperColor"]));
-            }
-            set {
-                this["PaperColor"] = value;
             }
         }
     }

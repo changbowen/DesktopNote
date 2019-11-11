@@ -1,10 +1,10 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using System;
+using System.ComponentModel;
 using System.Globalization;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,8 +24,8 @@ namespace DesktopNote
         {
             Thickness p;
             if (parameter == null) p = new Thickness(1);
-            else p = (Thickness) new System.Windows.ThicknessConverter().ConvertFrom(parameter);
-            var d = (double) value;
+            else p = (Thickness)new System.Windows.ThicknessConverter().ConvertFrom(parameter);
+            var d = (double)value;
             return new Thickness(d * p.Left, d * p.Top, d * p.Right, d * p.Bottom);
         }
 
@@ -38,19 +38,33 @@ namespace DesktopNote
 
     public partial class MainWindow : Window
     {
-        public Setting CurrentSetting;
-        private object Lock_Save = new object();
-        private int CountDown = 0;
-        private Point mousepos;
+        internal readonly Setting CurrentSetting;
+        internal readonly object lock_save = new object();
+
+        //override CurrentSetting with values loaded from note content file
+        private const int SaveCountDownValue = 2000;
+        private int SaveCountDown = 0;
+        private readonly CancellationTokenSource SaveCoundDownCancel = new CancellationTokenSource();
+        private Task SaveNoteTask;
+        private Point MousePos;
         private DispatcherTimer DockTimer;
         private int DockTimerCountDown;
         private bool IsResizing;
 
-        public MainWindow(int setidx)
+
+        public MainWindow(Setting setting)
         {
             InitializeComponent();
-            CurrentSetting = new Setting(setidx);
+            CurrentSetting = setting;
+            CurrentSetting.MainWin = this;
         }
+
+        //public MainWindow(string path)
+        //{
+        //    InitializeComponent();
+        //    note_path = path;
+        //}
+
 
         #region Docking
         public DockStatus LastDockStatus;
@@ -70,14 +84,12 @@ namespace DesktopNote
         {
             var ds = (DockStatus)e.NewValue;
             var win = (MainWindow)d;
-            if (ds == DockStatus.None)
-            {
+            if (ds == DockStatus.None) {
                 win.ResizeMode = ResizeMode.CanResizeWithGrip;
                 if (!win.CurrentSetting.AutoDock) win.Topmost = false;
                 else win.Topmost = true;
             }
-            else
-            {
+            else {
                 win.ResizeMode = ResizeMode.NoResize;
                 win.Topmost = true;
             }
@@ -89,14 +101,12 @@ namespace DesktopNote
         /// <param name="changePos">Update LastDockStatus if set to True.</param>
         internal void DockToSide(bool changePos = false)
         {
-            if (DockedTo == DockStatus.None)
-            {
+            if (DockedTo == DockStatus.None) {
                 double toval;
                 DependencyProperty tgtpro;
                 double pad = 15d;
                 DockStatus dockto;
-                if (changePos)
-                {
+                if (changePos) {
                     App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
                     if (Left <= App.CurrScrnRect.Left) //dock left
                     {
@@ -125,8 +135,7 @@ namespace DesktopNote
                         tgtpro = TopProperty;
                         dockto = DockStatus.Bottom;
                     }
-                    else
-                    {
+                    else {
                         LastDockStatus = DockStatus.None;
                         return;
                     }
@@ -135,8 +144,7 @@ namespace DesktopNote
                 else //'restore last docking position
                 {
                     dockto = LastDockStatus;
-                    switch (LastDockStatus)
-                    {
+                    switch (LastDockStatus) {
                         case DockStatus.Left:
                             toval = App.CurrScrnRect.Left - ActualWidth + pad;
                             tgtpro = LeftProperty;
@@ -175,8 +183,7 @@ namespace DesktopNote
 
         internal void UnDock()
         {
-            if ((int)DockedTo > 1)
-            {
+            if ((int)DockedTo > 1) {
                 double toval;
                 DependencyProperty tgtpro;
                 //double pad = 15d;
@@ -254,8 +261,7 @@ namespace DesktopNote
         private void Win_Main_MouseEnter(object sender, MouseEventArgs e)
         {
             //undocking
-            if (CurrentSetting.AutoDock && (DockedTo != DockStatus.None || (int)LastDockStatus > 1))
-            {
+            if (CurrentSetting.AutoDock && (DockedTo != DockStatus.None || (int)LastDockStatus > 1)) {
                 UnDock();
                 //dock if conditions met in 1 min
                 if (DockTimer != null && DockTimer.IsEnabled) return;
@@ -263,15 +269,13 @@ namespace DesktopNote
                 DockTimerCountDown = 60;
                 DockTimer.Tick += (s1, e1) => {
                     DockTimerCountDown -= 2;
-                    if (DockTimerCountDown <= 0 || (int)DockedTo > 1 || (int)LastDockStatus < 2)
-                    {
+                    if (DockTimerCountDown <= 0 || (int)DockedTo > 1 || (int)LastDockStatus < 2) {
                         DockTimer.Stop();
                         DockTimer = null;
                         return;
                     }
 
-                    if (ShouldDock())
-                    {
+                    if (ShouldDock()) {
                         DockToSide();
                         DockTimer.Stop();
                         DockTimer = null;
@@ -302,9 +306,8 @@ namespace DesktopNote
         #region RichTextBox Events
         private void RTB_Main_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (RTB_Main.IsFocused)
-            {
-                CountDown = 2000;
+            if (RTB_Main.IsFocused) {
+                SaveCountDown = SaveCountDownValue;
                 TB_Status.Visibility = Visibility.Hidden;
             }
         }
@@ -324,8 +327,7 @@ namespace DesktopNote
         private void RTB_Main_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             //when padding is set on list, changing font size results in incorrect bullet position.
-            if (Keyboard.Modifiers == ModifierKeys.Control)
-            {
+            if (Keyboard.Modifiers == ModifierKeys.Control) {
                 e.Handled = true;
                 if (e.Delta > 0) //wheel up
                     App.FormatWindow.IncreaseSize(null, null);
@@ -351,8 +353,7 @@ namespace DesktopNote
 
         private void RTB_Main_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && App.FormatWindow?.Opacity == 1)
-            {
+            if (e.ChangedButton == MouseButton.Left && App.FormatWindow?.Opacity == 1) {
                 App.FormatWindow.FadeOut();
             }
         }
@@ -362,95 +363,84 @@ namespace DesktopNote
         private void Rec_BG_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rec_BG.CaptureMouse();
-            if (e.ClickCount == 2)
-            {
+            if (e.ClickCount == 2) {
                 if (WindowState == WindowState.Normal)
                     WindowState = WindowState.Maximized;
                 else if (WindowState == WindowState.Maximized)
                     WindowState = WindowState.Normal;
             }
             else
-                mousepos = e.GetPosition(this);
+                MousePos = e.GetPosition(this);
         }
 
         private void Rec_BG_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && mousepos != null)
-            {
+            if (e.LeftButton == MouseButtonState.Pressed && MousePos != null) {
                 var pos = e.GetPosition(this);
-                Left += pos.X - mousepos.X;
-                Top += pos.Y - mousepos.Y;
+                Left += pos.X - MousePos.X;
+                Top += pos.Y - MousePos.Y;
             }
         }
         #endregion
 
-        private void SaveNotes()
+        /// <summary>
+        /// Calls SaveNote on the UI thread after CoundDown.
+        /// </summary>
+        private void SaveNoteThread()
         {
-            while (true)
-            {
-                while (CountDown<=0)
-                {
+            while (true) {
+                while (SaveCountDown <= 0) {
+                    if (SaveCoundDownCancel.IsCancellationRequested) return;
                     Thread.Sleep(1000);
                 }
-                do
-                {
+                while (SaveCountDown > 0) {
+                    if (SaveCoundDownCancel.IsCancellationRequested) return;
                     Thread.Sleep(500);
-                    CountDown -= 500;
-                } while (CountDown>0);
-                SaveToXamlPkg();
-            }
-        }
-
-        private string TextRangeSave()
-        {
-            string statusText, exMsg = null;
-            try
-            {
-                var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                using (var ms = new FileStream(CurrentSetting.Doc_Location, FileMode.Create))
-                {
-                    tr.Save(ms, DataFormats.XamlPackage, true);
+                    SaveCountDown -= 500;
                 }
-                File.WriteAllText(CurrentSetting.Bak_Location, tr.Text);
-                statusText = (string)Application.Current.Resources["status_saved"];
-            }
-            catch (Exception ex)
-            {
-                statusText = (string)Application.Current.Resources["status_save_failed"];
-                exMsg = ex.ToString();
-            }
 
-            TB_Status.Text = statusText;
-            TB_Status.Visibility = Visibility.Visible;
-            return exMsg;
+                bool isUIthread = Dispatcher.CheckAccess();
+                if (isUIthread) Helpers.SaveNote(this);
+                else Dispatcher.Invoke(() => Helpers.SaveNote(this));
+            }
         }
 
-        /// <returns>Non-null string if there are errors when saving.</returns>
-        internal string SaveToXamlPkg()
+        public async Task Close(bool dontSave = false)
         {
-            string exMsg = null;
-            lock (Lock_Save)
-            {
-                bool isUIthread = Dispatcher.CheckAccess();
-                if (isUIthread)
-                    exMsg = TextRangeSave();
-                else
-                    exMsg = Dispatcher.Invoke(() => TextRangeSave());
+            if (!dontSave) {
+                //update window size and position
+                CurrentSetting.Win_Pos = new Point(Left, Top);
+                CurrentSetting.Win_Size = new Size(Width, Height);
+                CurrentSetting.DockedTo = (int)LastDockStatus;
+
+                //save per-note, app settings and contents to file
+                var exMsg = Helpers.SaveNote(this);
+                if (exMsg != null &&
+                    Helpers.MsgBox(
+                        body: exMsg + "\r\n" + (string)App.Res["msgbox_not_saved_confirm"],
+                        button: MessageBoxButton.YesNo,
+                        image: MessageBoxImage.Exclamation) != MessageBoxResult.Yes) {
+                    return;
+                }
             }
-            return exMsg;
+
+            //cleaning up
+            SaveCoundDownCancel.Cancel();
+            CurrentSetting.PropertyChanged -= CurrentSetting_PropertyChanged;
+            App.MainWindows.Remove(this);
+            await SaveNoteTask;
+            base.Close();
         }
 
         private void Win_Main_Loaded(object sender, RoutedEventArgs e)
         {
-            //WinAPI.SetToolWindow(this);
+            //check and merge previous settings
+            Setting.Upgrade();
 
-            //create tray icon
-            if (App.TrayIcon == null)
-            {
-                using (var stream = Application.GetResourceStream(new Uri("pack://application:,,,/DesktopNote;component/Resources/stickynote.ico")).Stream)
-                {
-                    App.TrayIcon = new TaskbarIcon
-                    {
+            //create tray icon so you can still use the app when notes fail to load
+            if (App.TrayIcon == null) {
+                using (var stream = Application.GetResourceStream(new Uri("pack://application:,,,/DesktopNote;component/Resources/stickynote.ico")).Stream) {
+                    App.TrayIcon = new TaskbarIcon {
                         Icon = new System.Drawing.Icon(stream),
                         ToolTipText = nameof(DesktopNote),
                         ContextMenu = (ContextMenu)Resources["TrayMenu"],
@@ -461,15 +451,15 @@ namespace DesktopNote
                 App.TrayIcon.TrayMouseDoubleClick += TrayIcon_TrayMouseDoubleClick;
             }
 
-            //check and merge previous settings
-            if (Properties.Settings.Default.UpgradeFlag)
-            {
-                Properties.Settings.Default.Upgrade();
-                Properties.Settings.Default.UpgradeFlag = false;
-                Properties.Settings.Default.Save();
+            //load settings and content
+            if (CurrentSetting.Flags.HasFlag(Setting.NoteFlag.Existing) && !Helpers.LoadNote(this)) {
+                Close(true); return;
             }
 
-            //load settings
+            //save when settings changed
+            CurrentSetting.PropertyChanged += CurrentSetting_PropertyChanged;
+
+            //apply settings
             Width = CurrentSetting.Win_Size.Width;
             Height = CurrentSetting.Win_Size.Height;
             Left = CurrentSetting.Win_Pos.X;
@@ -482,17 +472,14 @@ namespace DesktopNote
             RTB_Main.Background = new SolidColorBrush(CurrentSetting.BackColor);
             Rec_BG.Fill = new SolidColorBrush(CurrentSetting.PaperColor);
 
-            if (App.FormatWindow == null)
-            {
+            if (App.FormatWindow == null) {
                 App.FormatWindow = new Win_Format(this);
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = CurrentSetting.FontColor;
                 ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = CurrentSetting.BackColor;
 
                 //add fonts to menu
-                foreach (var f in Fonts.SystemFontFamilies)
-                {
-                    var mi = new ComboBoxItem
-                    {
+                foreach (var f in Fonts.SystemFontFamilies) {
+                    var mi = new ComboBoxItem {
                         Content = f.Source,
                         FontFamily = f,
                         FontSize = FontSize + 4,
@@ -501,34 +488,14 @@ namespace DesktopNote
                     App.FormatWindow.CB_Font.Items.Add(mi);
                     if (f.Source == CurrentSetting.Font) mi.IsSelected = true;
                 }
-                App.FormatWindow.CB_Font.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("Content", System.ComponentModel.ListSortDirection.Ascending));
+                App.FormatWindow.CB_Font.Items.SortDescriptions.Add(new SortDescription("Content", ListSortDirection.Ascending));
             }
 
-            //loading contents
-            lock (Lock_Save)
-            {
-                if (File.Exists(CurrentSetting.Doc_Location))
-                {
-                    try
-                    {
-                        var tr = new TextRange(RTB_Main.Document.ContentStart, RTB_Main.Document.ContentEnd);
-                        tr.Load(new FileStream(CurrentSetting.Doc_Location, FileMode.Open), DataFormats.XamlPackage);
-                    }
-                    catch
-                    {
-                        MessageBox.Show((string)Application.Current.Resources["msgbox_load_error"] + "\r\n" + CurrentSetting.Bak_Location,
-                            (string)Application.Current.Resources["msgbox_title_load_error"], MessageBoxButton.OK, MessageBoxImage.Stop);
-                    }
-                }
-            }
-            
             //reset dependency property values saved explicitly
             //this is to reduce format inconsistency across reloads
-            if (RTB_Main.Document.Blocks.Count > 0)
-            {
+            if (RTB_Main.Document.Blocks.Count > 0) {
                 RTB_Main.FontSize = RTB_Main.Document.Blocks.FirstBlock.FontSize;
-                foreach (var b in RTB_Main.Document.Blocks)
-                {
+                foreach (var b in RTB_Main.Document.Blocks) {
                     //unify font for new paragraghs. otherwise wont be able to change fonts after reload.
                     //doesnt affect specifically set font sizes in Inlines & Run.
                     b.ClearValue(TextElement.FontSizeProperty);
@@ -543,23 +510,34 @@ namespace DesktopNote
                 }
             }
 
+            //without the below two lines, Load actions can be undone.
             RTB_Main.IsUndoEnabled = false;
             RTB_Main.IsUndoEnabled = true;
-            //without the above two lines, Load actions can be undone.
 
+            //trigger dock after 2s
             if (CurrentSetting.AutoDock)
-            {
                 Task.Run(() => { Thread.Sleep(2000); Dispatcher.Invoke(() => DockToSide(true)); });
-            }
 
-            var task_save = new Thread(SaveNotes) { IsBackground = true };
-            task_save.Start();
+            //start save note thread
+            SaveNoteTask = Task.Run(SaveNoteThread, SaveCoundDownCancel.Token);
 
+            //add hook
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
             source.AddHook(WndProc);
+
+            //update stuff
+            if (!Setting.NoteList.Contains(CurrentSetting.Doc_Location))
+                Setting.NoteList.Add(CurrentSetting.Doc_Location);
+            App.MainWindows.Add(this);
         }
 
-        private void resetPadding(TextElement ele) {
+        private void CurrentSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            SaveCountDown = SaveCountDownValue;
+        }
+
+        private void resetPadding(TextElement ele)
+        {
             switch (ele) {
                 case List lst:
                     lst.ClearValue(Block.PaddingProperty);
@@ -577,8 +555,7 @@ namespace DesktopNote
 
         private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
-            if (msg == SingleInstance.RegisteredWM)
-            {
+            if (msg == SingleInstance.RegisteredWM) {
                 //activate and reset dock status when a second instance is requested
                 //in case of resolution changes etc that might cause the main window to be "lost".
                 Activate();
@@ -602,15 +579,14 @@ namespace DesktopNote
         #region TrayIcon Events
         private void TM_Exit_Click(object sender, RoutedEventArgs e)
         {
-            App.Quit(true);
+            App.Quit();
         }
 
         private void TM_ResetPos_Click(object sender, RoutedEventArgs e)
         {
             App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
             var i = 0;
-            foreach (var win in App.MainWindows)
-            {
+            foreach (var win in App.MainWindows) {
                 var delta = i * 20;
                 win.BeginAnimation(LeftProperty, null); //might be required to change position.
                 win.BeginAnimation(TopProperty, null);
@@ -626,19 +602,24 @@ namespace DesktopNote
 
         private void TM_NewNote_Click(object sender, RoutedEventArgs e)
         {
-            Win_Format.NewNote();
+            Helpers.NewNote();
+        }
+
+        private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
+        {
+            var path = Helpers.OpenFileDialog(this, false, CurrentSetting.Doc_Location, "DesktopNote Content|*");
+            if (path == null) return;
+
+            Helpers.OpenNote(path)?.Show();
         }
 
         private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            foreach (var win in App.MainWindows)
-            {
+            foreach (var win in App.MainWindows) {
                 win.Activate();
                 win.UnDock();
             }
         }
-
         #endregion
-
     }
 }

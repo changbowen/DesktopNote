@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xml:space="preserve">
+    <sys:String x:Key="desktopnote">桌面笔记</sys:String>
     <sys:String x:Key="button_cancel">取消</sys:String>
     <sys:String x:Key="button_ok">确定</sys:String>
     <sys:String x:Key="button_search">查找</sys:String>
@@ -10,18 +11,20 @@
     <sys:String x:Key="menu_auto_dock">屏幕边缘停靠</sys:String>
     <sys:String x:Key="menu_auto_start">随系统启动</sys:String>
     <sys:String x:Key="menu_exit">退出</sys:String>
-    <sys:String x:Key="menu_close">关闭</sys:String>
-    <sys:String x:Key="menu_help">帮助</sys:String>
-    <sys:String x:Key="menu_paper_color">纸张颜色</sys:String>
+    <sys:String x:Key="menu_close">关闭笔记</sys:String>
+    <sys:String x:Key="menu_opennote">打开笔记</sys:String>
+    <sys:String x:Key="menu_savenote">保存笔记</sys:String>
+    <sys:String x:Key="menu_about">关于</sys:String>
     <sys:String x:Key="menu_reset_formats">重置格式</sys:String>
     <sys:String x:Key="menu_reset_settings">重置设置</sys:String>
     <sys:String x:Key="menu_reset_positions">重置位置</sys:String>
-    <sys:String x:Key="msgbox_help">编辑功能可通过快捷键或者菜单访问。
+    <sys:String x:Key="msgbox_about">编辑功能可通过快捷键或者菜单访问。
 使用Ctrl + 鼠标滚轮来更改文字大小。
 选中文本时更改大小仅对选中的部分生效。
-笔记内容会自动存储在程序所在目录。
+笔记内容默认会自动存储在程序所在目录，支持自定义存储位置。
 点击确定打开程序主页。</sys:String>
-    <sys:String x:Key="msgbox_load_error">载入笔记内容时发生错误。笔记内容的文本副本可在以下位置找到。</sys:String>
+    <sys:String x:Key="msgbox_load_error">载入如下笔记内容时发生错误：{0}。
+笔记内容的文本副本可在以下位置找到：{1}。</sys:String>
     <sys:String x:Key="msgbox_run_from_network">请勿从网络位置运行此程序。请将程序复制到本地后再执行。
 点击确定退出。</sys:String>
     <sys:String x:Key="msgbox_searched_to_end">搜索已达文档末尾。</sys:String>
@@ -33,6 +36,7 @@
     <sys:String x:Key="tooltip_align_left">左对齐 (Ctrl + L)</sys:String>
     <sys:String x:Key="tooltip_align_right">右对齐 (Ctrl + R)</sys:String>
     <sys:String x:Key="tooltip_back_color">背景颜色</sys:String>
+    <sys:String x:Key="tooltip_paper_color">纸张颜色</sys:String>
     <sys:String x:Key="tooltip_bold">粗体 (Ctrl + B)</sys:String>
     <sys:String x:Key="tooltip_bullets">项目符号 (Ctrl + Shift + L)</sys:String>
     <sys:String x:Key="tooltip_copy">复制 (Ctrl + C)</sys:String>
@@ -60,4 +64,6 @@
     <sys:String x:Key="menu_newnote">新笔记</sys:String>
     <sys:String x:Key="msgbox_delete_confirm">是否需要一起删除笔记内容和备份文件？</sys:String>
     <sys:String x:Key="msgbox_not_saved_confirm">当前笔记内容并未保存，退出会丢失更改的内容。确定要退出吗？</sys:String>
+    <sys:String x:Key="label_filename">文件名</sys:String>
+    <sys:String x:Key="msgbox_file_already_opened">该文件已在另一窗口中打开！</sys:String>
 </ResourceDictionary>

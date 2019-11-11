@@ -58,7 +58,7 @@ namespace DesktopNote
                 if (start == null)
                 {
                     textchanged = true;
-                    MessageBox.Show((string)Application.Current.Resources["msgbox_searched_to_end"], "", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Helpers.MsgBox("msgbox_searched_to_end", button: MessageBoxButton.OK, image: MessageBoxImage.Information);
                 }
             }
         }

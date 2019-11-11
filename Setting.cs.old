@@ -1,0 +1,173 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Windows.Media;
+using System.Configuration;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+
+namespace DesktopNote
+{
+    public class Setting
+    {
+        public int SettingIndex;
+        private readonly Properties.Settings set;
+
+        public string Doc_Location
+        {
+            get {
+                return set.Doc_Location[SettingIndex];
+            }
+            set {
+                set.Doc_Location[SettingIndex] = value;
+            }
+        }
+        public string Bak_Location
+        {
+            get {
+                return set.Bak_Location[SettingIndex];
+            }
+            set {
+                set.Bak_Location[SettingIndex] = value;
+            }
+        }
+        public System.Windows.Size Win_Size
+        {
+            get {
+                return System.Windows.Size.Parse(set.Win_Size[SettingIndex]);
+            }
+            set {
+                set.Win_Size[SettingIndex] = value.ToString();
+            }
+        }
+        public System.Windows.Point Win_Pos
+        {
+            get {
+                return System.Windows.Point.Parse(set.Win_Pos[SettingIndex]);
+            }
+            set {
+                set.Win_Pos[SettingIndex] = value.ToString();
+            }
+        }
+        public bool AutoDock
+        {
+            get {
+                return bool.Parse(set.AutoDock[SettingIndex]);
+            }
+            set {
+                set.AutoDock[SettingIndex] = value.ToString();
+            }
+        }
+        public int DockedTo
+        {
+            get {
+                return int.Parse(set.DockedTo[SettingIndex]);
+            }
+            set {
+                set.DockedTo[SettingIndex] = value.ToString();
+            }
+        }
+        public string Font
+        {
+            get {
+                return set.Font[SettingIndex];
+            }
+            set {
+                set.Font[SettingIndex] = value;
+            }
+        }
+        public Color FontColor
+        {
+            get {
+                return (Color)ColorConverter.ConvertFromString(set.FontColor[SettingIndex]);
+            }
+            set {
+                set.FontColor[SettingIndex] = value.ToString();
+            }
+        }
+        public Color BackColor
+        {
+            get {
+                return (Color)ColorConverter.ConvertFromString(set.BackColor[SettingIndex]);
+            }
+            set {
+                set.BackColor[SettingIndex] = value.ToString();
+            }
+        }
+        public Color PaperColor
+        {
+            get {
+                return (Color)ColorConverter.ConvertFromString(set.PaperColor[SettingIndex]);
+            }
+            set {
+                set.PaperColor[SettingIndex] = value.ToString();
+            }
+        }
+
+        public Setting(int setidx)
+        {
+            SettingIndex = setidx;
+            set = Properties.Settings.Default;
+        }
+
+        /// <summary>
+        /// For now this is the same as calling Properties.Settings.Default.Save().
+        /// </summary>
+        public void Save()
+        {
+            set.Save();
+        }
+
+        /// <summary>
+        /// Reset the setting for specified index. Leave setidx default to reset current.
+        /// </summary>
+        public void Reset(int setidx = -1)
+        {
+            if (setidx == -1) setidx = SettingIndex;
+            foreach (SettingsPropertyValue val in set.PropertyValues) {
+                if (val.Name == nameof(set.Doc_Location) || val.Name == nameof(set.Bak_Location)) continue;
+                try {
+                    if (val.Property.PropertyType == typeof(StringCollection)) {
+                        var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
+                        ((StringCollection)val.PropertyValue)[setidx] = defval;
+                    }
+                }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// Do not use Properties.Settings.Default.Reset() as it will remove also the additional note entries.
+        /// </summary>
+        public void ResetAll()
+        {
+            //need to check before use
+            var notecount = set.Doc_Location.Count;
+            try {
+                foreach (SettingsPropertyValue val in set.PropertyValues) {
+                    if (val.Name == nameof(set.Doc_Location) || val.Name == nameof(set.Bak_Location)) continue;
+                    if (val.Property.PropertyType == typeof(StringCollection)) {
+                        var defval = XElement.Parse((string)val.Property.DefaultValue).Element("string").Value;
+                        for (int i = 0; i < notecount; i++) {
+                            ((StringCollection)val.PropertyValue)[i] = defval;
+                        }
+                    }
+                }
+            }
+            catch { }
+            
+        }
+
+        public string Serialize()
+        {
+            var root = new XElement("Setting");
+            foreach (var info in typeof(Setting).GetProperties()) {
+                var ele = new XElement(info.Name, info.GetValue(this).ToString());
+                root.Add(ele);
+            }
+            return root.ToString(SaveOptions.DisableFormatting);
+        }
+    }
+}

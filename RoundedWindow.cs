@@ -20,10 +20,15 @@ namespace DesktopNote
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             //parameter is the clipped width to preserve
-            var offset = parameter != null ? double.Parse((string)parameter) : 0d;
+            var offset = 0d; var thickness = 20d;
+            if (parameter is string paraStr) {
+                var paraAry = paraStr.Split(',', ' ');
+                if (paraAry.Length > 0) offset = double.Parse(paraAry[0]);
+                if (paraAry.Length > 1) thickness = double.Parse(paraAry[1]);
+            }
             var width = (double)values[0];
             var height = (double)values[1];
-            return new Rect(new Point(-offset, -offset), new Point(width + offset - 20d, height + offset - 20d));//20是两边空隙总和
+            return new Rect(new Point(-offset, -offset), new Point(width + offset - thickness, height + offset - thickness));//20是两边空隙总和
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -262,7 +267,7 @@ namespace DesktopNote
                 realpos = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(newpos);
 
                 //make sure the window is displayed inside the screens.
-                double originX = 0d, originY = 0d;
+                double originX, originY;
                 if (currscrnW - realpos.X > ActualWidth)
                     originX = 0d;
                 else
@@ -312,7 +317,7 @@ namespace DesktopNote
         /// Fade out the window. This ignores the CloseBehavior setting.
         /// </summary>
         /// <param name="closeafterfade">Set to true to close the window after. Otherwise it is only hidden.</param>
-        public async void FadeOut(bool closeafterfade = false)
+        public async Task FadeOut(bool closeafterfade = false)
         {
             if (IsLoaded)//without this it will crash at the below line.
             {

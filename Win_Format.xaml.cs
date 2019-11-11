@@ -1,27 +1,17 @@
 ﻿using System;
-//using System.Collections.Generic;
-//using System.ComponentModel;
-//using System.Linq;
-//using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-//using System.Windows.Controls.Primitives;
-//using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Xml.Linq;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Navigation;
-//using System.Windows.Shapes;
+using System.IO;
 
 namespace DesktopNote
 {
     public partial class Win_Format : RoundedWindow
     {
         public MainWindow MainWin;
-        //public RichTextBox RTB_Main;
 
         public RichTextBox RTB_Main
         {
@@ -44,47 +34,92 @@ namespace DesktopNote
             RTB_Main = mainwin.RTB_Main;
         }
 
-        #region Menu Events
-        private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
+        private void FB1_Loaded(object sender, RoutedEventArgs e)
         {
-            if (e.NewValue.HasValue && ((Xceed.Wpf.Toolkit.ColorPicker)sender).IsOpen)
-            {
-                var cp = (ContentPresenter)VisualTreeHelper.GetParent((DependencyObject)sender);
-                if (cp != null)
-                {
-                    switch (cp.Name)
-                    {
-                        case "CP_Font":
-                            if (!RTB_Main.Selection.IsEmpty) //only change selected
-                                RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(e.NewValue.Value));
-                            else //change default
-                            {
-                                RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
-                                MainWin.CurrentSetting.FontColor = e.NewValue.Value;
-                            }
-                            break;
-                        case "CP_Back":
-                            if (!RTB_Main.Selection.IsEmpty) //only change selected
-                                RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(e.NewValue.Value)); //the caret color will be changed as well
-                            else //change default
-                            {
-                                RTB_Main.Background = new SolidColorBrush(e.NewValue.Value);
-                                MainWin.CurrentSetting.BackColor = e.NewValue.Value;
-                            }
-                            break;
-                        //moved to Win_Options.
-                        //case "CP_Paper":
-                        //    App.mainwin.Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
-                        //    Properties.Settings.Default.PaperColor = e.NewValue.Value;
-                        //    break;
-                    }
-                }
+            //remove margin in ColorPicker for better looks
+            var cp = (Xceed.Wpf.Toolkit.ColorPicker)CP_Paper.Content;
+            ((Grid)((ContentControl)cp.Template.FindName("PART_ColorPickerToggleButton", cp)).Content).Margin = new Thickness(0);
+            cp = (Xceed.Wpf.Toolkit.ColorPicker)CP_Font.Content;
+            ((Grid)((ContentControl)cp.Template.FindName("PART_ColorPickerToggleButton", cp)).Content).Margin = new Thickness(0);
+            cp = (Xceed.Wpf.Toolkit.ColorPicker)CP_Back.Content;
+            ((Grid)((ContentControl)cp.Template.FindName("PART_ColorPickerToggleButton", cp)).Content).Margin = new Thickness(0);
+        }
+
+        private void FB1_FadingIn(object sender, RoutedEventArgs e)
+        {
+            //initialize values
+            LoadValues();
+        }
+
+        /// <summary>
+        /// Manually refresh control values.
+        /// </summary>
+        internal void LoadValues()
+        {
+            WinAPI.BringToTop(this);
+            //load filename
+            WTB_FileName.Text = MainWin.CurrentSetting.Doc_FileName;
+            //load paper color
+            ((Xceed.Wpf.Toolkit.ColorPicker)CP_Paper.Content).SelectedColor = MainWin.CurrentSetting.PaperColor;
+
+            if (!RTB_Main.Selection.IsEmpty) {
+                //load font
+                if (RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) is FontFamily caretfont)
+                    App.FormatWindow.CB_Font.SelectedValue = caretfont.Source;
+                else //multiple fonts
+                    App.FormatWindow.CB_Font.SelectedIndex = -1;
+                App.FormatWindow.CB_Font.ToolTip = (string)App.Res["tooltip_font_selection"];
+                //load font color
+                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content;
+                if (RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) is SolidColorBrush caretfontcolor)
+                    fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
+                else fontcolorpicker.SelectedColor = null;
+                //load back color
+                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content;
+                if (RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) is SolidColorBrush caretbackcolor)
+                    backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
+                else backcolorpicker.SelectedColor = null;
+            }
+            else {
+                //load global font
+                App.FormatWindow.CB_Font.SelectedValue = MainWin.CurrentSetting.Font;
+                App.FormatWindow.CB_Font.ToolTip = (string)App.Res["tooltip_font_default"];
+                //load global font color
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = MainWin.CurrentSetting.FontColor;
+                //load global back color
+                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = MainWin.CurrentSetting.BackColor;
             }
         }
 
-        private void Button_Exit_Click(object sender, RoutedEventArgs e)
+        #region Menu Events
+        private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
         {
-            App.Quit(true);
+            if (e.NewValue.HasValue && sender is Xceed.Wpf.Toolkit.ColorPicker cp && cp.IsOpen) {
+                switch (((ContentControl)cp.Parent).Name) {
+                    case "CP_Font":
+                        if (!RTB_Main.Selection.IsEmpty) //only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(e.NewValue.Value));
+                        else //change default
+                        {
+                            RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
+                            MainWin.CurrentSetting.FontColor = e.NewValue.Value;
+                        }
+                        break;
+                    case "CP_Back":
+                        if (!RTB_Main.Selection.IsEmpty) //only change selected
+                            RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(e.NewValue.Value)); //the caret color will be changed as well
+                        else //change default
+                        {
+                            RTB_Main.Background = new SolidColorBrush(e.NewValue.Value);
+                            MainWin.CurrentSetting.BackColor = e.NewValue.Value;
+                        }
+                        break;
+                    case "CP_Paper":
+                        MainWin.Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
+                        MainWin.CurrentSetting.PaperColor = e.NewValue.Value;
+                        break;
+                }
+            }
         }
 
         internal void ToggleStrike(object sender, RoutedEventArgs e)
@@ -103,8 +138,7 @@ namespace DesktopNote
             var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
             if (tdc != null)
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, null);
-            else
-            {
+            else {
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, new SolidColorBrush(Colors.Yellow));
             }
@@ -114,13 +148,11 @@ namespace DesktopNote
         {
             if (RTB_Main.Selection.IsEmpty)
                 RTB_Main.FontSize += 1;
-            else
-            {
+            else {
                 var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
                 if (ele == null) return;
                 Image img = null;
-                switch (ele.GetType().Name)
-                {
+                switch (ele.GetType().Name) {
                     case "BlockUIContainer":
                         img = ((BlockUIContainer)ele).Child as Image;
                         break;
@@ -131,8 +163,7 @@ namespace DesktopNote
                         img = (Image)ele;
                         break;
                 }
-                if (img != null)
-                {
+                if (img != null) {
                     img.Width += 2;
                     img.Height += 2;
                 }
@@ -143,17 +174,14 @@ namespace DesktopNote
 
         internal void DecreaseSize(object sender, RoutedEventArgs e)
         {
-            if (RTB_Main.Selection.IsEmpty)
-            {
+            if (RTB_Main.Selection.IsEmpty) {
                 if (RTB_Main.FontSize > 1) RTB_Main.FontSize -= 1;
             }
-            else
-            {
+            else {
                 var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
                 if (ele == null) return;
                 Image img = null;
-                switch (ele.GetType().Name)
-                {
+                switch (ele.GetType().Name) {
                     case "BlockUIContainer":
                         img = ((BlockUIContainer)ele).Child as Image;
                         break;
@@ -164,10 +192,8 @@ namespace DesktopNote
                         img = (Image)ele;
                         break;
                 }
-                if (img != null)
-                {
-                    if (img.Width > 2 && img.Height > 2)
-                    {
+                if (img != null) {
+                    if (img.Width > 2 && img.Height > 2) {
                         img.Width -= 2;
                         img.Height -= 2;
                     }
@@ -176,7 +202,7 @@ namespace DesktopNote
                     EditingCommands.DecreaseFontSize.Execute(null, RTB_Main);
             }
         }
-        
+
         internal void PasteAsText(object sender, RoutedEventArgs e)
         {
             var txt = Clipboard.GetText();
@@ -197,132 +223,9 @@ namespace DesktopNote
 
         #endregion
 
-        private void Button_Options_Click(object sender, RoutedEventArgs e)
-        {
-            FadeOut();
-            new Win_Options(MainWin).FadeIn();
-        }
-
-        private void FB1_FadingIn(object sender, RoutedEventArgs e)
-        {
-            //initialize values
-            LoadValues();
-        }
-
-        /// <summary>
-        /// Manually refresh control values.
-        /// </summary>
-        internal void LoadValues()
-        {
-            WinAPI.BringToTop(this);
-            if (!RTB_Main.Selection.IsEmpty)
-            {
-                var caretfont = RTB_Main.Selection.GetPropertyValue(TextElement.FontFamilyProperty) as FontFamily;
-                if (caretfont != null)
-                    App.FormatWindow.CB_Font.SelectedValue = caretfont.Source;
-                else //multiple fonts
-                    App.FormatWindow.CB_Font.SelectedIndex = -1;
-                App.FormatWindow.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_selection"];
-
-                var caretfontcolor = RTB_Main.Selection.GetPropertyValue(TextElement.ForegroundProperty) as SolidColorBrush;
-                var fontcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content;
-                if (caretfontcolor != null) fontcolorpicker.SelectedColor = new Color?(caretfontcolor.Color);
-                else fontcolorpicker.SelectedColor = null;
-
-                var caretbackcolor = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-                var backcolorpicker = (Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content;
-                if (caretbackcolor != null) backcolorpicker.SelectedColor = new Color?(caretbackcolor.Color);
-                else backcolorpicker.SelectedColor = null;
-            }
-            else
-            {
-                App.FormatWindow.CB_Font.SelectedValue = MainWin.CurrentSetting.Font;
-                App.FormatWindow.CB_Font.ToolTip = (string)Application.Current.Resources["tooltip_font_default"];
-                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Font.Content).SelectedColor = MainWin.CurrentSetting.FontColor;
-                ((Xceed.Wpf.Toolkit.ColorPicker)App.FormatWindow.CP_Back.Content).SelectedColor = MainWin.CurrentSetting.BackColor;
-            }
-        }
-
-        public static void NewNote(int refidx = -1)
-        {
-            var set = Properties.Settings.Default;
-            try
-            {
-                int newidx = 0;
-                foreach (System.Configuration.SettingsPropertyValue propval in set.PropertyValues)
-                {
-                    if (propval.Property.PropertyType != typeof(StringCollection)) continue;
-                    var strCol = (StringCollection)propval.PropertyValue;
-                    if (refidx == -1)//create from default
-                    {
-                        var defval = XElement.Parse((string)propval.Property.DefaultValue).Element("string").Value;
-                        newidx = strCol.Add(defval);
-                    }
-                    else//create from specified index
-                    {
-                        newidx = strCol.Add(strCol[refidx]);
-                    }
-                }
-
-                //set location to new
-                var now = DateTime.Now.ToString("yyyyMMddHHmmss");
-                var path = Environment.CurrentDirectory + "\\" + "DesktopNoteContent" + @"_" + now;
-                set.Doc_Location[newidx] = path;
-                set.Bak_Location[newidx] = path + @".txt";
-
-                var win = new MainWindow(newidx);
-                App.MainWindows.Add(win);
-                win.Show();
-                win.Top += 20d; win.Left += 20d;
-            }
-            catch { }
-        }
-
-        private void Button_NewNote_Click(object sender, RoutedEventArgs e)
-        {
-            NewNote(MainWin.CurrentSetting.SettingIndex);
-        }
-
-        private void Button_Close_Click(object sender, RoutedEventArgs e)
-        {
-            var result = MessageBox.Show((string)Application.Current.Resources["msgbox_delete_confirm"], "", MessageBoxButton.YesNoCancel, MessageBoxImage.Exclamation);
-            var set = Properties.Settings.Default;
-            try
-            {
-                switch (result)
-                {
-                    case MessageBoxResult.Cancel:
-                        break;
-                    case MessageBoxResult.Yes:
-                        System.IO.File.Delete(MainWin.CurrentSetting.Doc_Location);
-                        System.IO.File.Delete(MainWin.CurrentSetting.Bak_Location);
-                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
-                        set.Save();
-                        App.MainWindows.Remove(MainWin);
-                        MainWin.Close();
-                        FadeOut();
-                        break;
-                    case MessageBoxResult.No:
-                        set.Doc_Location[MainWin.CurrentSetting.SettingIndex] = "";//mark setting item to be removed after restart
-                        set.Save();
-                        App.MainWindows.Remove(MainWin);
-                        MainWin.Close();
-                        FadeOut();
-                        break;
-                }
-                //check if the last window was closed
-                if (App.MainWindows.All(w => w == null))
-                {
-                    NewNote();
-                }
-            }
-            catch { }
-        }
-
         private void CB_Font_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (App.FormatWindow.Opacity == 1 && e.AddedItems.Count == 1)
-            {
+            if (App.FormatWindow.Opacity == 1 && e.AddedItems.Count == 1) {
                 var mi = (ComboBoxItem)e.AddedItems[0];
 
                 if (!RTB_Main.Selection.IsEmpty) //only change selected
@@ -333,6 +236,53 @@ namespace DesktopNote
                     MainWin.CurrentSetting.Font = mi.FontFamily.Source;
                 }
             }
+        }
+
+        private void Button_Options_Click(object sender, RoutedEventArgs e)
+        {
+            FadeOut();
+            new Win_Options(MainWin).FadeIn();
+        }
+
+        private void Button_NewNote_Click(object sender, RoutedEventArgs e)
+        {
+            Helpers.NewNote(MainWin.CurrentSetting);
+            Close();
+        }
+
+        private void Button_Close_Click(object sender, RoutedEventArgs e)
+        {
+            switch (Helpers.MsgBox("msgbox_delete_confirm", button: MessageBoxButton.YesNoCancel, image: MessageBoxImage.Exclamation)) {
+                case MessageBoxResult.Yes:
+                    File.Delete(MainWin.CurrentSetting.Doc_Location);
+                    File.Delete(MainWin.CurrentSetting.Bak_Location);
+                    Setting.NoteList.Remove(MainWin.CurrentSetting.Doc_Location);
+                    MainWin.Close(true); FadeOut(); break;
+                case MessageBoxResult.No:
+                    Setting.NoteList.Remove(MainWin.CurrentSetting.Doc_Location);
+                    MainWin.Close(true); FadeOut(); break;
+                default:
+                    break;
+            }
+        }
+
+        private void Button_OpenNote_Click(object sender, RoutedEventArgs e)
+        {
+            var path = Helpers.OpenFileDialog(this, false, MainWin.CurrentSetting.Doc_Location, "DesktopNote Content|*");
+            if (path == null) return;
+
+            Helpers.OpenNote(path)?.Show();
+            Close();
+        }
+
+        private void Button_Exit_Click(object sender, RoutedEventArgs e)
+        {
+            App.Quit();
+        }
+        
+        private void WTB_FileName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            MainWin.CurrentSetting.Doc_Location = Path.GetDirectoryName(MainWin.CurrentSetting.Doc_Location) + "\\" + WTB_FileName.Text;
         }
     }
 }

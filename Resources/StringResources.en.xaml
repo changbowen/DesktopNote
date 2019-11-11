@@ -2,6 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xml:space="preserve">
+    <sys:String x:Key="desktopnote">DesktopNote</sys:String>
     <sys:String x:Key="button_cancel">Cancel</sys:String>
     <sys:String x:Key="button_ok">OK</sys:String>
     <sys:String x:Key="button_search">Search</sys:String>
@@ -10,18 +11,20 @@
     <sys:String x:Key="menu_auto_dock">Auto Dock</sys:String>
     <sys:String x:Key="menu_auto_start">Auto Start</sys:String>
     <sys:String x:Key="menu_exit">Exit</sys:String>
-    <sys:String x:Key="menu_close">Close</sys:String>
-    <sys:String x:Key="menu_help">Help</sys:String>
-    <sys:String x:Key="menu_paper_color">Paper Color</sys:String>
+    <sys:String x:Key="menu_close">Close Note</sys:String>
+    <sys:String x:Key="menu_opennote">Open Note</sys:String>
+    <sys:String x:Key="menu_savenote">Save Note</sys:String>
+    <sys:String x:Key="menu_about">About</sys:String>
     <sys:String x:Key="menu_reset_formats">Reset Formats</sys:String>
     <sys:String x:Key="menu_reset_settings">Reset Settings</sys:String>
     <sys:String x:Key="menu_reset_positions">Reset Positions</sys:String>
-    <sys:String x:Key="msgbox_help">Available editing features can be accessd from menu or keyboard combination.
+    <sys:String x:Key="msgbox_about">Available editing features can be accessd from menu or keyboard combination.
 Use Ctrl + mouse wheel to change font size.
 Change font or font size when there is a selection will only change selected text.
-Note content will be auto saved to application root.
+Note content will be auto saved to application root by default but you can change it.
 You will be directed to the homepage if you click OK.</sys:String>
-    <sys:String x:Key="msgbox_load_error">There was an error loading the note contents. Please refer to the following backup file at application root for recovery.</sys:String>
+    <sys:String x:Key="msgbox_load_error">There was an error loading the note contents at {0}.
+Please refer to the backup file for recovery at {1}.</sys:String>
     <sys:String x:Key="msgbox_run_from_network">Please do not run this program from a network location. Copy to a local drive first.
 Program will exit now.</sys:String>
     <sys:String x:Key="msgbox_searched_to_end">Search has reached the end of the document.</sys:String>
@@ -33,6 +36,7 @@ Program will exit now.</sys:String>
     <sys:String x:Key="tooltip_align_left">Align Left (Ctrl + L)</sys:String>
     <sys:String x:Key="tooltip_align_right">Align Right (Ctrl + R)</sys:String>
     <sys:String x:Key="tooltip_back_color">Back Color</sys:String>
+    <sys:String x:Key="tooltip_paper_color">Paper Color</sys:String>
     <sys:String x:Key="tooltip_bold">Bold (Ctrl + B)</sys:String>
     <sys:String x:Key="tooltip_bullets">Bullets (Ctrl + Shift + L)</sys:String>
     <sys:String x:Key="tooltip_copy">Copy (Ctrl + C)</sys:String>
@@ -60,4 +64,6 @@ Program will exit now.</sys:String>
     <sys:String x:Key="menu_newnote">New Note</sys:String>
     <sys:String x:Key="msgbox_delete_confirm">Do you also want to delete the note content and backup files?</sys:String>
     <sys:String x:Key="msgbox_not_saved_confirm">Current note content is not saved. Changes will be lost after exiting. Exit anyway?</sys:String>
+    <sys:String x:Key="label_filename">File Name</sys:String>
+    <sys:String x:Key="msgbox_file_already_opened">The file is already opened in another window!</sys:String>
 </ResourceDictionary>

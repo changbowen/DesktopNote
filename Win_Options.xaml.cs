@@ -4,6 +4,7 @@
 //using System.Text;
 //using System.Threading.Tasks;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 //using System.Windows.Data;
@@ -58,7 +59,6 @@ namespace DesktopNote
                 MainWin.UnDock();
                 MainWin.Topmost = false;
             }
-            MainWin.CurrentSetting.Save();
         }
 
         private void Button_ResetFormats_Click(object sender, RoutedEventArgs e)
@@ -76,39 +76,26 @@ namespace DesktopNote
             //Rec_BG.Fill = new SolidColorBrush(cp);
         }
 
-        private void Button_ResetSet_Click(object sender, RoutedEventArgs e)
+        private async void Button_ResetSet_Click(object sender, RoutedEventArgs e)
         {
-            MainWin.CurrentSetting.Reset();
-            MainWin.CurrentSetting.Save();
-
-            var win = new MainWindow(MainWin.CurrentSetting.SettingIndex);
-            App.MainWindows.Remove(MainWin);
+            //create default setting with current note path
+            await FadeOut(true);
+            var newSetting = new Setting(Setting.NoteFlag.Existing | Setting.NoteFlag.IgnoreSettingsFromFile,
+                path: MainWin.CurrentSetting.Doc_Location);
             MainWin.Close();
-            App.MainWindows.Add(win);
-            win.Show();
-
-            FadeOut(true);
+            new MainWindow(newSetting).Show();
             //var optwin = new Win_Options(win);
             //optwin.Show();
         }
 
-        private void Button_Help_Click(object sender, RoutedEventArgs e)
+        private void Button_About_Click(object sender, RoutedEventArgs e)
         {
             Close();
             System.Threading.Tasks.Task.Run(delegate
             {
-                if (MessageBox.Show((string)Application.Current.Resources["msgbox_help"], "", MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK)
-                    System.Diagnostics.Process.Start("iexplore.exe", "https://github.com/changbowen/DesktopNote");
+                if (Helpers.MsgBox("msgbox_about", button: MessageBoxButton.OKCancel, image: MessageBoxImage.Information) == MessageBoxResult.OK)
+                    System.Diagnostics.Process.Start("https://github.com/changbowen/DesktopNote");
             });
-        }
-
-        private void ColorChange(object sender, RoutedPropertyChangedEventArgs<Color?> e)
-        {
-            if (e.NewValue.HasValue && ((Xceed.Wpf.Toolkit.ColorPicker)sender).IsOpen)
-            {
-                MainWin.Rec_BG.Fill = new SolidColorBrush(e.NewValue.Value);
-                MainWin.CurrentSetting.PaperColor = e.NewValue.Value;
-            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -127,9 +114,6 @@ namespace DesktopNote
                     run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
             }
 
-            //set paper color
-            CP_Paper.SelectedColor = MainWin.CurrentSetting.PaperColor;
-
             //set path
             TB_SavePath.Text = MainWin.CurrentSetting.Doc_Location;
             TB_SavePathTxt.Text = MainWin.CurrentSetting.Bak_Location;
@@ -138,28 +122,21 @@ namespace DesktopNote
 
         private void TB_SavePath_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var savedlg = new Microsoft.Win32.SaveFileDialog();
-            savedlg.Filter = "DesktopNote Content|*";
-            if (savedlg.ShowDialog(this) == true &&
-                savedlg.FileName != System.IO.Path.GetFullPath(MainWin.CurrentSetting.Doc_Location))
-            {
-                MainWin.CurrentSetting.Doc_Location = savedlg.FileName;
-                MainWin.CurrentSetting.Save();
-                TB_SavePath.Text = savedlg.FileName;
-            }
+            var path = Helpers.OpenFileDialog(this, true, MainWin.CurrentSetting.Doc_Location, "DesktopNote Content|*");
+            if (path == null) return;
+
+            MainWin.CurrentSetting.Doc_Location = path;
+            TB_SavePath.Text = path;
+            TB_SavePathTxt.Text = MainWin.CurrentSetting.Bak_Location;
         }
 
-        private void TB_SavePathTxt_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            var savedlg = new Microsoft.Win32.SaveFileDialog();
-            savedlg.Filter = "DesktopNote Text Content|*.txt";
-            if (savedlg.ShowDialog(this) == true &&
-                savedlg.FileName != System.IO.Path.GetFullPath(MainWin.CurrentSetting.Bak_Location))
-            {
-                MainWin.CurrentSetting.Bak_Location = savedlg.FileName;
-                MainWin.CurrentSetting.Save();
-                TB_SavePathTxt.Text = savedlg.FileName;
-            }
-        }
+        //private void TB_SavePathTxt_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        //{
+        //    var path = Helpers.OpenFileDialog(this, true, MainWin.CurrentSetting.Bak_Location, "DesktopNote Text Content|*.txt");
+        //    if (path == null) return;
+
+        //    MainWin.CurrentSetting.Bak_Location = path;
+        //    TB_SavePathTxt.Text = path;
+        //}
     }
 }

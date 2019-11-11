@@ -34,6 +34,8 @@ namespace DesktopNote
 
         public Rect GetInfo(Window win)
         {
+            if (!win.IsLoaded || PresentationSource.FromVisual(win) == null) return new Rect();
+
             var mi = new MonitorInfo();
             mi.cbSize = (uint)Marshal.SizeOf(typeof(MonitorInfo));
             var hwmon = MonitorFromWindow(new System.Windows.Interop.WindowInteropHelper(win).EnsureHandle(), MONITOR_DEFAULTTOPRIMERTY);

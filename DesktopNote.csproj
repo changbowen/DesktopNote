@@ -57,6 +57,9 @@
     <StartupObject>
     </StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -85,7 +88,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers.cs" />
     <Compile Include="Setting.cs" />
+    <None Include="app.manifest" />
+    <None Include="Setting.cs.old" />
     <Compile Include="SingleInstance.cs" />
     <Compile Include="WinAPI.cs" />
     <Compile Include="Win_Format.xaml.cs">
@@ -160,6 +166,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Resources\FontAwesomeSolid.otf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
