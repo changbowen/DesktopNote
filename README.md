@@ -11,7 +11,7 @@ If you really like it [![PayPal](https://img.shields.io/badge/%24-PayPal-blue.sv
 ## Notice About Recent Changes
 **Before using the latest version please backup all of the note contents.**
 
-Commit [2108429](https://github.com/changbowen/DesktopNote/commit/210842905f3477a5a183046c1684cd9514a071fc) moves most of the per-note settings to the note content file. By updating to the latest version you will lose the list of opened notes and some note specific formatting like paper color, font family etc. But note contents will not be affected. As long as you know where the files are, you can re-open them later.
+Commit [2108429](https://github.com/changbowen/DesktopNote/commit/210842905f3477a5a183046c1684cd9514a071fc) added support for re-opening closed notes. It moves most of the per-note settings to the note content file. By updating to the latest version you will lose the list of opened notes and some note specific formatting like paper color, font family etc. But note contents will not be affected. As long as you know where the files are, you can re-open them later.
 
 Issues / bugs / pull requests are always welcome.
 
