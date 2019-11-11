@@ -13,18 +13,18 @@ namespace DesktopNote
 {
     internal static class Helpers
     {
-        internal static string OpenFileDialog(Window owner, bool save, string path, string filter)
+        internal static string OpenFileDialog(Window owner, bool save, string path = null, string filter = null)
         {
             if (owner == null || PresentationSource.FromVisual(owner) == null)
                 throw new Exception("ShowDialog needs a loaded window to attach itself.");
 
             var dlg = new OpenFileDialog {
                 Title = save ? (string)App.Res["menu_savenote"] : (string)App.Res["menu_opennote"],
-                Filter = filter,
                 CheckFileExists = save ? false : true,
                 CheckPathExists = save ? false : true,
-                InitialDirectory = Path.GetDirectoryName(path)
             };
+            dlg.Filter = filter ?? @"DesktopNote Content|*";
+            if (!string.IsNullOrEmpty(path)) dlg.InitialDirectory = Path.GetDirectoryName(path);
 
             if (dlg.ShowDialog(owner) == true) return dlg.FileName;
             return null;
@@ -43,11 +43,13 @@ namespace DesktopNote
                 return MessageBox.Show(body, title, button, image);
         }
 
+
         internal static MainWindow NewNote(Setting refSetting = null)
         {
             var win = new MainWindow(new Setting(Setting.NoteFlag.CreateNew, refSetting));
             win.Show();
             win.Top += 20d; win.Left += 20d;
+            SaveNote(win);
             return win;
         }
 

@@ -92,24 +92,8 @@
             <Grid.CacheMode>
                 <BitmapCache/>
             </Grid.CacheMode>
-            
-            <!--<Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition />
-            </Grid.RowDefinitions>-->
-            <!--<Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>-->
-            
             <Grid.RenderTransform>
                 <ScaleTransform ScaleX="0" ScaleY="0"/>
-                <!--<TransformGroup>
-                    --><!--<ScaleTransform ScaleX="1" ScaleY="1"/>-->
-                    <!--<SkewTransform/>
-                    <RotateTransform/>
-                    <TranslateTransform/>--><!--
-                </TransformGroup>-->
             </Grid.RenderTransform>
             
             <!--挖空shadow layer-->
@@ -159,7 +143,7 @@
             </StackPanel>
             
             <!--the real content-->
-            <ContentPresenter x:Name="WindowContent" Margin="20,20,20,20" Content="{TemplateBinding Content}"/>
+            <ContentPresenter x:Name="WindowContent" Margin="18" Content="{TemplateBinding Content}"/>
 
             <!--resize grip-->
             <ResizeGrip x:Name="WindowResizeGrip" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsTabStop="false" Visibility="Collapsed"/>

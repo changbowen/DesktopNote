@@ -122,7 +122,7 @@ namespace DesktopNote
 
         private void TB_SavePath_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var path = Helpers.OpenFileDialog(this, true, MainWin.CurrentSetting.Doc_Location, "DesktopNote Content|*");
+            var path = Helpers.OpenFileDialog(this, true, MainWin.CurrentSetting.Doc_Location);
             if (path == null) return;
 
             MainWin.CurrentSetting.Doc_Location = path;

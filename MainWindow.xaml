@@ -12,6 +12,7 @@
     <Window.Resources>
         <ContextMenu x:Key="TrayMenu">
             <MenuItem Header="{StaticResource menu_newnote}" Click="TM_NewNote_Click"/>
+            <MenuItem Header="{StaticResource menu_opennote}" Click="TM_OpenNote_Click"/>
             <MenuItem Header="{StaticResource menu_reset_positions}" Click="TM_ResetPos_Click"/>
             <MenuItem Header="{StaticResource menu_exit}" Click="TM_Exit_Click"/>
         </ContextMenu>

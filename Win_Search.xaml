@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:DesktopNote"
-        Height="110" Width="250" FontSize="10" ResizeMode="NoResize" SizeToContent="Height" RenderTransformOrigin_BG="0.5,0.5"
+        Width="250" FontSize="10" ResizeMode="NoResize" SizeToContent="Height" RenderTransformOrigin_BG="0.5,0.5"
         Loaded="Window_Loaded" ShowInTaskbar="False" Topmost="True" ButtonCloseVisible="False">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -10,12 +10,32 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ContentControlBaseStyle}">
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Style.Triggers>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="{x:Type ContentControl}" BasedOn="{StaticResource ContentControlBaseStyle}">
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+        </Grid.Resources>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{StaticResource label_search_for}"/>
-        <TextBox Margin="5,5,0,5" Grid.Column="1" x:Name="TB_Search" Height="23" TextChanged="TB_Search_TextChanged"/>
-        <Button Grid.Column="1" Grid.Row="1" x:Name="Btn_Search" Content="{StaticResource button_search}" HorizontalAlignment="Right" Margin="0,0,55,0" VerticalAlignment="Bottom" Width="50" IsDefault="True" Background="White" Height="20" Click="Btn_Search_Click"/>
-        <Button Grid.Column="1" Grid.Row="1" x:Name="Btn_Cancel" Content="{StaticResource button_cancel}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="50" IsCancel="True" Background="White" Height="20" Click="Btn_Cancel_Click"/>
+        <ContentControl Grid.Column="1" Margin="8 5 2 5">
+            <TextBox x:Name="TB_Search" Height="24" BorderThickness="0" VerticalContentAlignment="Center" TextChanged="TB_Search_TextChanged"/>
+        </ContentControl>
+        <UniformGrid Grid.Column="1" Grid.Row="1" HorizontalAlignment="Right" Rows="1">
+            <Button x:Name="Btn_Search" Content="{StaticResource button_search}" IsDefault="True" Click="Btn_Search_Click"/>
+            <Button x:Name="Btn_Cancel" Content="{StaticResource button_cancel}" IsCancel="True" Click="Btn_Cancel_Click"/>
+        </UniformGrid>
     </Grid>
 </l:RoundedWindow>

@@ -2,9 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -605,13 +603,17 @@ namespace DesktopNote
             Helpers.NewNote();
         }
 
-        //removed due to FileDialog needs a visible window to work. Otherwise it closes immediately.
-        //private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
-        //{
-        //    var path = Helpers.OpenFileDialog(null, false, CurrentSetting.Doc_Location, "DesktopNote Content|*");
-        //    if (path == null) return;
-        //    Helpers.OpenNote(path)?.Show();
-        //}
+        private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
+        {
+            //OpenFileDialog needs at least one loaded parent window
+            if (App.MainWindows.Count == 0) return;
+            var visWin = App.MainWindows.Find(w => PresentationSource.FromVisual(w) != null);
+            if (visWin == null) return;
+            //using the last opened location
+            var path = Helpers.OpenFileDialog(visWin, false);
+            if (path == null) return;
+            Helpers.OpenNote(path)?.Show();
+        }
 
         private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {

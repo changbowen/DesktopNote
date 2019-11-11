@@ -262,13 +262,16 @@ namespace DesktopNote
                     Setting.NoteList.Remove(MainWin.CurrentSetting.Doc_Location);
                     MainWin.Close(true); FadeOut(); break;
                 default:
-                    break;
+                    return;
             }
+
+            //exit app if all windows are closed
+            if (App.MainWindows.Count == 0) App.Quit();
         }
 
         private void Button_OpenNote_Click(object sender, RoutedEventArgs e)
         {
-            var path = Helpers.OpenFileDialog(this, false, MainWin.CurrentSetting.Doc_Location, "DesktopNote Content|*");
+            var path = Helpers.OpenFileDialog(this, false, MainWin.CurrentSetting.Doc_Location);
             if (path == null) return;
 
             Helpers.OpenNote(path)?.Show();

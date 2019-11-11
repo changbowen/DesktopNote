@@ -28,6 +28,7 @@ namespace DesktopNote
 
         private void RunCheck(object sender1, StartupEventArgs e1)
         {
+            //check if app is already running
             if (SingleInstance.CheckExist(MutexString, ref mtx)) {
                 SingleInstance.SendNotifyMessage(SingleInstance.HWND_BROADCAST, SingleInstance.RegisteredWM, IntPtr.Zero, IntPtr.Zero);
                 Current.Shutdown();
