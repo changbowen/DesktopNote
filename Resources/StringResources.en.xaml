@@ -18,7 +18,8 @@
     <sys:String x:Key="menu_reset_formats">Reset Formats</sys:String>
     <sys:String x:Key="menu_reset_settings">Reset Settings</sys:String>
     <sys:String x:Key="menu_reset_positions">Reset Positions</sys:String>
-    <sys:String x:Key="msgbox_about">Available editing features can be accessd from menu or keyboard combination.
+    <sys:String x:Key="msgbox_about">App version: {0}.
+Available editing features can be accessd from menu or keyboard combination.
 Use Ctrl + mouse wheel to change font size.
 Change font or font size when there is a selection will only change selected text.
 Note content will be auto saved to application root by default but you can change it.
