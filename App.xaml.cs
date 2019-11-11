@@ -87,7 +87,7 @@ namespace DesktopNote
             Res = Current.Resources;
 
             //load notes
-            foreach (var path in Setting.NoteList) {
+            foreach (var path in Setting.NoteList.Cast<string>().ToArray()) {
                 Helpers.OpenNote(path)?.Show();
             }
 

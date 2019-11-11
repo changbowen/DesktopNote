@@ -47,6 +47,9 @@ namespace DesktopNote
             set {
                 if (string.IsNullOrWhiteSpace(Path.GetFileName(value))) return;
                 if (doc_location == value) return;
+                //convert relative path to absolute path and check again
+                value = Path.GetFullPath(value);
+                if (doc_location == value) return;
                 if (MainWin != null && MainWin.IsLoaded) {
                     if (File.Exists(doc_location) && !File.Exists(value) &&
                         File.Exists(doc_location + ".txt") && !File.Exists(value + ".txt")) {

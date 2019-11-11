@@ -524,8 +524,10 @@ namespace DesktopNote
             source.AddHook(WndProc);
 
             //update stuff
-            if (!Setting.NoteList.Contains(CurrentSetting.Doc_Location))
+            if (!Setting.NoteList.Contains(CurrentSetting.Doc_Location)) {
                 Setting.NoteList.Add(CurrentSetting.Doc_Location);
+                Setting.Save();
+            }
             App.MainWindows.Add(this);
         }
 
