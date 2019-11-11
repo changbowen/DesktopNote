@@ -13,11 +13,14 @@ If you really like it [![PayPal](https://img.shields.io/badge/%24-PayPal-blue.sv
 
 Commit [2108429](https://github.com/changbowen/DesktopNote/commit/210842905f3477a5a183046c1684cd9514a071fc) moves most of the per-note settings to the note content file. By updating to the latest version you will lose the list of opened notes and some note specific formatting like paper color, font family etc. But note contents will not be affected. As long as you know where the files are, you can re-open them later.
 
+Issues / bugs / pull requests are always welcome.
+
 ## Screenshot
 <img src="https://i.imgur.com/1DdJ4Sr.png" alt=""/>
 
 ## Features
-- **Multiple note windows supported**.
+- Supports re-opening closed notes.
+- Multiple note windows supported.
 - Auto saving note contents to application root folder.
 - Supports images as content.
 - Search function.
