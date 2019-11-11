@@ -15,6 +15,9 @@ namespace DesktopNote
     {
         internal static string OpenFileDialog(Window owner, bool save, string path, string filter)
         {
+            if (owner == null || PresentationSource.FromVisual(owner) == null)
+                throw new Exception("ShowDialog needs a loaded window to attach itself.");
+
             var dlg = new OpenFileDialog {
                 Title = save ? (string)App.Res["menu_savenote"] : (string)App.Res["menu_opennote"],
                 Filter = filter,

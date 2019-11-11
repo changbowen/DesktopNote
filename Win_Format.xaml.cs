@@ -282,7 +282,8 @@ namespace DesktopNote
         
         private void WTB_FileName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            MainWin.CurrentSetting.Doc_Location = Path.GetDirectoryName(MainWin.CurrentSetting.Doc_Location) + "\\" + WTB_FileName.Text;
+            var dir = Path.GetDirectoryName(MainWin.CurrentSetting.Doc_Location);
+            MainWin.CurrentSetting.Doc_Location = (string.IsNullOrEmpty(dir) ? dir : dir + @"\") + WTB_FileName.Text;
         }
     }
 }

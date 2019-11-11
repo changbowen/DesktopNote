@@ -605,13 +605,13 @@ namespace DesktopNote
             Helpers.NewNote();
         }
 
-        private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
-        {
-            var path = Helpers.OpenFileDialog(this, false, CurrentSetting.Doc_Location, "DesktopNote Content|*");
-            if (path == null) return;
-
-            Helpers.OpenNote(path)?.Show();
-        }
+        //removed due to FileDialog needs a visible window to work. Otherwise it closes immediately.
+        //private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var path = Helpers.OpenFileDialog(null, false, CurrentSetting.Doc_Location, "DesktopNote Content|*");
+        //    if (path == null) return;
+        //    Helpers.OpenNote(path)?.Show();
+        //}
 
         private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
