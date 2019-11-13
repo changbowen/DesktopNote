@@ -89,6 +89,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers.cs" />
+    <Compile Include="Reminder.cs" />
     <Compile Include="Setting.cs" />
     <None Include="app.manifest" />
     <None Include="Setting.cs.old" />
@@ -214,6 +215,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Hardcodet.Wpf.TaskbarNotification.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Reminder.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -39,11 +39,13 @@ namespace DesktopNote
         internal readonly Setting CurrentSetting;
         internal readonly object lock_save = new object();
 
-        //override CurrentSetting with values loaded from note content file
         private const int SaveCountDownValue = 2000;
         private int SaveCountDown = 0;
         private readonly CancellationTokenSource SaveCoundDownCancel = new CancellationTokenSource();
         private Task SaveNoteTask;
+
+        private Task ReminderTask;
+
         private Point MousePos;
         private DispatcherTimer DockTimer;
         private int DockTimerCountDown;
@@ -519,6 +521,9 @@ namespace DesktopNote
             //start save note thread
             SaveNoteTask = Task.Run(SaveNoteThread, SaveCoundDownCancel.Token);
 
+            //start reminder thread
+            ReminderTask = Task.Run();
+
             //add hook
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
             source.AddHook(WndProc);
@@ -529,6 +534,21 @@ namespace DesktopNote
                 Setting.Save();
             }
             App.MainWindows.Add(this);
+        }
+
+        private void ReminderCheck()
+        {
+            //get the time of the next reminder and sleep through
+            var nextTime = DateTime.MinValue;
+            foreach (var rmd in CurrentSetting.Reminders) {
+                if (rmd.Time > DateTime.Now) {
+                    nextTime = rmd.Time;
+                    break;
+                }
+            }
+            Thread.Sleep(nextTime - DateTime.Now);
+            Dispatcher.BeginInvoke(new Action(()=> { }));
+
         }
 
         private void CurrentSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)

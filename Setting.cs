@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
@@ -29,6 +30,8 @@ namespace DesktopNote
             IgnoreSettingsFromFile,
         }
 
+        internal const string ReminderBeginMark = "-----REMINDERS_BEGIN-----";
+        internal const string ReminderEndMark = "-----REMINDERS_END-----";
 
         //mapping to app settings for convenience
         internal static StringCollection NoteList => Properties.Settings.Default.NoteList;
@@ -170,6 +173,16 @@ namespace DesktopNote
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PaperColor)));
             }
         }
+
+        private List<Reminder> reminders;
+        internal List<Reminder> Reminders
+        {
+            get {
+                if (reminders == null) reminders = new List<Reminder>();
+                return reminders;
+            }
+        }
+
         #endregion
 
         /// <summary>

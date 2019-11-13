@@ -135,8 +135,7 @@ namespace DesktopNote
 
         internal void ToggleHighlight(object sender, RoutedEventArgs e)
         {
-            var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-            if (tdc != null)
+            if (RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) is SolidColorBrush)
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, null);
             else {
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
@@ -287,6 +286,20 @@ namespace DesktopNote
         {
             var dir = Path.GetDirectoryName(MainWin.CurrentSetting.Doc_Location);
             MainWin.CurrentSetting.Doc_Location = (string.IsNullOrEmpty(dir) ? dir : dir + @"\") + WTB_FileName.Text;
+        }
+
+        private void Reminder(object sender, RoutedEventArgs e)
+        {
+            FadeOut();
+            if (RTB_Main.Selection.IsEmpty || RTB_Main.Selection.Start.GetOffsetToPosition(RTB_Main.Selection.End) == 0)
+                RTB_Main.Selection.Select(RTB_Main.CaretPosition.Paragraph.ContentStart, RTB_Main.CaretPosition.Paragraph.ContentEnd);
+
+            MainWin.CurrentSetting.Reminders.Add(new Reminder() {
+                Time = DateTime.Now.AddSeconds(5d),
+                StartPos = RTB_Main.Selection.Start.GetOffsetToPosition(RTB_Main.Document.ContentStart),
+                EndPos = RTB_Main.Selection.End.GetOffsetToPosition(RTB_Main.Document.ContentStart),
+                Comment = "test reminder!!!!"
+            });
         }
     }
 }

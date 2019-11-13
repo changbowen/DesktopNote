@@ -51,10 +51,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="6">
+        <ContentControl Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5">
             <wtk:WatermarkTextBox x:Name="WTB_FileName" BorderThickness="0" KeepWatermarkOnGotFocus="True" VerticalContentAlignment="Center"
                                   Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}}"
-                                  Width="164" TextChanged="WTB_FileName_TextChanged" Watermark="{StaticResource label_filename}">
+                                  Width="136" TextChanged="WTB_FileName_TextChanged" Watermark="{StaticResource label_filename}">
                 <wtk:WatermarkTextBox.WatermarkTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" Foreground="Gray"/>
@@ -62,10 +62,13 @@
                 </wtk:WatermarkTextBox.WatermarkTemplate>
             </wtk:WatermarkTextBox>
         </ContentControl>
-        <Button Grid.Column="6" Grid.Row="0" ToolTip="{StaticResource tooltip_find}" Click="Find">
+        <Button Grid.Column="5" Grid.Row="0" ToolTip="{StaticResource tooltip_find}" Click="Find">
             <Image Stretch="None" Source="Resources/FindText.ico"/>
         </Button>
-
+        <Button Grid.Column="6" Grid.Row="0" ToolTip="{StaticResource tooltip_find}" Click="Reminder">
+            <Image Stretch="None" Source="Resources/Reminder.ico"/>
+        </Button>
+        
         <Button Grid.Column="0" Grid.Row="1" Command="Undo" ToolTip="{StaticResource tooltip_undo}">
             <Image Stretch="None" Source="Resources/Undo.ico"/>
         </Button>
