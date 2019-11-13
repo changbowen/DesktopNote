@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -44,7 +45,8 @@ namespace DesktopNote
         private readonly CancellationTokenSource SaveCoundDownCancel = new CancellationTokenSource();
         private Task SaveNoteTask;
 
-        private Task ReminderTask;
+        private System.Timers.Timer ReminderTimer;
+        private Reminder NextRemider;
 
         private Point MousePos;
         private DispatcherTimer DockTimer;
@@ -522,7 +524,22 @@ namespace DesktopNote
             SaveNoteTask = Task.Run(SaveNoteThread, SaveCoundDownCancel.Token);
 
             //start reminder thread
-            ReminderTask = Task.Run();
+            CurrentSetting.Reminders.CollectionChanged += (object s1, System.Collections.Specialized.NotifyCollectionChangedEventArgs e1) => {
+                if (ReminderTimer == null) {
+                    ReminderTimer = new System.Timers.Timer() { AutoReset = false };
+                    ReminderTimer.Elapsed += (object s2, ElapsedEventArgs e2) => {
+                        if (NextRemider == null) return;
+                        Dispatcher.BeginInvoke(new Action(() => {
+                            Helpers.MsgBox(body: NextRemider.Comment);
+                        }));
+                    };
+                };
+                ReminderTimer.Stop();
+                NextRemider = CurrentSetting.GetNextReminder();
+                if (NextRemider == null) return;
+                ReminderTimer.Interval = (NextRemider.Time - DateTime.Now).TotalMilliseconds;
+                ReminderTimer.Start();
+            };
 
             //add hook
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
@@ -534,21 +551,6 @@ namespace DesktopNote
                 Setting.Save();
             }
             App.MainWindows.Add(this);
-        }
-
-        private void ReminderCheck()
-        {
-            //get the time of the next reminder and sleep through
-            var nextTime = DateTime.MinValue;
-            foreach (var rmd in CurrentSetting.Reminders) {
-                if (rmd.Time > DateTime.Now) {
-                    nextTime = rmd.Time;
-                    break;
-                }
-            }
-            Thread.Sleep(nextTime - DateTime.Now);
-            Dispatcher.BeginInvoke(new Action(()=> { }));
-
         }
 
         private void CurrentSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)

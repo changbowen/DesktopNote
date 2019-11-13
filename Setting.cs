@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
@@ -174,14 +174,8 @@ namespace DesktopNote
             }
         }
 
-        private List<Reminder> reminders;
-        internal List<Reminder> Reminders
-        {
-            get {
-                if (reminders == null) reminders = new List<Reminder>();
-                return reminders;
-            }
-        }
+
+        internal ObservableCollection<Reminder> Reminders = new ObservableCollection<Reminder>();
 
         #endregion
 
@@ -272,6 +266,12 @@ namespace DesktopNote
                         break;
                 }
             }
+        }
+
+        internal Reminder GetNextReminder()
+        {
+            if (Reminders.Count == 0) return null;
+            return Reminders.Where(r => r.Time > DateTime.Now).OrderBy(r => r.Time).FirstOrDefault();
         }
 
         //      /// <summary>
