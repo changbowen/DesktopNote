@@ -135,8 +135,7 @@ namespace DesktopNote
 
         internal void ToggleHighlight(object sender, RoutedEventArgs e)
         {
-            var tdc = RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) as SolidColorBrush;
-            if (tdc != null)
+            if (RTB_Main.Selection.GetPropertyValue(TextElement.BackgroundProperty) is SolidColorBrush)
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.BackgroundProperty, null);
             else {
                 RTB_Main.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, new SolidColorBrush(Colors.Black));
