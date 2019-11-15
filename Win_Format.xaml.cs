@@ -214,10 +214,7 @@ namespace DesktopNote
         {
             FadeOut();
             var win = new Win_Search(MainWin);
-            win.FadeIn(
-                MainWin.Left + (MainWin.Width - win.Width) / 2,
-                MainWin.Top + (MainWin.Height - win.Height) / 2
-                );
+            win.FadeIn();
         }
 
         #endregion
