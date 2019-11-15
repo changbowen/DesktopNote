@@ -103,6 +103,9 @@
     <Compile Include="Win_Options.xaml.cs">
       <DependentUpon>Win_Options.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Win_Reminder.xaml.cs">
+      <DependentUpon>Win_Reminder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Win_Search.xaml.cs">
       <DependentUpon>Win_Search.xaml</DependentUpon>
     </Compile>
@@ -135,6 +138,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Win_Options.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Win_Reminder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

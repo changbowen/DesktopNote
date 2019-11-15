@@ -530,7 +530,8 @@ namespace DesktopNote
                     ReminderTimer.Elapsed += (object s2, ElapsedEventArgs e2) => {
                         if (NextRemider == null) return;
                         Dispatcher.BeginInvoke(new Action(() => {
-                            Helpers.MsgBox(body: NextRemider.Comment);
+                            var win = new Win_Reminder(this, NextRemider);
+                            win.FadeIn(Left + (Width - win.ActualWidth) / 2, Top + (Height - win.ActualHeight) / 2);
                         }));
                     };
                 };

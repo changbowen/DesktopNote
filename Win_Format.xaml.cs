@@ -298,7 +298,7 @@ namespace DesktopNote
                 Time = DateTime.Now.AddSeconds(5d),
                 StartPos = RTB_Main.Selection.Start.GetOffsetToPosition(RTB_Main.Document.ContentStart),
                 EndPos = RTB_Main.Selection.End.GetOffsetToPosition(RTB_Main.Document.ContentStart),
-                Comment = "test reminder!!!!"
+                Content = "test reminder!!!!"
             });
         }
     }

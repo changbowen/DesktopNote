@@ -1,0 +1,37 @@
+﻿<l:RoundedWindow x:Class="DesktopNote.Win_Reminder" x:Name="Win_Rmd"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:DesktopNote"
+        Title="{StaticResource menu_options}" ResizeMode="NoResize" FontSize="14" ButtonCloseVisible="False"
+        SizeToContent="WidthAndHeight">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource ContentControlBaseStyle}">
+                <Setter Property="Margin" Value="4 0"/>
+                <Style.Triggers>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="ContentControl" BasedOn="{StaticResource ContentControlBaseStyle}">
+                <Setter Property="Margin" Value="4"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Margin="10" HorizontalAlignment="Center"
+                   Text="{Binding ElementName=Win_Rmd, Path=Reminder.Content}"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <Button Content="Snooze 5 mins"/>
+            <Button Content="Got it"/>
+        </StackPanel>
+    </Grid>
+</l:RoundedWindow>
