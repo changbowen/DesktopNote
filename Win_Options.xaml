@@ -18,7 +18,6 @@
         <Grid.Resources>
             <Style TargetType="Button" BasedOn="{StaticResource ContentControlBaseStyle}">
                 <Setter Property="Margin" Value="4 0"/>
-                <Setter Property="CommandTarget" Value="{Binding RTB_Main, ElementName=FB1, Mode=OneWay}"/>
                 <Style.Triggers>
                     <Trigger Property="IsPressed" Value="True">
                         <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
