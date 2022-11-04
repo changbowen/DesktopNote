@@ -27,7 +27,8 @@
         </Rectangle>
         <RichTextBox x:Name="RTB_Main" Margin="20" Background="{x:Null}" BorderBrush="{x:Null}" AcceptsTab="True" BorderThickness="0" IsInactiveSelectionHighlightEnabled="True"
                      TextChanged="RTB_Main_TextChanged" PreviewKeyDown="RTB_Main_PreviewKeyDown" PreviewMouseWheel="RTB_Main_PreviewMouseWheel"
-                     GotKeyboardFocus="RTB_Main_GotKeyboardFocus"
+                     GotKeyboardFocus="RTB_Main_GotKeyboardFocus" AllowDrop="True"
+                     PreviewDragEnter="RTB_Main_PreviewDrag" PreviewDragOver="RTB_Main_PreviewDrag" PreviewDrop="RTB_Main_PreviewDrop"
                      ContextMenuOpening="RTB_Main_ContextMenuOpening" PreviewMouseDown="RTB_Main_PreviewMouseDown">
             <!--<wtk:RichTextBoxFormatBarManager.FormatBar>
                 <wtk:RichTextBoxFormatBar/>

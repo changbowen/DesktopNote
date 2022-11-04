@@ -148,23 +148,14 @@ namespace DesktopNote
             if (RTB_Main.Selection.IsEmpty)
                 RTB_Main.FontSize += 1;
             else {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
-                if (ele == null) return;
-                Image img = null;
-                switch (ele.GetType().Name) {
-                    case "BlockUIContainer":
-                        img = ((BlockUIContainer)ele).Child as Image;
-                        break;
-                    case "InlineUIContainer":
-                        img = ((InlineUIContainer)ele).Child as Image;
-                        break;
-                    case "Image":
-                        img = (Image)ele;
-                        break;
-                }
+                var img = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetImageElement();
                 if (img != null) {
-                    img.Width += 2;
-                    img.Height += 2;
+                    var startW = double.IsNaN(img.Width) ? img.ActualWidth : img.Width;
+                    var startH = double.IsNaN(img.Height) ? img.ActualHeight : img.Height;
+                    img.VerticalAlignment = VerticalAlignment.Bottom;
+                    img.HorizontalAlignment = HorizontalAlignment.Left;
+                    img.Width = startW * 1.1;
+                    img.Height = startH * 1.1;
                 }
                 else
                     EditingCommands.IncreaseFontSize.Execute(null, RTB_Main);
@@ -177,25 +168,14 @@ namespace DesktopNote
                 if (RTB_Main.FontSize > 1) RTB_Main.FontSize -= 1;
             }
             else {
-                var ele = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetAdjacentElement(LogicalDirection.Forward);
-                if (ele == null) return;
-                Image img = null;
-                switch (ele.GetType().Name) {
-                    case "BlockUIContainer":
-                        img = ((BlockUIContainer)ele).Child as Image;
-                        break;
-                    case "InlineUIContainer":
-                        img = ((InlineUIContainer)ele).Child as Image;
-                        break;
-                    case "Image":
-                        img = (Image)ele;
-                        break;
-                }
+                var img = RTB_Main.Selection.Start.GetNextContextPosition(LogicalDirection.Forward)?.GetImageElement();
                 if (img != null) {
-                    if (img.Width > 2 && img.Height > 2) {
-                        img.Width -= 2;
-                        img.Height -= 2;
-                    }
+                    var startW = double.IsNaN(img.Width) ? img.ActualWidth : img.Width;
+                    var startH = double.IsNaN(img.Height) ? img.ActualHeight : img.Height;
+                    img.VerticalAlignment = VerticalAlignment.Bottom;
+                    img.HorizontalAlignment = HorizontalAlignment.Left;
+                    img.Width = startW * 0.9;
+                    img.Height = startH * 0.9;
                 }
                 else
                     EditingCommands.DecreaseFontSize.Execute(null, RTB_Main);

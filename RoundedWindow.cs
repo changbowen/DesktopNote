@@ -262,6 +262,7 @@ namespace DesktopNote
             if (left.Equals(double.NaN) || top.Equals(double.NaN))//nan==nan returns false.
             {
                 //get the physical pixel-based position.
+                //this doesn't work when mouse is outside of mainwindow(?)
                 newpos = PointToScreen(Mouse.GetPosition(this));
                 //convert to the actual position considering the DPI settings etc.
                 realpos = PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.Transform(newpos);

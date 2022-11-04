@@ -7,7 +7,10 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Documents;
-using System.Xml.Linq;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
+using Size = System.Drawing.Size;
+using System.Windows.Controls;
 
 namespace DesktopNote
 {
@@ -185,7 +188,137 @@ namespace DesktopNote
             return exMsg;
         }
 
+        internal static BitmapSource GetImageSource(Stream stream, Size decodeSize = default)
+        {
+            try {
+                stream.Position = 0;
+                var frame = BitmapFrame.Create(stream, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+                var pixelSize = new Size(frame.PixelWidth, frame.PixelHeight);
+                ushort orien = 0;
+                if ((frame.Metadata as BitmapMetadata)?.GetQuery("/app1/ifd/{ushort=274}") is ushort u)
+                    orien = u;
+                frame = null;
 
+                //calculate decode size
+                if (decodeSize.Width + decodeSize.Height > 0) {
+                    //use pixelSize if decodeSize is too big
+                    //DecodePixelWidth / Height is set to PixelWidth / Height anyway in reference source
+                    if (decodeSize.Width > pixelSize.Width) decodeSize.Width = pixelSize.Width;
+                    if (decodeSize.Height > pixelSize.Height) decodeSize.Height = pixelSize.Height;
+
+                    //flip decodeSize according to orientation
+                    if (orien > 4 && orien < 9)
+                        decodeSize = new Size(decodeSize.Height, decodeSize.Width);
+                }
+
+                //init bitmapimage
+                stream.Position = 0;
+                var bi = new BitmapImage();
+                bi.BeginInit();
+                bi.CacheOption = BitmapCacheOption.OnLoad;
+                if (pixelSize.Width > 0 && pixelSize.Height > 0) {
+                    //setting both DecodePixelWidth and Height will break the aspect ratio
+                    var imgRatio = (double)pixelSize.Width / pixelSize.Height;
+                    if (decodeSize.Width > 0 && decodeSize.Height > 0) {
+                        if (imgRatio > (double)decodeSize.Width / decodeSize.Height)
+                            bi.DecodePixelHeight = decodeSize.Height;
+                        else
+                            bi.DecodePixelWidth = decodeSize.Width;
+                    }
+                    else if (decodeSize.Width == 0 && decodeSize.Height > 0)
+                        bi.DecodePixelHeight = decodeSize.Height;
+                    else if (decodeSize.Height == 0 && decodeSize.Width > 0)
+                        bi.DecodePixelWidth = decodeSize.Width;
+                }
+                bi.StreamSource = stream;
+                bi.EndInit();
+                bi.Freeze();
+
+                if (orien < 2) return bi;
+                //apply orientation based on metadata
+                var tb = new TransformedBitmap();
+                tb.BeginInit();
+                tb.Source = bi;
+                switch (orien) {
+                    case 2:
+                        tb.Transform = new ScaleTransform(-1d, 1d);
+                        break;
+                    case 3:
+                        tb.Transform = new RotateTransform(180d);
+                        break;
+                    case 4:
+                        tb.Transform = new ScaleTransform(1d, -1d);
+                        break;
+                    case 5: {
+                        var tg = new TransformGroup();
+                        tg.Children.Add(new RotateTransform(90d));
+                        tg.Children.Add(new ScaleTransform(-1d, 1d));
+                        tb.Transform = tg;
+                        break;
+                    }
+                    case 6:
+                        tb.Transform = new RotateTransform(90d);
+                        break;
+                    case 7: {
+                        var tg = new TransformGroup();
+                        tg.Children.Add(new RotateTransform(90d));
+                        tg.Children.Add(new ScaleTransform(1d, -1d));
+                        tb.Transform = tg;
+                        break;
+                    }
+                    case 8:
+                        tb.Transform = new RotateTransform(270d);
+                        break;
+                }
+                tb.EndInit();
+                tb.Freeze();
+                return tb;
+            }
+            catch {
+                return null;
+            }
+        }
+
+        internal static Image GetImageElement(this TextPointer pointer)
+        {
+            var ele = pointer?.GetAdjacentElement(LogicalDirection.Forward);
+            switch (ele) {
+                case BlockUIContainer ele1:
+                    return ele1.Child as Image;
+                case InlineUIContainer ele2:
+                    return ele2.Child as Image;
+                case Image ele3:
+                    return ele3;
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        /// Get visual or logical parent of an element depending on the type of <paramref name="self"/>.
+        /// </summary>
+        /// <param name="includeSelf">Also check the type of the initial object passed in.</param>
+        /// <returns>The parent element or null.</returns>
+        internal static T GetParent<T>(DependencyObject self, bool includeSelf = false)
+        {
+            switch (self) {
+                case T s when includeSelf:
+                    return s;
+                case FrameworkElement s:
+                    self = s.Parent;
+                    break;
+                case FrameworkContentElement s:
+                    self = s.Parent;
+                    break;
+                case Visual s:
+                    self = VisualTreeHelper.GetParent(s);
+                    break;
+                default:
+                    return default;
+            }
+            if (self == null) return default;
+            if (self is T t) return t;
+            return GetParent<T>(self, false);
+        }
     }
 
     public static class StreamReaderExtensions

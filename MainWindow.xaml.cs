@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace DesktopNote
@@ -353,6 +355,33 @@ namespace DesktopNote
         {
             if (e.ChangedButton == MouseButton.Left && App.FormatWindow?.Opacity == 1) {
                 App.FormatWindow.FadeOut();
+            }
+        }
+
+        private void RTB_Main_PreviewDrag(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Copy;
+            e.Handled = true;
+        }
+
+        private void RTB_Main_PreviewDrop(object sender, DragEventArgs e)
+        {
+            var paths = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (paths == null || paths.Length == 0) return;
+
+            foreach (var path in paths) {
+                BitmapSource bs;
+                using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
+                    bs = Helpers.GetImageSource(fs);
+                }
+                if (bs == null) continue;
+
+                var ele = RTB_Main.CaretPosition.GetAdjacentElement(LogicalDirection.Forward);
+                Helpers.GetParent<Paragraph>(ele, true)?.Inlines.Add(new Image() {
+                    Source = bs,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                });
             }
         }
         #endregion
