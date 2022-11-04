@@ -2,6 +2,8 @@
 The only **simple** yet **rich-featured** desktop note app you'll ever need for your PC.
 
 ## Download
+[![Github releases (by asset)](https://img.shields.io/github/downloads/Naereen/StrapDown.js/latest/strapdown.min.js)](https://github.com/changbowen/DesktopNote/releases/)
+
 **Always go to bin/Release for the [latest dev build](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
 
 **最新开发版本[链接](https://github.com/changbowen/DesktopNote/raw/master_C%23/bin/Release/DesktopNote.exe).**
