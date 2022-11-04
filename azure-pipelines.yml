@@ -40,7 +40,7 @@ steps:
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/bin/x64/Release'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/bin/Release'
     includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(System.DefaultWorkingDirectory)/$(Build.Repository.Name).zip'
