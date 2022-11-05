@@ -361,6 +361,8 @@ namespace DesktopNote
         private void RTB_Main_PreviewDrag(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Copy;
+            UnDock();
+
             e.Handled = true;
         }
 
