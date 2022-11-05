@@ -67,4 +67,8 @@
     <sys:String x:Key="msgbox_not_saved_confirm">当前笔记内容并未保存，退出会丢失更改的内容。确定要退出吗？</sys:String>
     <sys:String x:Key="label_filename">文件名</sys:String>
     <sys:String x:Key="msgbox_file_already_opened">该文件已在另一窗口中打开！</sys:String>
+    <sys:String x:Key="msgbox_new_version_avail">有新版本可用。
+当前版本: {0}
+新版本: {1}
+点击确定以打开发布页面。</sys:String>
 </ResourceDictionary>

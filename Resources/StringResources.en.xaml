@@ -67,4 +67,8 @@ Program will exit now.</sys:String>
     <sys:String x:Key="msgbox_not_saved_confirm">Current note content is not saved. Changes will be lost after exiting. Exit anyway?</sys:String>
     <sys:String x:Key="label_filename">File Name</sys:String>
     <sys:String x:Key="msgbox_file_already_opened">The file is already opened in another window!</sys:String>
+    <sys:String x:Key="msgbox_new_version_avail">A new version is available.
+Current version: {0}
+New version: {1}
+Click OK to open the release page.</sys:String>
 </ResourceDictionary>

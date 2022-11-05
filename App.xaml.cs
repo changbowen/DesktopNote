@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-//using System.Configuration;
-//using System.Data;
 using System.Linq;
-//using System.Threading.Tasks;
 using System.Windows;
+using System.Threading.Tasks;
+using System.IO;
+using System.Web.Script.Serialization;
+using System.Net;
+using System.Diagnostics;
 
 namespace DesktopNote
 {
@@ -77,6 +79,26 @@ namespace DesktopNote
             //set english as fallback language
             if (!langadded)
                 Resources.MergedDictionaries.Add(new ResourceDictionary() { Source = new Uri(@"Resources\StringResources.en.xaml", UriKind.Relative) });
+
+            // check for updates
+            Task.Run(() => {
+                var localVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                var req = WebRequest.CreateHttp($@"https://api.github.com/repos/changbowen/{nameof(DesktopNote)}/releases/latest");
+                req.ContentType = @"application/json; charset=utf-8";
+                req.UserAgent = nameof(DesktopNote); // needed otherwise 403
+                req.Timeout = 10000;
+                using (var res = req.GetResponse())
+                using (var stream = res.GetResponseStream())
+                using (var reader = new StreamReader(stream, System.Text.Encoding.UTF8)) {
+                    var dict = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(reader.ReadToEnd());
+                    if (!dict.TryGetValue("tag_name", out var tagName)) return;
+                    var remoteVer = Version.Parse(((string)tagName).TrimStart('v'));
+                    if (localVer < remoteVer && MessageBox.Show(string.Format((string)App.Res["msgbox_new_version_avail"],
+                        localVer, remoteVer), string.Empty, MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK) {
+                        Process.Start(@"explorer", $@"https://github.com/changbowen/{nameof(DesktopNote)}/releases");
+                    }
+                }
+            });
 
             //other run checks
             if (PathIsNetworkPath(AppDomain.CurrentDomain.BaseDirectory)) {
