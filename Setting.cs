@@ -120,6 +120,19 @@ namespace DesktopNote
         }
 
 
+        private int undockdelay;
+        [NoteSetting]
+        internal int UndockDelay
+        {
+            get => undockdelay;
+            set {
+                if (undockdelay == value) return;
+                undockdelay = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UndockDelay)));
+            }
+        }
+
+
         private string font;
         [NoteSetting]
         internal string Font
@@ -185,6 +198,7 @@ namespace DesktopNote
                 Win_Pos = refSetting.Win_Pos;
                 AutoDock = refSetting.AutoDock;
                 DockedTo = refSetting.DockedTo;
+                UndockDelay = refSetting.UndockDelay;
                 Font = refSetting.Font;
                 FontColor = refSetting.FontColor;
                 BackColor = refSetting.BackColor;
@@ -213,6 +227,7 @@ namespace DesktopNote
             Win_Size = new Size(300, 350);
             Win_Pos = new Point(0, 0);
             AutoDock = true;
+            UndockDelay = 0;
             DockedTo = 0;
             Font = "Segoe Print";
             FontColor = (Color)ColorConverter.ConvertFromString("#FF000000");
@@ -247,6 +262,7 @@ namespace DesktopNote
                         info.SetValue(this, bool.Parse(ele.Value));
                         break;
                     case nameof(DockedTo):
+                    case nameof(UndockDelay):
                         info.SetValue(this, int.Parse(ele.Value));
                         break;
                     case nameof(FontColor):
@@ -261,22 +277,6 @@ namespace DesktopNote
             }
         }
 
-        //      /// <summary>
-        //      /// Leaving win to null will not save per-note settings.
-        //      /// Returns status message from SaveNote if win is passed. Otherwise null.
-        //      /// </summary>
-        //public static string Save(MainWindow win = null)
-        //      {
-        //          ////update note list (moved to Window.Closing event)
-        //          //Properties.Settings.Default.NoteList.Clear();
-        //          //Properties.Settings.Default.NoteList.AddRange(App.MainWindows.Select(w => w.CurrentSetting.Doc_Location).ToArray());
-
-        //          //save settings
-        //          Properties.Settings.Default.Save();
-        //          //save per-note settings
-        //          if (win != null) return Helpers.SaveNote(win);
-        //          return null;
-        //      }
 
         [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
         sealed class NoteSettingAttribute : Attribute

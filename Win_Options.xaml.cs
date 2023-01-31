@@ -7,12 +7,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-//using System.Windows.Data;
 using System.Windows.Documents;
-//using System.Windows.Input;
-using System.Windows.Media;
-//using System.Windows.Media.Imaging;
-//using System.Windows.Shapes;
 
 namespace DesktopNote
 {
@@ -20,7 +15,7 @@ namespace DesktopNote
     {
         public readonly MainWindow MainWin;
         private readonly RichTextBox RTB_Main;
-        private string assname = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+        private readonly string assname = App.Assembly.GetName().Name;
 
         public Win_Options(MainWindow mainwin)
         {
@@ -33,6 +28,8 @@ namespace DesktopNote
 
         protected override void OnClosed(EventArgs e)
         {
+            MainWin.CurrentSetting.UndockDelay = IUD_UndockDelay.Value ?? 0;
+
             base.OnClosed(e);
             App.OptionsWindow = null;
         }
@@ -41,7 +38,7 @@ namespace DesktopNote
         {
             var run = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
             if (CB_AutoStart.IsChecked == true)
-                run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
+                run.SetValue(assname, App.Assembly.Location, Microsoft.Win32.RegistryValueKind.String);
             else
                 run.DeleteValue(assname, false);
         }
@@ -93,7 +90,7 @@ namespace DesktopNote
             Close();
             System.Threading.Tasks.Task.Run(delegate
             {
-                if (Helpers.MsgBox(body: string.Format((string)App.Res["msgbox_about"], System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()),
+                if (Helpers.MsgBox(body: string.Format((string)App.Res["msgbox_about"], App.Assembly.GetName().Version.ToString()),
                                    button: MessageBoxButton.OKCancel,
                                    image: MessageBoxImage.Information) == MessageBoxResult.OK)
                     System.Diagnostics.Process.Start("https://github.com/changbowen/DesktopNote");
@@ -112,14 +109,15 @@ namespace DesktopNote
             if (!string.IsNullOrEmpty(run_value))
             {//update the exe location if Run contains assname.
                 CB_AutoStart.IsChecked = true;
-                if (run_value != System.Reflection.Assembly.GetExecutingAssembly().Location)
-                    run.SetValue(assname, System.Reflection.Assembly.GetExecutingAssembly().Location, Microsoft.Win32.RegistryValueKind.String);
+                if (run_value != App.Assembly.Location)
+                    run.SetValue(assname, App.Assembly.Location, Microsoft.Win32.RegistryValueKind.String);
             }
 
             //set path
             TB_SavePath.Text = MainWin.CurrentSetting.Doc_Location;
             TB_SavePathTxt.Text = MainWin.CurrentSetting.Bak_Location;
 
+            IUD_UndockDelay.Value = MainWin.CurrentSetting.UndockDelay;
         }
 
         private void TB_SavePath_PreviewMouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

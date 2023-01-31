@@ -62,6 +62,7 @@ Program will exit now.</sys:String>
     <sys:String x:Key="menu_options">Options</sys:String>
     <sys:String x:Key="label_content_path">Content path</sys:String>
     <sys:String x:Key="label_content_path_txt">Text content path</sys:String>
+    <sys:String x:Key="label_undock_delay">Undock delay (ms)</sys:String>
     <sys:String x:Key="menu_newnote">New Note</sys:String>
     <sys:String x:Key="msgbox_delete_confirm">Do you also want to delete the note content and backup files?</sys:String>
     <sys:String x:Key="msgbox_not_saved_confirm">Current note content is not saved. Changes will be lost after exiting. Exit anyway?</sys:String>

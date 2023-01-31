@@ -8,12 +8,14 @@ using System.IO;
 using System.Web.Script.Serialization;
 using System.Net;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace DesktopNote
 {
     public partial class App : Application
     {
         public static readonly string AppRootDir = AppDomain.CurrentDomain.BaseDirectory;
+        public static Assembly Assembly => Assembly.GetExecutingAssembly();
         public static List<MainWindow> MainWindows = new List<MainWindow>();
         public static ResourceDictionary Res;
         public static Win_Format FormatWindow;
@@ -38,15 +40,15 @@ namespace DesktopNote
             }
 
             AppDomain.CurrentDomain.AssemblyResolve += (object sender, ResolveEventArgs e) => {
-                var desiredAssembly = new System.Reflection.AssemblyName(e.Name).Name;
+                var desiredAssembly = new AssemblyName(e.Name).Name;
                 switch (desiredAssembly) {
                     case "Xceed.Wpf.Toolkit":
                     case "Hardcodet.Wpf.TaskbarNotification":
                         var ressourceName = "DesktopNote.Resources." + desiredAssembly + ".dll";
-                        using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(ressourceName)) {
+                        using (var stream = Assembly.GetManifestResourceStream(ressourceName)) {
                             byte[] assemblyData = new byte[stream.Length];
                             stream.Read(assemblyData, 0, assemblyData.Length);
-                            return System.Reflection.Assembly.Load(assemblyData);
+                            return Assembly.Load(assemblyData);
                         }
                     default:
                         return null;
@@ -57,9 +59,8 @@ namespace DesktopNote
             var lang = System.Threading.Thread.CurrentThread.CurrentCulture.Name.Substring(0, 2);
             //check if stringresources.lang exist
             bool langadded = false;
-            var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var resourceName = assembly.GetName().Name + ".g";
-            var resourceManager = new System.Resources.ResourceManager(resourceName, assembly);
+            var resourceName = Assembly.GetName().Name + ".g";
+            var resourceManager = new System.Resources.ResourceManager(resourceName, Assembly);
             try {
                 var resourceSet = resourceManager.GetResourceSet(System.Threading.Thread.CurrentThread.CurrentCulture, true, true);
                 foreach (System.Collections.DictionaryEntry resource in resourceSet) {
@@ -82,7 +83,7 @@ namespace DesktopNote
 
             // check for updates
             Task.Run(() => {
-                var localVer = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+                var localVer = Assembly.GetName().Version;
                 var req = WebRequest.CreateHttp($@"https://api.github.com/repos/changbowen/{nameof(DesktopNote)}/releases/latest");
                 req.ContentType = @"application/json; charset=utf-8";
                 req.UserAgent = nameof(DesktopNote); // needed otherwise 403
@@ -93,7 +94,7 @@ namespace DesktopNote
                     var dict = new JavaScriptSerializer().Deserialize<Dictionary<string, object>>(reader.ReadToEnd());
                     if (!dict.TryGetValue("tag_name", out var tagName)) return;
                     var remoteVer = Version.Parse(((string)tagName).TrimStart('v'));
-                    if (localVer < remoteVer && MessageBox.Show(string.Format((string)App.Res["msgbox_new_version_avail"],
+                    if (localVer < remoteVer && MessageBox.Show(string.Format((string)Res["msgbox_new_version_avail"],
                         localVer, remoteVer), string.Empty, MessageBoxButton.OKCancel, MessageBoxImage.Information) == MessageBoxResult.OK) {
                         Process.Start(@"explorer", $@"https://github.com/changbowen/{nameof(DesktopNote)}/releases");
                     }
@@ -120,7 +121,7 @@ namespace DesktopNote
         {
             //update notelist
             Setting.NoteList.Clear();
-            Setting.NoteList.AddRange(App.MainWindows.Select(w => w.CurrentSetting.Doc_Location).ToArray());
+            Setting.NoteList.AddRange(MainWindows.Select(w => w.CurrentSetting.Doc_Location).ToArray());
             Setting.Save();
 
             foreach (var win in MainWindows.ToArray()) {

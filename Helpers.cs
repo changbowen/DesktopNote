@@ -14,8 +14,11 @@ using System.Windows.Controls;
 
 namespace DesktopNote
 {
-    internal static class Helpers
+    public static class Helpers
     {
+        public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
+        public static bool Docked(this DockStatus status) => (int)status > 1;
+
         internal static string OpenFileDialog(Window owner, bool save, string path = null, string filter = null)
         {
             if (owner == null || PresentationSource.FromVisual(owner) == null)

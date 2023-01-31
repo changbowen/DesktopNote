@@ -22,7 +22,6 @@ bld/
 [Bb]in/*
 [Bb]in/[Rr]elease/*
 [Oo]bj/
-!bin/Release/DesktopNote.exe
 
 # Visual Studio 2015 cache/options directory
 .vs/

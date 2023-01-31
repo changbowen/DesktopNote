@@ -1,6 +1,7 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static DesktopNote.Helpers;
 
 namespace DesktopNote
 {
@@ -44,11 +46,11 @@ namespace DesktopNote
         //override CurrentSetting with values loaded from note content file
         private const int SaveCountDownValue = 2000;
         private int SaveCountDown = 0;
-        private readonly CancellationTokenSource SaveCoundDownCancel = new CancellationTokenSource();
+        private readonly CancellationTokenSource SaveCountDownCancel = new CancellationTokenSource();
         private Task SaveNoteTask;
         private Point MousePos;
         private DispatcherTimer DockTimer;
-        private int DockTimerCountDown;
+        private DispatcherTimer UndockTimer;
         private bool IsResizing;
 
 
@@ -67,9 +69,7 @@ namespace DesktopNote
 
 
         #region Docking
-        public DockStatus LastDockStatus;
-
-        public enum DockStatus { None, Docking, Left, Right, Top, Bottom }
+        private DockStatus LastDockedTo;
 
         public DockStatus DockedTo
         {
@@ -101,133 +101,157 @@ namespace DesktopNote
         /// <param name="changePos">Update LastDockStatus if set to True.</param>
         internal void DockToSide(bool changePos = false)
         {
-            if (DockedTo == DockStatus.None) {
-                double toval;
-                DependencyProperty tgtpro;
-                double pad = 15d;
-                DockStatus dockto;
-                if (changePos) {
-                    App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
-                    if (Left <= App.CurrScrnRect.Left) //dock left
-                    {
+            if (DockedTo != DockStatus.None) return;
+
+            double toval;
+            DependencyProperty tgtpro;
+            double pad = 15d;
+            DockStatus dockto;
+            if (changePos) {
+                App.CurrScrnRect = new GetCurrentMonitor().GetInfo(this);
+                if (Left <= App.CurrScrnRect.Left) //dock left
+                {
+                    toval = App.CurrScrnRect.Left - ActualWidth + pad;
+                    tgtpro = LeftProperty;
+                    dockto = DockStatus.Left;
+                }
+
+                else if (Left + ActualWidth >= App.CurrScrnRect.Right) //dock right
+                {
+                    toval = App.CurrScrnRect.Right - pad;
+                    tgtpro = LeftProperty;
+                    dockto = DockStatus.Right;
+                }
+
+                else if (Top <= App.CurrScrnRect.Top) //dock top
+                {
+                    toval = App.CurrScrnRect.Top - ActualHeight + pad;
+                    tgtpro = TopProperty;
+                    dockto = DockStatus.Top;
+                }
+
+                else if (Top + ActualHeight >= App.CurrScrnRect.Bottom) //dock bottom
+                {
+                    toval = App.CurrScrnRect.Bottom - pad;
+                    tgtpro = TopProperty;
+                    dockto = DockStatus.Bottom;
+                }
+                else {
+                    LastDockedTo = DockStatus.None;
+                    return;
+                }
+                LastDockedTo = dockto;
+            }
+            else //restore last docking position
+            {
+                dockto = LastDockedTo;
+                switch (LastDockedTo) {
+                    case DockStatus.Left:
                         toval = App.CurrScrnRect.Left - ActualWidth + pad;
                         tgtpro = LeftProperty;
-                        dockto = DockStatus.Left;
-                    }
-
-                    else if (Left + ActualWidth >= App.CurrScrnRect.Right) //dock right
-                    {
+                        break;
+                    case DockStatus.Right:
                         toval = App.CurrScrnRect.Right - pad;
                         tgtpro = LeftProperty;
-                        dockto = DockStatus.Right;
-                    }
-
-                    else if (Top <= App.CurrScrnRect.Top) //dock top
-                    {
+                        break;
+                    case DockStatus.Top:
                         toval = App.CurrScrnRect.Top - ActualHeight + pad;
                         tgtpro = TopProperty;
-                        dockto = DockStatus.Top;
-                    }
-
-                    else if (Top + ActualHeight >= App.CurrScrnRect.Bottom) //dock bottom
-                    {
+                        break;
+                    case DockStatus.Bottom:
                         toval = App.CurrScrnRect.Bottom - pad;
                         tgtpro = TopProperty;
-                        dockto = DockStatus.Bottom;
-                    }
-                    else {
-                        LastDockStatus = DockStatus.None;
+                        break;
+                    default:
                         return;
-                    }
-                    LastDockStatus = dockto;
                 }
-                else //'restore last docking position
-                {
-                    dockto = LastDockStatus;
-                    switch (LastDockStatus) {
-                        case DockStatus.Left:
-                            toval = App.CurrScrnRect.Left - ActualWidth + pad;
-                            tgtpro = LeftProperty;
-                            break;
-                        case DockStatus.Right:
-                            toval = App.CurrScrnRect.Right - pad;
-                            tgtpro = LeftProperty;
-                            break;
-                        case DockStatus.Top:
-                            toval = App.CurrScrnRect.Top - ActualHeight + pad;
-                            tgtpro = TopProperty;
-                            break;
-                        case DockStatus.Bottom:
-                            toval = App.CurrScrnRect.Bottom - pad;
-                            tgtpro = TopProperty;
-                            break;
-                        default:
-                            return;
-                    }
-                }
-
-                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 500))) {
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                };
-                var anim_fade = new DoubleAnimation(0.4, new Duration(new TimeSpan(0, 0, 0, 0, 300))) {
-                    BeginTime = new TimeSpan(0, 0, 0, 0, 200)
-                };
-                var anim_prop = new ObjectAnimationUsingKeyFrames();
-                anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
-                anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
-                BeginAnimation(tgtpro, anim_move);
-                BeginAnimation(OpacityProperty, anim_fade);
-                BeginAnimation(DockedToProperty, anim_prop);
             }
+
+            var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 500))) {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            var anim_fade = new DoubleAnimation(0.4, new Duration(new TimeSpan(0, 0, 0, 0, 300))) {
+                BeginTime = new TimeSpan(0, 0, 0, 0, 200)
+            };
+            var anim_prop = new ObjectAnimationUsingKeyFrames();
+            anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
+            anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
+            BeginAnimation(tgtpro, anim_move);
+            BeginAnimation(OpacityProperty, anim_fade);
+            BeginAnimation(DockedToProperty, anim_prop);
         }
 
         internal void UnDock()
         {
-            if ((int)DockedTo > 1) {
-                double toval;
-                DependencyProperty tgtpro;
-                //double pad = 15d;
-                DockStatus dockto;
-                if (DockedTo == DockStatus.Left) //Me.Left = App.CurrScrnRect.left - Me.ActualWidth + pad Then
-                {
-                    toval = App.CurrScrnRect.Left;
-                    tgtpro = LeftProperty;
-                    dockto = DockStatus.None;
-                }
-                else if (DockedTo == DockStatus.Right) //Me.Left = App.CurrScrnRect.right - pad Then
-                {
-                    toval = App.CurrScrnRect.Right - ActualWidth;
-                    tgtpro = LeftProperty;
-                    dockto = DockStatus.None;
-                }
-                else if (DockedTo == DockStatus.Top) //Me.Top = App.CurrScrnRect.top - Me.ActualHeight + pad Then
-                {
-                    toval = App.CurrScrnRect.Top;
-                    tgtpro = TopProperty;
-                    dockto = DockStatus.None;
-                }
-                else if (DockedTo == DockStatus.Bottom) //Me.Top = App.CurrScrnRect.bottom - pad Then
-                {
-                    toval = App.CurrScrnRect.Bottom - ActualHeight;
-                    tgtpro = TopProperty;
-                    dockto = DockStatus.None;
-                }
-                else
-                    return;
+            if (!DockedTo.Docked()) return; //not docked
 
-                var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop) {
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                };
-                var anim_fade = new DoubleAnimationUsingKeyFrames();
-                anim_fade.KeyFrames.Add(new DiscreteDoubleKeyFrame(1, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
-                var anim_prop = new ObjectAnimationUsingKeyFrames();
-                anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
-                anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
-
-                BeginAnimation(tgtpro, anim_move);
-                BeginAnimation(OpacityProperty, anim_fade);
-                BeginAnimation(DockedToProperty, anim_prop);
+            double toval;
+            DependencyProperty tgtpro;
+            //double pad = 15d;
+            DockStatus dockto;
+            if (DockedTo == DockStatus.Left) //Me.Left = App.CurrScrnRect.left - Me.ActualWidth + pad Then
+            {
+                toval = App.CurrScrnRect.Left;
+                tgtpro = LeftProperty;
+                dockto = DockStatus.None;
             }
+            else if (DockedTo == DockStatus.Right) //Me.Left = App.CurrScrnRect.right - pad Then
+            {
+                toval = App.CurrScrnRect.Right - ActualWidth;
+                tgtpro = LeftProperty;
+                dockto = DockStatus.None;
+            }
+            else if (DockedTo == DockStatus.Top) //Me.Top = App.CurrScrnRect.top - Me.ActualHeight + pad Then
+            {
+                toval = App.CurrScrnRect.Top;
+                tgtpro = TopProperty;
+                dockto = DockStatus.None;
+            }
+            else if (DockedTo == DockStatus.Bottom) //Me.Top = App.CurrScrnRect.bottom - pad Then
+            {
+                toval = App.CurrScrnRect.Bottom - ActualHeight;
+                tgtpro = TopProperty;
+                dockto = DockStatus.None;
+            }
+            else
+                return;
+
+            var anim_move = new DoubleAnimation(toval, new Duration(new TimeSpan(0, 0, 0, 0, 300)), FillBehavior.Stop) {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            var anim_fade = new DoubleAnimationUsingKeyFrames();
+            anim_fade.KeyFrames.Add(new DiscreteDoubleKeyFrame(1, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
+            var anim_prop = new ObjectAnimationUsingKeyFrames();
+            anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(DockStatus.Docking, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0))));
+            anim_prop.KeyFrames.Add(new DiscreteObjectKeyFrame(dockto, KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 500))));
+
+            BeginAnimation(tgtpro, anim_move);
+            BeginAnimation(OpacityProperty, anim_fade);
+            BeginAnimation(DockedToProperty, anim_prop);
+
+
+            if (!CurrentSetting.AutoDock) return;
+            //create timer if not already created, to dock when conditions met
+            if (DockTimer != null && DockTimer.IsEnabled) return;
+            DockTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(2) };
+            Debug.Print("DockTimer created.");
+
+            DockTimer.Tick += (s1, e1) => {
+                //!LastDockedTo.Docked() = not attached to any side
+                if (!CurrentSetting.AutoDock || DockedTo.Docked() || !LastDockedTo.Docked()) {
+                    DockTimer.Stop();
+                    DockTimer = null;
+                    Debug.Print("DockTimer stopped.");
+                }
+                else if (ShouldDock()) {
+                    DockToSide();
+                    DockTimer.Stop();
+                    DockTimer = null;
+                    Debug.Print("DockTimer stopped.");
+                }
+            };
+            DockTimer.Start();
+            Debug.Print("DockTimer started.");
         }
 
         /// <summary>
@@ -237,19 +261,20 @@ namespace DesktopNote
         private bool ShouldDock()
         {
 #if DEBUG
-            System.Diagnostics.Debug.Print(
-                (LastDockStatus != DockStatus.None) + ", " +
-                !RTB_Main.IsKeyboardFocusWithin + ", " +
-                !Win_Main.IsMouseOver + ", " +
-                !IsResizing + ", " +
-                (App.FormatWindow == null || !App.FormatWindow.MainWin.Equals(this) || App.FormatWindow.Opacity == 0) + ", " +
-                (App.SearchWindow == null || !App.SearchWindow.MainWin.Equals(this) || App.SearchWindow.Opacity == 0) + ", " +
-                (App.OptionsWindow == null || !App.OptionsWindow.MainWin.Equals(this) || App.OptionsWindow.Opacity == 0));
+            Debug.Print(
+                $@"Snapped: {LastDockedTo != DockStatus.None}; " +
+                $@"NoInteraction: {!RTB_Main.IsKeyboardFocusWithin && !Win_Main.IsMouseOver && !Win_Main.IsStylusOver}; " +
+                $@"NotResizing: {!IsResizing}; " +
+                $@"NoChildWin: {
+                    (App.FormatWindow == null || !App.FormatWindow.MainWin.Equals(this) || App.FormatWindow.Opacity == 0) &&
+                    (App.SearchWindow == null || !App.SearchWindow.MainWin.Equals(this) || App.SearchWindow.Opacity == 0) &&
+                    (App.OptionsWindow == null || !App.OptionsWindow.MainWin.Equals(this) || App.OptionsWindow.Opacity == 0)
+                }"
+            );
 #endif
             if (CurrentSetting.AutoDock &&
-                LastDockStatus != DockStatus.None &&
-                !RTB_Main.IsKeyboardFocusWithin &&
-                !Win_Main.IsMouseOver &&
+                LastDockedTo != DockStatus.None &&
+                !RTB_Main.IsKeyboardFocusWithin && !Win_Main.IsMouseOver && !Win_Main.IsStylusOver &&
                 !IsResizing &&
                 (App.FormatWindow == null || !App.FormatWindow.MainWin.Equals(this) || App.FormatWindow.Opacity == 0) &&
                 (App.SearchWindow == null || !App.SearchWindow.MainWin.Equals(this) || App.SearchWindow.Opacity == 0) &&
@@ -260,29 +285,21 @@ namespace DesktopNote
 
         private void Win_Main_MouseEnter(object sender, MouseEventArgs e)
         {
-            //undocking
-            if (CurrentSetting.AutoDock && (DockedTo != DockStatus.None || (int)LastDockStatus > 1)) {
-                UnDock();
-                //dock if conditions met in 1 min
-                if (DockTimer != null && DockTimer.IsEnabled) return;
-                DockTimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(2) };
-                DockTimerCountDown = 60;
-                DockTimer.Tick += (s1, e1) => {
-                    DockTimerCountDown -= 2;
-                    if (DockTimerCountDown <= 0 || (int)DockedTo > 1 || (int)LastDockStatus < 2) {
-                        DockTimer.Stop();
-                        DockTimer = null;
-                        return;
-                    }
+            if (!CurrentSetting.AutoDock || !DockedTo.Docked()) return;
 
-                    if (ShouldDock()) {
-                        DockToSide();
-                        DockTimer.Stop();
-                        DockTimer = null;
-                        return;
-                    }
+            if (CurrentSetting.UndockDelay > 0) {
+                if (UndockTimer != null && UndockTimer.IsEnabled) return;
+                UndockTimer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(CurrentSetting.UndockDelay) };
+                UndockTimer.Tick += (s1, e1) => {
+                    Debug.Print("UndockTimer tick.");
+                    UndockTimer.Stop();
+                    UndockTimer = null;
+                    if (IsMouseOver || IsStylusOver) UnDock();
                 };
-                DockTimer.Start();
+                UndockTimer.Start();
+            }
+            else {
+                UnDock();
             }
         }
 
@@ -374,12 +391,12 @@ namespace DesktopNote
             foreach (var path in paths) {
                 BitmapSource bs;
                 using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read)) {
-                    bs = Helpers.GetImageSource(fs);
+                    bs = GetImageSource(fs);
                 }
                 if (bs == null) continue;
 
                 var ele = RTB_Main.CaretPosition.GetAdjacentElement(LogicalDirection.Forward);
-                Helpers.GetParent<Paragraph>(ele, true)?.Inlines.Add(new Image() {
+                GetParent<Paragraph>(ele, true)?.Inlines.Add(new Image() {
                     Source = bs,
                     VerticalAlignment = VerticalAlignment.Bottom,
                     HorizontalAlignment = HorizontalAlignment.Left,
@@ -419,18 +436,18 @@ namespace DesktopNote
         {
             while (true) {
                 while (SaveCountDown <= 0) {
-                    if (SaveCoundDownCancel.IsCancellationRequested) return;
+                    if (SaveCountDownCancel.IsCancellationRequested) return;
                     Thread.Sleep(1000);
                 }
                 while (SaveCountDown > 0) {
-                    if (SaveCoundDownCancel.IsCancellationRequested) return;
+                    if (SaveCountDownCancel.IsCancellationRequested) return;
                     Thread.Sleep(500);
                     SaveCountDown -= 500;
                 }
 
                 bool isUIthread = Dispatcher.CheckAccess();
-                if (isUIthread) Helpers.SaveNote(this);
-                else Dispatcher.Invoke(() => Helpers.SaveNote(this));
+                if (isUIthread) SaveNote(this);
+                else Dispatcher.Invoke(() => SaveNote(this));
             }
         }
 
@@ -440,12 +457,12 @@ namespace DesktopNote
                 //update window size and position
                 CurrentSetting.Win_Pos = new Point(Left, Top);
                 CurrentSetting.Win_Size = new Size(Width, Height);
-                CurrentSetting.DockedTo = (int)LastDockStatus;
+                CurrentSetting.DockedTo = (int)LastDockedTo;
 
                 //save per-note, app settings and contents to file
-                var exMsg = Helpers.SaveNote(this);
+                var exMsg = SaveNote(this);
                 if (exMsg != null &&
-                    Helpers.MsgBox(
+                    MsgBox(
                         body: exMsg + "\r\n" + (string)App.Res["msgbox_not_saved_confirm"],
                         button: MessageBoxButton.YesNo,
                         image: MessageBoxImage.Exclamation) != MessageBoxResult.Yes) {
@@ -454,7 +471,7 @@ namespace DesktopNote
             }
 
             //cleaning up
-            SaveCoundDownCancel.Cancel();
+            SaveCountDownCancel.Cancel();
             CurrentSetting.PropertyChanged -= CurrentSetting_PropertyChanged;
             App.MainWindows.Remove(this);
             await SaveNoteTask;
@@ -481,7 +498,7 @@ namespace DesktopNote
             }
 
             //load settings and content
-            if (CurrentSetting.Flags.HasFlag(Setting.NoteFlag.Existing) && !Helpers.LoadNote(this)) {
+            if (CurrentSetting.Flags.HasFlag(Setting.NoteFlag.Existing) && !LoadNote(this)) {
                 Close(true); return;
             }
 
@@ -494,7 +511,7 @@ namespace DesktopNote
             Left = CurrentSetting.Win_Pos.X;
             Top = CurrentSetting.Win_Pos.Y;
 
-            LastDockStatus = (DockStatus)CurrentSetting.DockedTo;
+            LastDockedTo = (DockStatus)CurrentSetting.DockedTo;
             //DockedTo = DockStatus.None;
             RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
             RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
@@ -548,7 +565,7 @@ namespace DesktopNote
                 Task.Run(() => { Thread.Sleep(2000); Dispatcher.Invoke(() => DockToSide(true)); });
 
             //start save note thread
-            SaveNoteTask = Task.Run(SaveNoteThread, SaveCoundDownCancel.Token);
+            SaveNoteTask = Task.Run(SaveNoteThread, SaveCountDownCancel.Token);
 
             //add hook
             var source = PresentationSource.FromVisual(this) as System.Windows.Interop.HwndSource;
@@ -565,6 +582,10 @@ namespace DesktopNote
         private void CurrentSetting_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             SaveCountDown = SaveCountDownValue;
+            if (e.PropertyName == nameof(Setting.AutoDock)) {
+                DockTimer?.Stop(); DockTimer = null;
+                UndockTimer?.Stop(); UndockTimer = null;
+            }
         }
 
         private void resetPadding(TextElement ele)
@@ -626,14 +647,14 @@ namespace DesktopNote
                 win.Top = App.CurrScrnRect.Top + delta;
                 win.Left = App.CurrScrnRect.Left + +delta;
                 win.DockedTo = DockStatus.None;
-                win.LastDockStatus = DockStatus.None;
+                win.LastDockedTo = DockStatus.None;
                 i += 1;
             }
         }
 
         private void TM_NewNote_Click(object sender, RoutedEventArgs e)
         {
-            Helpers.NewNote();
+            NewNote();
         }
 
         private void TM_OpenNote_Click(object sender, RoutedEventArgs e)
@@ -643,9 +664,9 @@ namespace DesktopNote
             var visWin = App.MainWindows.Find(w => PresentationSource.FromVisual(w) != null);
             if (visWin == null) return;
             //using the last opened location
-            var path = Helpers.OpenFileDialog(visWin, false);
+            var path = OpenFileDialog(visWin, false);
             if (path == null) return;
-            Helpers.OpenNote(path)?.Show();
+            OpenNote(path)?.Show();
         }
 
         private void TrayIcon_TrayMouseDoubleClick(object sender, RoutedEventArgs e)

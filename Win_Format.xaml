@@ -2,7 +2,8 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:DesktopNote"
-        xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit" xmlns:Themes="clr-namespace:Xceed.Wpf.Toolkit.Themes;assembly=Xceed.Wpf.Toolkit" x:Class="DesktopNote.Win_Format" x:Name="FB1"
+        xmlns:wtk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        x:Class="DesktopNote.Win_Format" x:Name="FB1"
         CloseBehavior="FadeOutAndHide" Focusable="False" SizeToContent="WidthAndHeight"
         UseLayoutRounding="True" FontSize="10" ShowInTaskbar="False" ShowActivated="False" ButtonCloseVisible="False"
         Topmost="True" ResizeMode="NoResize" FadingIn="FB1_FadingIn" Loaded="FB1_Loaded">
