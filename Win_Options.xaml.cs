@@ -45,13 +45,12 @@ namespace DesktopNote
 
         private void CB_AutoDock_Click(object sender, RoutedEventArgs e)
         {
-            if (CB_AutoDock.IsChecked == true)
-            {
+            if (CB_AutoDock.IsChecked == true) {
                 MainWin.CurrentSetting.AutoDock = true;
                 MainWin.DockToSide(true);
+                MainWin.Topmost = true;
             }
-            else
-            {
+            else {
                 MainWin.CurrentSetting.AutoDock = false;
                 MainWin.UnDock();
                 MainWin.Topmost = false;

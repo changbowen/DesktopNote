@@ -83,6 +83,8 @@ namespace DesktopNote
 
             // check for updates
             Task.Run(() => {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
                 var localVer = Assembly.GetName().Version;
                 var req = WebRequest.CreateHttp($@"https://api.github.com/repos/changbowen/{nameof(DesktopNote)}/releases/latest");
                 req.ContentType = @"application/json; charset=utf-8";

@@ -15,7 +15,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.Resources>
             <Style TargetType="Button" BasedOn="{StaticResource ContentControlBaseStyle}">
@@ -52,13 +51,15 @@
             <wtk:IntegerUpDown x:Name="IUD_UndockDelay" BorderThickness="0" VerticalContentAlignment="Center"
                      Height="{Binding ActualHeight, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentControl}}}"/>
         </ContentControl>
-        
-        <CheckBox Grid.Row="3" x:Name="CB_AutoStart" Margin="4 2" Content="{StaticResource menu_auto_start}" Click="CB_AutoStart_Click" VerticalAlignment="Center"/>
-        <CheckBox Grid.Row="4" x:Name="CB_AutoDock" Margin="4 2" Content="{StaticResource menu_auto_dock}" Click="CB_AutoDock_Click" VerticalAlignment="Center"/>
-        <UniformGrid Grid.Row="3" Grid.Column="1" Rows="1" Grid.RowSpan="2" Margin="0 4">
-            <Button Grid.Row="2" Grid.Column="1" Content="{StaticResource menu_reset_formats}" Click="Button_ResetFormats_Click"/>
-            <Button Grid.Row="3" Grid.Column="4" Content="{StaticResource menu_reset_settings}" Click="Button_ResetSet_Click"/>
-            <Button Grid.Row="4" Grid.Column="4" Content="{StaticResource menu_about}" Click="Button_About_Click"/>
+
+        <StackPanel Grid.Row="3">
+            <CheckBox x:Name="CB_AutoStart" Margin="4 2" Content="{StaticResource menu_auto_start}" Click="CB_AutoStart_Click" VerticalAlignment="Center"/>
+            <CheckBox x:Name="CB_AutoDock" Margin="4 2" Content="{StaticResource menu_auto_dock}" Click="CB_AutoDock_Click" VerticalAlignment="Center"/>
+        </StackPanel>
+        <UniformGrid Grid.Row="3" Grid.Column="1" Rows="1" Margin="0 4">
+            <Button Content="{StaticResource menu_reset_formats}" Click="Button_ResetFormats_Click" VerticalAlignment="Bottom"/>
+            <Button Content="{StaticResource menu_reset_settings}" Click="Button_ResetSet_Click" VerticalAlignment="Bottom"/>
+            <Button Content="{StaticResource menu_about}" Click="Button_About_Click" VerticalAlignment="Bottom"/>
         </UniformGrid>
     </Grid>
 </l:RoundedWindow>

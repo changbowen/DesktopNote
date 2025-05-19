@@ -86,12 +86,9 @@ namespace DesktopNote
             var win = (MainWindow)d;
             if (ds == DockStatus.None) {
                 win.ResizeMode = ResizeMode.CanResizeWithGrip;
-                if (!win.CurrentSetting.AutoDock) win.Topmost = false;
-                else win.Topmost = true;
             }
             else {
                 win.ResizeMode = ResizeMode.NoResize;
-                win.Topmost = true;
             }
         }
 
@@ -510,6 +507,7 @@ namespace DesktopNote
             Height = CurrentSetting.Win_Size.Height;
             Left = CurrentSetting.Win_Pos.X;
             Top = CurrentSetting.Win_Pos.Y;
+            Topmost = CurrentSetting.AutoDock;
 
             LastDockedTo = (DockStatus)CurrentSetting.DockedTo;
             //DockedTo = DockStatus.None;
