@@ -513,6 +513,7 @@ namespace DesktopNote
             //DockedTo = DockStatus.None;
             RTB_Main.FontFamily = new FontFamily(CurrentSetting.Font);
             RTB_Main.Foreground = new SolidColorBrush(CurrentSetting.FontColor);
+            RTB_Main.CaretBrush = new SolidColorBrush(CurrentSetting.FontColor);
             RTB_Main.Background = new SolidColorBrush(CurrentSetting.BackColor);
             Rec_BG.Fill = new SolidColorBrush(CurrentSetting.PaperColor);
 

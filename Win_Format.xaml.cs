@@ -102,6 +102,7 @@ namespace DesktopNote
                         else //change default
                         {
                             RTB_Main.Foreground = new SolidColorBrush(e.NewValue.Value);
+                            RTB_Main.CaretBrush = new SolidColorBrush(e.NewValue.Value);
                             MainWin.CurrentSetting.FontColor = e.NewValue.Value;
                         }
                         break;
