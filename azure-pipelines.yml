@@ -13,7 +13,7 @@ trigger:
       - azure-pipelines.yml
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'windows-2022'
 
 variables:
   solution: '**/*.sln'
@@ -34,6 +34,7 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
+    vsVersion: '17.0'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     clean: true
